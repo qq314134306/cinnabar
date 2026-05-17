@@ -1,7 +1,24 @@
 # 紫微知道
 
-紫微斗数命盘分析工具，精准排盘 + AI 深度解读，支持一键自部署和多模型切换。
-<img width="1920" height="911" alt="image" src="https://github.com/user-attachments/assets/756c0de6-e31c-4166-913e-c2d0afd1cf15" />
+[![Stars](https://img.shields.io/github/stars/ruijayfeng/ziwei?style=social)](https://github.com/ruijayfeng/ziwei)
+[![Forks](https://img.shields.io/github/forks/ruijayfeng/ziwei?style=social)](https://github.com/ruijayfeng/ziwei)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/ruijayfeng/ziwei/blob/main/LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF)](https://vitejs.dev/)
+
+## 🌐 English
+
+**ZiweiKnows** is an open-source Zi Wei Dou Shu (紫微斗数) astrology chart calculator with AI-powered reading and interpretation.
+
+- **Precise Chart Calculation** - Based on iztro library, Zhongzhou school method, complete 12-palace configuration
+- **AI Interpretation** - Traditional fortune-teller style, structured output
+- **Annual Fortune Analysis** - Monthly trend analysis with Liurui叠宫 technique
+- **Dual Chart Matching** - Sihua interaction analysis for relationship compatibility
+- **Life K-Line** - AI-powered 100-year forecast visualization
+- **Share Card** - Destiny quotes card, one-click export & share
+
+**Tech Stack:** React 18 + TypeScript + Vite + Tailwind CSS + Glassmorphism + Recharts + ECharts + iztro + Multi-LLM Support
 
 ## 功能特性
 
