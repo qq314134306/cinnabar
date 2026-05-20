@@ -3,23 +3,24 @@
    高级玻璃态设计 + 精致导航交互
    ============================================================ */
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { BirthForm } from '@/components/BirthForm'
 import { ChartDisplay } from '@/components/chart'
 import { AIInterpretation } from '@/components/AIInterpretation'
 import { SettingsPanel } from '@/components/SettingsPanel'
 import { YearlyFortune } from '@/components/fortune'
 import { LifeKLine } from '@/components/kline'
+import { KLineIcon } from '@/components/icons/KLineIcon'
 import { MatchAnalysis } from '@/components/match'
 import { ShareCard } from '@/components/share'
 import { useChartStore } from '@/stores'
 
 type TabType = 'chart' | 'fortune' | 'kline' | 'match' | 'share'
 
-const TABS: Array<{ key: TabType; label: string; icon: string }> = [
+const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
   { key: 'chart', label: '命盘解读', icon: '☰' },
   { key: 'fortune', label: '年度运势', icon: '◎' },
-  { key: 'kline', label: '人生K线', icon: '⊹' },
+  { key: 'kline', label: '人生K线', icon: <KLineIcon className="h-4 w-4" /> },
   { key: 'match', label: '双人合盘', icon: '⚭' },
   { key: 'share', label: '分享卡片', icon: '◈' },
 ]
@@ -110,7 +111,7 @@ export default function App() {
                   {/* 内容 */}
                   <span className="relative flex items-center gap-2">
                     <span className={`
-                      text-xs transition-all duration-200
+                      inline-flex h-4 w-4 items-center justify-center text-xs transition-all duration-200
                       ${activeTab === tab.key ? 'text-gold' : 'opacity-50 group-hover:opacity-70'}
                     `}>
                       {tab.icon}
@@ -189,7 +190,7 @@ export default function App() {
                 }
               `}
             >
-              <span className="text-base">{tab.icon}</span>
+              <span className="inline-flex h-5 w-5 items-center justify-center text-base">{tab.icon}</span>
               <span className="text-xs">{tab.label}</span>
               {/* 选中指示点 */}
               {activeTab === tab.key && (

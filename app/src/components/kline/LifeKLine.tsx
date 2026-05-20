@@ -23,6 +23,7 @@ import {
   LabelList,
 } from 'recharts'
 import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
+import { KLineIcon } from '@/components/icons/KLineIcon'
 import { ScoreRadar } from './ScoreRadar'
 import {
   generateLifetimeKLines,
@@ -344,7 +345,14 @@ export function LifeKLine() {
             disabled={isGenerating}
             className="px-8 py-3 rounded-xl bg-gradient-to-r from-star to-gold text-night font-medium hover:shadow-[0_0_30px_rgba(124,58,237,0.4)] transition-all duration-300 disabled:opacity-50"
           >
-            {isGenerating ? (progress || '生成中...') : '✨ AI 生成人生 K 线'}
+            {isGenerating ? (
+              progress || '生成中...'
+            ) : (
+              <span className="inline-flex items-center gap-2">
+                <KLineIcon className="h-4 w-4" />
+                AI 生成人生 K 线
+              </span>
+            )}
           </button>
           {!llmConfig.apiKey && (
             <p className="text-text-muted text-xs">提示：配置 API Key 可使用 AI 分析命盘生成</p>
@@ -537,7 +545,7 @@ export function LifeKLine() {
 function EmptyState() {
   return (
     <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-      <div className="text-4xl mb-4 opacity-30">📈</div>
+      <KLineIcon className="mx-auto mb-4 h-12 w-12 text-gold/30" />
       <p className="text-text-muted mb-4">
         请先在「命盘解读」中输入您的生辰信息
       </p>

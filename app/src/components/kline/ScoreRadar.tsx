@@ -11,6 +11,7 @@ import * as echarts from 'echarts/core'
 import { RadarChart } from 'echarts/charts'
 import { RadarComponent, TooltipComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
+import { RadarIcon } from '@/components/icons/KLineIcon'
 import type { FortuneScore } from '@/lib/fortune-score'
 
 // 注册 ECharts 组件
@@ -104,8 +105,9 @@ export function ScoreRadar({ score, period }: ScoreRadarProps) {
     >
       {/* 标题 */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm text-text-muted font-medium">
-          📊 {period} 运势分析
+        <h3 className="flex items-center gap-2 text-sm text-text-muted font-medium">
+          <RadarIcon className="h-4 w-4 text-gold/70" />
+          {period} 运势分析
         </h3>
         <div className="flex items-center gap-2">
           <span
