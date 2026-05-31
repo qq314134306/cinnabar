@@ -49,6 +49,9 @@ npm run test -- sync-zwknows
 
 `src/components/ui/`: Small reusable UI primitives.
 
+`src/components/OpenSourceLinks.tsx`: GitHub repository and license links for
+open source attribution in the app shell.
+
 `src/lib/`: Business helpers for date handling, astrology support, true solar
 time, birthplace data, LLM wiring, and scoring.
 

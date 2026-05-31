@@ -38,6 +38,7 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 ## Important Files
 
 - `app/src/components/BirthForm.tsx` - birth input, birthplace matching entry, and true solar time options.
+- `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers.
 - `app/src/lib/birthplace-data.json` - local city/region coordinate dataset.
 - `app/src/lib/birth-date.ts` - birth date handling.

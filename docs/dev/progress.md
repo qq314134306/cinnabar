@@ -13,6 +13,7 @@
 
 ## Recently Completed
 
+- Added visible GitHub repository and MIT License links to the app shell.
 - Added true solar time correction support.
 - Added free-text birthplace matching.
 - Added local city and region coordinate dataset from `88250/city-geo`.
@@ -61,6 +62,8 @@ known and is not by itself a failure.
 - Add feature-level tests whenever true solar time or birthplace matching behavior
   changes.
 - Use GitHub issue templates for new feature, bug, and internal development work.
+- Keep the in-app open source links pointed at the source repository unless the
+  public repository strategy changes.
 
 [PROTOCOL]: Update this file after each feature, fix, release, deployment change,
 or notable verification run.
