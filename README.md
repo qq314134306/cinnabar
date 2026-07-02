@@ -20,7 +20,7 @@
 <p align="center">
   <a href="https://github.com/ruijayfeng/ziwei"><img alt="Stars" src="https://img.shields.io/github/stars/ruijayfeng/ziwei?style=social" /></a>
   <a href="https://github.com/ruijayfeng/ziwei"><img alt="Forks" src="https://img.shields.io/github/forks/ruijayfeng/ziwei?style=social" /></a>
-  <a href="https://github.com/ruijayfeng/ziwei/blob/main/LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-green.svg" /></a>
+  <a href="https://github.com/ruijayfeng/ziwei/blob/main/LICENSE"><img alt="GPLv3 License" src="https://img.shields.io/badge/License-GPLv3-blue.svg" /></a>
   <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-blue" /></a>
   <a href="https://react.dev/"><img alt="React" src="https://img.shields.io/badge/React-19-61DAFB" /></a>
   <a href="https://vite.dev/"><img alt="Vite" src="https://img.shields.io/badge/Vite-7-646CFF" /></a>
@@ -139,7 +139,7 @@ app/
 
 ## 开源协议
 
-MIT License
+GPLv3 License
 
 ## 致谢
 
