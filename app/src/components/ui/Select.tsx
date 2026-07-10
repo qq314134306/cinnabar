@@ -1,5 +1,5 @@
 /* ============================================================
-   Select 组件 - 高级玻璃态风格
+   Select — glassmorphism style
    ============================================================ */
 
 import type { SelectHTMLAttributes } from 'react'
@@ -57,7 +57,7 @@ export function Select({ label, options, error, className = '', id, ...props }: 
             </option>
           ))}
         </select>
-        {/* 下拉箭头 */}
+        {/* Dropdown arrow */}
         <div
           className="
             absolute right-3 top-1/2 -translate-y-1/2

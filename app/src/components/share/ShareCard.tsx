@@ -1,6 +1,6 @@
 /* ============================================================
-   命格金句分享卡片
-   紫微斗数命理风格 · 适合小红书分享
+   Share card — a quotable "essence of your chart" image
+   Cinnabar seal styling, exported with html2canvas.
    ============================================================ */
 
 import { useRef, useState, useCallback } from 'react'
@@ -8,16 +8,17 @@ import html2canvas from 'html2canvas'
 import { useChartStore, useContentCacheStore } from '@/stores'
 import { Button } from '@/components/ui'
 import type { FunctionalAstrolabe } from '@/lib/astro'
+import { translateFiveElementsClass, translateGanZhi, translateStarLabel } from '@/lib/ziwei-glossary'
 
 /* ------------------------------------------------------------
-   字体常量 (html2canvas 不支持 CSS 变量，需硬编码)
+   Fonts (html2canvas cannot resolve CSS variables — hardcoded)
    ------------------------------------------------------------ */
 
-const FONT_BRUSH = "'Ma Shan Zheng', 'STKaiti', 'KaiTi', cursive"
-const FONT_SERIF = "'Noto Serif SC', 'Georgia', serif"
+const FONT_DISPLAY = "'Cormorant Garamond', 'Georgia', serif"
+const FONT_BODY = "'Inter', system-ui, sans-serif"
 
 /* ------------------------------------------------------------
-   天干地支转换
+   Sexagenary year (stem-branch) helpers
    ------------------------------------------------------------ */
 
 const STEMS = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸']
@@ -30,59 +31,58 @@ function yearToGanZhi(year: number): string {
 }
 
 /* ------------------------------------------------------------
-   从 AI 解读中提取金句
+   Pull a quotable passage from the AI reading
    ------------------------------------------------------------ */
 
 function extractQuote(content: string): string | null {
-  // 尝试匹配 "命格金句" 章节
-  const sectionMatch = content.match(/###\s*陆[·.、]\s*命格金句[\s\S]*?(?=###|---|\n\n\n|$)/)
-  if (sectionMatch) {
-    // 提取引号内的内容
-    const quotes = sectionMatch[0].match(/"([^"]+)"/g)
-    if (quotes && quotes.length > 0) {
-      return quotes.map(q => q.replace(/"/g, '')).join('\n')
-    }
-    // 尝试提取 > 引用块
-    const blockQuote = sectionMatch[0].match(/>\s*[""]([^""]+)[""]/)
-    if (blockQuote) {
-      return blockQuote[1]
-    }
+  // Prefer explicit double-quoted sentences from the reading
+  const quotes = content.match(/"([^"]{20,240})"/g)
+  if (quotes && quotes.length > 0) {
+    return quotes[0].replace(/"/g, '')
+  }
+  // Fall back to the opening sentence of the reading
+  const plain = content
+    .replace(/^#.*$/gm, '')
+    .replace(/[*_>`]/g, '')
+    .trim()
+  const firstSentence = plain.match(/[^.!?]{40,220}[.!?]/)
+  if (firstSentence) {
+    return firstSentence[0].trim()
   }
   return null
 }
 
 /* ------------------------------------------------------------
-   获取命宫主星
+   Life Palace main stars
    ------------------------------------------------------------ */
 
 function getLifePalaceStars(chart: FunctionalAstrolabe): string {
   const lifePalace = chart.palaces?.find((p) => p.name === '命宫')
-  if (!lifePalace?.majorStars?.length) return '未知'
-  return lifePalace.majorStars.map((s) => String(s.name).replace('星', '')).join('·')
+  if (!lifePalace?.majorStars?.length) return 'Unknown'
+  return lifePalace.majorStars.map((s) => translateStarLabel(String(s.name))).join(' · ')
 }
 
 /* ------------------------------------------------------------
-   获取格局名称
+   Notable pattern detection (simplified)
    ------------------------------------------------------------ */
 
 function getPatternName(chart: FunctionalAstrolabe): string | null {
-  // 简化版格局判断 - 可后续扩展
   const lifePalace = chart.palaces?.find((p) => p.name === '命宫')
   const stars = lifePalace?.majorStars?.map((s) => String(s.name)) || []
 
-  if (stars.includes('紫微') && stars.includes('天府')) return '紫府同宫格'
-  if (stars.includes('紫微') && stars.includes('贪狼')) return '紫贪同宫格'
-  if (stars.includes('紫微') && stars.includes('天相')) return '紫相同宫格'
-  if (stars.includes('太阳') && stars.includes('太阴')) return '日月同宫格'
-  if (stars.includes('天机') && stars.includes('太阴')) return '机月同梁格'
-  if (stars.includes('廉贞') && stars.includes('贪狼')) return '廉贪同宫格'
-  if (stars.includes('武曲') && stars.includes('贪狼')) return '武贪同宫格'
+  if (stars.includes('紫微') && stars.includes('天府')) return 'Emperor & Treasurer united'
+  if (stars.includes('紫微') && stars.includes('贪狼')) return 'Emperor & Desirer united'
+  if (stars.includes('紫微') && stars.includes('天相')) return 'Emperor & Minister united'
+  if (stars.includes('太阳') && stars.includes('太阴')) return 'Sun & Moon united'
+  if (stars.includes('天机') && stars.includes('太阴')) return 'Strategist & Moon pattern'
+  if (stars.includes('廉贞') && stars.includes('贪狼')) return 'Firebrand & Desirer united'
+  if (stars.includes('武曲') && stars.includes('贪狼')) return 'General & Desirer united'
 
   return null
 }
 
 /* ------------------------------------------------------------
-   分享卡片组件
+   Share card component
    ------------------------------------------------------------ */
 
 export function ShareCard() {
@@ -93,82 +93,77 @@ export function ShareCard() {
   const [customQuote, setCustomQuote] = useState('')
   const [isEditing, setIsEditing] = useState(false)
 
-  // 从 AI 解读中提取金句
   const extractedQuote = aiInterpretation ? extractQuote(aiInterpretation) : null
-  const displayQuote = customQuote || extractedQuote || '命由天定，事在人为。\n知命而不惧，顺势而为之。'
+  const displayQuote = customQuote || extractedQuote || 'Your chart holds the map.\nHow you walk it is yours to choose.'
 
-  // 命盘信息
   const ganZhi = birthInfo ? yearToGanZhi(birthInfo.year) : ''
-  const gender = birthInfo?.gender === 'male' ? '乾造' : '坤造'
+  const ganZhiEn = ganZhi ? translateGanZhi(ganZhi) : ''
   const stars = chart ? getLifePalaceStars(chart) : ''
   const pattern = chart ? getPatternName(chart) : null
-  const fiveElements = chart?.fiveElementsClass || ''
+  const fiveElements = chart ? translateFiveElementsClass(chart.fiveElementsClass) : ''
 
   const handleDownload = useCallback(async () => {
     if (!cardRef.current) return
 
     setGenerating(true)
     try {
-      // 等待字体加载完成
       await document.fonts.ready
 
       const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: '#0a0a12',
+        backgroundColor: '#12132b',
         scale: 2,
         useCORS: true,
-        logging: true,  // 开启日志
         allowTaint: true,
       })
 
       const dataUrl = canvas.toDataURL('image/png')
 
-      // 创建下载链接
       const link = document.createElement('a')
-      link.download = `紫微命格-${ganZhi}${gender}.png`
+      link.download = `cinnabar-reading-${ganZhiEn.toLowerCase() || 'chart'}.png`
       link.href = dataUrl
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
     } catch (err) {
-      console.error('生成图片失败:', err)
-      alert(`图片生成失败: ${err instanceof Error ? err.message : '未知错误'}`)
+      console.error('Image generation failed:', err)
+      alert(`Image generation failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setGenerating(false)
     }
-  }, [ganZhi, gender])
+  }, [ganZhiEn])
 
   if (!chart || !birthInfo) {
     return (
       <div className="text-center py-12 text-text-muted">
         <div className="text-4xl mb-3 opacity-30">✦</div>
-        <p>请先生成命盘，再创建分享卡片</p>
+        <p>Cast your chart first, then create a share card.</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-6 max-w-lg mx-auto">
-      {/* 提示信息 */}
+      {/* Hint */}
       {!extractedQuote && (
         <div className="text-center text-text-muted text-sm px-4">
-          <p>💡 先进行 AI 命盘解读，即可自动提取专属金句</p>
+          <p>💡 Get your AI reading first and a quote will be pulled from it automatically.</p>
         </div>
       )}
 
-      {/* 卡片预览 - 所有颜色硬编码，避免 oklab */}
+      {/* Card preview — hardcoded colors (html2canvas can't parse oklab) */}
       <div
         ref={cardRef}
         style={{
           width: '360px',
           height: '560px',
-          background: '#0c0c18',
+          background: '#12132b',
           borderRadius: '16px',
           position: 'relative',
           overflow: 'hidden',
           margin: '0 auto',
         }}
       >
-        {/* 外边框 - 双线描金 */}
+        {/* Double gold border */}
         <div
           style={{
             position: 'absolute',
@@ -177,7 +172,7 @@ export function ShareCard() {
             right: '8px',
             bottom: '8px',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 215, 0, 0.15)',
+            border: '1px solid rgba(201, 162, 75, 0.25)',
             pointerEvents: 'none',
           }}
         />
@@ -189,18 +184,18 @@ export function ShareCard() {
             right: '12px',
             bottom: '12px',
             borderRadius: '8px',
-            border: '1px solid rgba(255, 215, 0, 0.08)',
+            border: '1px solid rgba(201, 162, 75, 0.12)',
             pointerEvents: 'none',
           }}
         />
 
-        {/* 四角装饰 */}
-        <div style={{ position: 'absolute', top: '16px', left: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
-        <div style={{ position: 'absolute', top: '16px', right: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
-        <div style={{ position: 'absolute', bottom: '16px', left: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
-        <div style={{ position: 'absolute', bottom: '16px', right: '16px', color: 'rgba(212, 175, 55, 0.3)', fontSize: '18px' }}>✦</div>
+        {/* Corner stars */}
+        <div style={{ position: 'absolute', top: '16px', left: '16px', color: 'rgba(201, 162, 75, 0.35)', fontSize: '18px' }}>✦</div>
+        <div style={{ position: 'absolute', top: '16px', right: '16px', color: 'rgba(201, 162, 75, 0.35)', fontSize: '18px' }}>✦</div>
+        <div style={{ position: 'absolute', bottom: '16px', left: '16px', color: 'rgba(201, 162, 75, 0.35)', fontSize: '18px' }}>✦</div>
+        <div style={{ position: 'absolute', bottom: '16px', right: '16px', color: 'rgba(201, 162, 75, 0.35)', fontSize: '18px' }}>✦</div>
 
-        {/* 内容区 */}
+        {/* Content */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -211,37 +206,38 @@ export function ShareCard() {
           display: 'flex',
           flexDirection: 'column',
         }}>
-          {/* 顶部星辰装饰线 */}
+          {/* Star divider */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div style={{ width: '48px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
-            <span style={{ color: 'rgba(212, 175, 55, 0.5)', fontSize: '12px', letterSpacing: '0.1em' }}>☆ · ☆ · ☆</span>
-            <div style={{ width: '48px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
+            <div style={{ width: '48px', height: '1px', background: 'rgba(201, 162, 75, 0.35)' }} />
+            <span style={{ color: 'rgba(201, 162, 75, 0.55)', fontSize: '12px', letterSpacing: '0.1em' }}>☆ · ☆ · ☆</span>
+            <div style={{ width: '48px', height: '1px', background: 'rgba(201, 162, 75, 0.35)' }} />
           </div>
 
-          {/* 标题 */}
+          {/* Title */}
           <div style={{ textAlign: 'center', marginBottom: '16px' }}>
             <h2
               style={{
-                fontSize: '20px',
-                letterSpacing: '0.2em',
-                color: '#FCD34D',
-                fontFamily: FONT_SERIF,
+                fontSize: '22px',
+                letterSpacing: '0.14em',
+                color: '#C9A24B',
+                fontFamily: FONT_DISPLAY,
                 margin: 0,
               }}
             >
-              紫微命格
+              THE ESSENCE OF YOUR CHART
             </h2>
           </div>
 
-          {/* 金句主体 */}
+          {/* Quote */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div
               style={{
-                fontSize: '18px',
-                lineHeight: '2',
-                color: '#FFFBEB',
+                fontSize: '19px',
+                lineHeight: '1.8',
+                color: '#F3ECDD',
                 whiteSpace: 'pre-line',
-                fontFamily: FONT_BRUSH,
+                fontFamily: FONT_DISPLAY,
+                fontStyle: 'italic',
                 textAlign: 'center',
                 padding: '0 16px',
               }}
@@ -250,37 +246,37 @@ export function ShareCard() {
             </div>
           </div>
 
-          {/* 分隔线 */}
+          {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ width: '64px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
-            <span style={{ color: 'rgba(212, 175, 55, 0.4)', fontSize: '12px' }}>❖</span>
-            <div style={{ width: '64px', height: '1px', background: 'rgba(212, 175, 55, 0.3)' }} />
+            <div style={{ width: '64px', height: '1px', background: 'rgba(201, 162, 75, 0.35)' }} />
+            <span style={{ color: 'rgba(201, 162, 75, 0.45)', fontSize: '12px' }}>❖</span>
+            <div style={{ width: '64px', height: '1px', background: 'rgba(201, 162, 75, 0.35)' }} />
           </div>
 
-          {/* 命盘信息 */}
+          {/* Chart facts */}
           <div style={{ textAlign: 'center' }}>
             <p
               style={{
                 fontSize: '14px',
                 letterSpacing: '0.05em',
-                color: 'rgba(252, 211, 77, 0.8)',
-                fontFamily: FONT_SERIF,
+                color: 'rgba(224, 192, 120, 0.85)',
+                fontFamily: FONT_BODY,
                 margin: '0 0 8px 0',
               }}
             >
-              命宫主星：{stars}
+              Life Palace stars: {stars}
             </p>
             {pattern && (
-              <p style={{ fontSize: '12px', color: 'rgba(212, 175, 55, 0.6)', margin: '0 0 4px 0' }}>
-                格局：{pattern}
+              <p style={{ fontSize: '12px', color: 'rgba(201, 162, 75, 0.65)', fontFamily: FONT_BODY, margin: '0 0 4px 0' }}>
+                Pattern: {pattern}
               </p>
             )}
-            <p style={{ fontSize: '12px', color: 'rgba(212, 175, 55, 0.5)', margin: 0 }}>
+            <p style={{ fontSize: '12px', color: 'rgba(201, 162, 75, 0.55)', fontFamily: FONT_BODY, margin: 0 }}>
               {fiveElements}
             </p>
           </div>
 
-          {/* 印章 + 年份 */}
+          {/* Cinnabar seal + year */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '16px' }}>
             <div
               style={{
@@ -290,46 +286,46 @@ export function ShareCard() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '4px',
-                border: '1px solid rgba(255, 180, 0, 0.4)',
-                background: 'rgba(255, 180, 0, 0.05)',
-                color: 'rgba(212, 175, 55, 0.7)',
-                fontSize: '14px',
-                fontFamily: FONT_SERIF,
+                border: '1px solid rgba(178, 58, 46, 0.7)',
+                background: 'rgba(178, 58, 46, 0.85)',
+                color: '#F3ECDD',
+                fontSize: '16px',
+                fontFamily: FONT_DISPLAY,
               }}
             >
-              命
+              ☆
             </div>
-            <p style={{ color: 'rgba(252, 211, 77, 0.6)', fontSize: '14px', letterSpacing: '0.1em', margin: 0 }}>
-              {ganZhi}年 · {gender}
+            <p style={{ color: 'rgba(224, 192, 120, 0.65)', fontSize: '14px', letterSpacing: '0.08em', fontFamily: FONT_BODY, margin: 0 }}>
+              {ganZhiEn} Year
             </p>
           </div>
 
-          {/* 底部水印 */}
-          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(212, 175, 55, 0.1)', textAlign: 'center' }}>
-            <p style={{ color: 'rgba(212, 175, 55, 0.3)', fontSize: '12px', letterSpacing: '0.2em', margin: 0 }}>
-              ─── 紫微知道 ───
+          {/* Watermark */}
+          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid rgba(201, 162, 75, 0.12)', textAlign: 'center' }}>
+            <p style={{ color: 'rgba(201, 162, 75, 0.4)', fontSize: '12px', letterSpacing: '0.25em', fontFamily: FONT_BODY, margin: 0 }}>
+              ─── CINNABAR ───
             </p>
           </div>
         </div>
       </div>
 
-      {/* 编辑金句 */}
+      {/* Edit quote */}
       <div className="space-y-3">
         {isEditing ? (
           <div className="space-y-2">
             <textarea
               value={customQuote}
               onChange={(e) => setCustomQuote(e.target.value)}
-              placeholder="输入自定义金句，每句话换行..."
+              placeholder="Write your own quote — line breaks are kept..."
               className="w-full h-24 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-text placeholder:text-text-muted focus:outline-none focus:border-gold/30 resize-none"
-              style={{ fontFamily: FONT_BRUSH }}
+              style={{ fontFamily: FONT_DISPLAY }}
             />
             <div className="flex gap-2">
               <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
-                取消
+                Cancel
               </Button>
               <Button size="sm" onClick={() => setIsEditing(false)}>
-                确定
+                Done
               </Button>
             </div>
           </div>
@@ -338,12 +334,12 @@ export function ShareCard() {
             onClick={() => setIsEditing(true)}
             className="w-full py-2 text-sm text-text-muted hover:text-text-secondary transition-colors"
           >
-            ✎ 自定义金句
+            ✎ Customize the quote
           </button>
         )}
       </div>
 
-      {/* 下载按钮 */}
+      {/* Download */}
       <Button
         onClick={handleDownload}
         disabled={generating}
@@ -353,15 +349,15 @@ export function ShareCard() {
         {generating ? (
           <span className="flex items-center justify-center gap-2">
             <span className="w-4 h-4 border-2 border-night border-t-transparent rounded-full animate-spin" />
-            生成中...
+            Generating...
           </span>
         ) : (
-          '保存分享图'
+          'Save Share Image'
         )}
       </Button>
 
       <p className="text-center text-text-muted text-xs">
-        长按保存图片，分享到小红书 📕
+        Save the image and share it anywhere ✨
       </p>
     </div>
   )

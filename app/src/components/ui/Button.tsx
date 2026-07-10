@@ -1,5 +1,5 @@
 /* ============================================================
-   Button 组件 - 高级渐变风格
+   Button — gradient style
    ============================================================ */
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
@@ -69,7 +69,7 @@ export function Button({
       disabled={disabled}
       {...props}
     >
-      {/* 悬浮光效层 */}
+      {/* Hover light sweep */}
       <span
         className="
           absolute inset-0 opacity-0
@@ -80,7 +80,7 @@ export function Button({
           pointer-events-none
         "
       />
-      {/* 内容 */}
+      {/* Content */}
       <span className="relative z-10 flex items-center justify-center gap-2">
         {children}
       </span>

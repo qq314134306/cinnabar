@@ -1,5 +1,5 @@
 /* ============================================================
-   Input 组件 - 高级玻璃态风格
+   Input — glassmorphism style
    ============================================================ */
 
 import type { InputHTMLAttributes } from 'react'
@@ -40,7 +40,7 @@ export function Input({ label, error, hint, className = '', id, ...props }: Inpu
           `}
           {...props}
         />
-        {/* 底部发光线 */}
+        {/* Bottom glow line */}
         <div
           className="
             absolute bottom-0 left-1/2 -translate-x-1/2
