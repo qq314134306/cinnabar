@@ -16,7 +16,7 @@
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
 import { extractKnowledge } from '../knowledge'
 import { buildGuidancePromptContext } from '../knowledge-db'
-import { chat, type LLMConfig } from './llm'
+import { chat } from './llm'
 
 /* ============================================================
    类型定义
@@ -1322,7 +1322,6 @@ function parseLLMKLineResponse(response: string): LLMKLineItem[] | null {
 export async function generateKLinesWithLLM(
   chart: FunctionalAstrolabe,
   birthYear: number,
-  llmConfig: LLMConfig,
   onProgress?: (progress: string) => void
 ): Promise<LifetimeKLinePoint[]> {
   onProgress?.('正在分析命盘...')
@@ -1332,7 +1331,7 @@ export async function generateKLinesWithLLM(
 
   onProgress?.('AI 正在推演运势走向...')
 
-  const response = await chat(llmConfig, [
+  const response = await chat([
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt },
   ])
