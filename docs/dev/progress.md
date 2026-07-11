@@ -13,6 +13,11 @@
 
 ## Recently Completed
 
+- Pricing/PayPal follow-up: raised the 1-Year Forecast to $9.90 (5-Year stays
+  $14.90); added a "just $2.98/year — best value" badge on the 5-Year card
+  (computed from `TIER_PRICES`, not hardcoded); forced the PayPal JS SDK to
+  `locale=en_US` (currency stays USD) so the buttons and checkout popup
+  render in English regardless of the visitor's country/browser locale.
 - Added a paywall below the free reading: "Unlock Your Future Report" with
   1-Year ($6.90) and 5-Year ($14.90, "Most Popular", gold-bordered) tiers,
   checked out via PayPal Smart Payment Buttons (`app/src/lib/paypal.ts`,
