@@ -13,7 +13,28 @@
 
 ## Recently Completed
 
-- Added visible GitHub repository and MIT License links to the app shell.
+- Review feedback round: birthplace matching now accepts pinyin ("Zhu Zhou" /
+  "zhuzhou" / "ZHUZHOU" all match 株洲, shown as "Zhuzhou") via pinyin-pro, and
+  supports ~230 major world cities (`app/src/lib/world-cities.json`) with
+  DST-aware true-solar-time correction using each city's IANA timezone through
+  the built-in Intl API — no timezone library. Unmatched cities degrade
+  gracefully with friendly copy. Placeholder now "e.g. New York, London, Tokyo".
+- Rebranded the site as Cinnabar ("Eastern Astrology, in English"): full English
+  UI, new Midnight Indigo / Cinnabar Red / Imperial Purple / Celestial Gold /
+  Parchment palette, English fonts, and English chart terminology via a new
+  glossary layer (`app/src/lib/ziwei-glossary.ts`) with coverage tests.
+- Replaced the client-side multi-provider LLM layer with a Vercel Edge Function
+  (`app/api/interpret.ts`) proxying DeepSeek; `DEEPSEEK_API_KEY` is read
+  server-side only and the user-facing API key settings panel was removed.
+- Rebuilt AI readings on an English prompt system (base system prompt, Scholar /
+  Old Sage persona toggle, free-reading and compatibility templates) grounded in
+  a generated English CHART FACTS block.
+- Hid Yearly Fortune and Life K-Line from navigation (code retained, adapted to
+  the new LLM client).
+- Pointed `package-lock.json` resolved URLs at registry.npmjs.org (previously
+  registry.npmmirror.com, which some build environments block).
+- Added visible GitHub repository and MIT License links to the app shell (label
+  since updated to GPLv3).
 - Added true solar time correction support.
 - Added free-text birthplace matching.
 - Added local city and region coordinate dataset from `88250/city-geo`.

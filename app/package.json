@@ -19,6 +19,7 @@
     "echarts-for-react": "^3.0.5",
     "html2canvas": "^1.4.1",
     "iztro": "^2.5.8",
+    "pinyin-pro": "^3.28.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-markdown": "^10.1.0",

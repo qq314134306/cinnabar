@@ -69,3 +69,27 @@ code and tests.
 
 [PROTOCOL]: Add a new decision when a choice affects future implementation,
 deployment, product behavior, or contributor workflow.
+
+## D004 - English-Only Presentation Over a zh-CN Engine Core
+
+The iztro engine keeps producing zh-CN star/palace/branch names internally, and
+every string comparison in the codebase stays keyed on those zh-CN values. All
+translation to English happens at the presentation layer through
+`app/src/lib/ziwei-glossary.ts`, following the Cinnabar glossary (majors as
+pinyin + archetype, palaces as "X Palace", Four Transformations as
+Prosperity/Power/Fame/Obstacle).
+
+Consequence: never switch the engine's output language; add or adjust English
+labels in the glossary instead. A coverage test asserts every engine-emittable
+star and palace name translates without CJK remnants.
+
+## D005 - Server-Side LLM Key Via Vercel Edge Proxy
+
+AI readings call `/api/interpret`, a Vercel Edge Function that forwards to
+DeepSeek (`deepseek-chat`) and streams SSE back. `DEEPSEEK_API_KEY` is read only
+from the server environment. The former in-browser multi-provider layer and the
+API key settings panel were removed.
+
+Consequence: deployments must set `DEEPSEEK_API_KEY` in the Vercel project
+environment. Local `vite dev`/`vite preview` do not serve the function; use
+`vercel dev` to exercise AI readings locally.

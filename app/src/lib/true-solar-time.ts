@@ -1,5 +1,6 @@
 /**
  * [INPUT]: Depends on birth date, selected shichen, and birthplace text
+ *          (Chinese names, pinyin like "Zhu Zhou", or world cities like "New York")
  * [OUTPUT]: Provides birthplace matching and true-solar-time birth resolution
  * [POS]: Domain helper between BirthForm input and iztro chart generation
  * [PROTOCOL]: Update this header when changed, then check AGENTS.md/CLAUDE.md
@@ -10,6 +11,14 @@ export interface Birthplace {
   province?: string
   city?: string
   area?: string
+  country?: string
+  /** English display name (pinyin for Chinese cities), populated by the async loader. */
+  enName?: string
+  /** IANA timezone (e.g. "America/New_York"). Defaults to Asia/Shanghai when absent. */
+  tz?: string
+  aliases?: string[]
+  /** Normalized latin search keys (pinyin or English), populated by the async loader. */
+  latinKeys?: string[]
   longitude: number
   latitude?: number
 }
@@ -42,9 +51,9 @@ export interface ResolvedBirthTime {
   location: Birthplace | null
 }
 
-const BEIJING_STANDARD_LONGITUDE = 120
 const MINUTES_PER_LONGITUDE_DEGREE = 4
 const REPRESENTATIVE_MINUTE = 0
+const DEFAULT_TIMEZONE = 'Asia/Shanghai'
 
 const SHICHEN_NAMES = [
   '子时',
@@ -74,12 +83,50 @@ export function findBirthplaceInData(input: string | undefined, birthplaces: Bir
   const normalized = normalizePlace(input)
   if (!normalized) return null
 
+  const scorer = hasCjk(normalized)
+    ? scoreBirthplaceMatch
+    : (query: string, place: Birthplace) => scoreLatinMatch(normalizeLatin(query), place)
+
   const ranked = birthplaces
-    .map((place) => ({ place, score: scoreBirthplaceMatch(normalized, place) }))
+    .map((place) => ({ place, score: scorer(normalized, place) }))
     .filter((candidate) => candidate.score > 0)
     .sort((left, right) => right.score - left.score)
 
   return ranked[0]?.place ?? null
+}
+
+/* ------------------------------------------------------------
+   Latin-script matching (pinyin for Chinese cities, English for
+   world cities). Case-insensitive; spaces and punctuation ignored,
+   so "Zhu Zhou", "zhuzhou", and "ZHUZHOU" all match 株洲.
+   ------------------------------------------------------------ */
+
+function hasCjk(value: string): boolean {
+  return /[一-鿿]/u.test(value)
+}
+
+function normalizeLatin(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/gu, '') // strip diacritics: São → Sao
+    .toLowerCase()
+    .replace(/[^a-z0-9]/gu, '')
+}
+
+function scoreLatinMatch(query: string, place: Birthplace): number {
+  if (query.length < 2 || !place.latinKeys?.length) return 0
+
+  let best = 0
+  for (const key of place.latinKeys) {
+    if (!key) continue
+    if (key === query) {
+      // Exact match; world cities (carrying tz) win ties against pinyin homophones.
+      best = Math.max(best, place.tz ? 100 : 95)
+    } else if (query.length >= 4 && key.startsWith(query)) {
+      best = Math.max(best, 60)
+    }
+  }
+  return best
 }
 
 export async function resolveBirthTimeAsync(input: ResolveBirthTimeInput): Promise<ResolvedBirthTime> {
@@ -95,7 +142,7 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
 
   const baseDate = new Date(input.year, input.month - 1, input.day, input.hour, REPRESENTATIVE_MINUTE)
   const correctionMinutes = shouldApply
-    ? getTrueSolarCorrectionMinutes(input.year, input.month, input.day, location.longitude)
+    ? getTrueSolarCorrectionMinutes(input.year, input.month, input.day, input.hour, location)
     : 0
   const correctedDate = new Date(baseDate.getTime() + correctionMinutes * 60_000)
   const timeIndex = shouldApply
@@ -119,9 +166,46 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   }
 }
 
+let birthplaceIndexPromise: Promise<Birthplace[]> | null = null
+
 async function loadBirthplaceData(): Promise<Birthplace[]> {
-  const mod = await import('./birthplace-data.json')
-  return mod.default as Birthplace[]
+  birthplaceIndexPromise ??= buildBirthplaceIndex()
+  return birthplaceIndexPromise
+}
+
+async function buildBirthplaceIndex(): Promise<Birthplace[]> {
+  const [chinaMod, worldMod, pinyinMod] = await Promise.all([
+    import('./birthplace-data.json'),
+    import('./world-cities.json'),
+    import('pinyin-pro'),
+  ])
+  const { pinyin } = pinyinMod
+
+  const toPinyinKey = (text: string): string =>
+    normalizeLatin(pinyin(text, { toneType: 'none', type: 'array' }).join(''))
+
+  const chinaPlaces = (chinaMod.default as Birthplace[]).map((place) => {
+    const keys = new Set<string>()
+    for (const token of [place.name, place.city, place.area]) {
+      if (!token) continue
+      keys.add(toPinyinKey(token))
+      const stripped = stripAdministrativeSuffix(token)
+      if (stripped && stripped !== token) keys.add(toPinyinKey(stripped))
+    }
+    const bare = stripAdministrativeSuffix(place.name) || place.name
+    const romanized = pinyin(bare, { toneType: 'none', type: 'array' }).join('')
+    const enName = romanized ? romanized.charAt(0).toUpperCase() + romanized.slice(1) : place.name
+    return { ...place, enName, latinKeys: Array.from(keys) }
+  })
+
+  // World cities lead the list so an exact English name beats a pinyin homophone.
+  const worldPlaces = (worldMod.default as Birthplace[]).map((place) => ({
+    ...place,
+    enName: place.name,
+    latinKeys: [place.name, ...(place.aliases ?? [])].map(normalizeLatin),
+  }))
+
+  return [...worldPlaces, ...chinaPlaces]
 }
 
 export function shichenNameForTimeIndex(timeIndex: number): string {
@@ -190,9 +274,62 @@ function isSpecificToken(value: string): boolean {
   return value.length >= 2
 }
 
-function getTrueSolarCorrectionMinutes(year: number, month: number, day: number, longitude: number): number {
-  const longitudeCorrection = (longitude - BEIJING_STANDARD_LONGITUDE) * MINUTES_PER_LONGITUDE_DEGREE
-  return longitudeCorrection + getEquationOfTimeMinutes(year, month, day)
+/**
+ * True solar correction = (solar mean time) − (clock time at the birthplace).
+ * Solar mean time runs at longitude × 4 min ahead of UTC; the clock runs at the
+ * birthplace's UTC offset (DST-aware via Intl). China entries carry no tz and
+ * default to Asia/Shanghai (+480), matching the classic (lon − 120°) × 4 rule.
+ */
+function getTrueSolarCorrectionMinutes(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  place: Birthplace
+): number {
+  const offsetMinutes = getUtcOffsetMinutes(place.tz ?? DEFAULT_TIMEZONE, year, month, day, hour)
+  return place.longitude * MINUTES_PER_LONGITUDE_DEGREE
+    - offsetMinutes
+    + getEquationOfTimeMinutes(year, month, day)
+}
+
+/**
+ * UTC offset (minutes) of an IANA timezone at a given local wall time,
+ * computed with the built-in Intl API — no timezone library needed.
+ */
+function getUtcOffsetMinutes(tz: string, year: number, month: number, day: number, hour: number): number {
+  try {
+    // Treat the wall time as a UTC guess, then refine once so DST transitions land correctly.
+    const instant = Date.UTC(year, month - 1, day, hour, REPRESENTATIVE_MINUTE)
+    let offset = offsetAtInstant(tz, instant)
+    offset = offsetAtInstant(tz, instant - offset * 60_000)
+    return offset
+  } catch {
+    // Unknown zone identifier: fall back to China standard time.
+    return 480
+  }
+}
+
+function offsetAtInstant(tz: string, instantMs: number): number {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+  })
+  const parts: Record<string, string> = {}
+  for (const part of dtf.formatToParts(new Date(instantMs))) {
+    parts[part.type] = part.value
+  }
+  const wallAsUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    parts.hour === '24' ? 0 : Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second)
+  )
+  return Math.round((wallAsUtc - instantMs) / 60_000)
 }
 
 function getEquationOfTimeMinutes(year: number, month: number, day: number): number {

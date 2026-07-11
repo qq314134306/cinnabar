@@ -1,18 +1,35 @@
 /* ============================================================
-   命盘可视化组件
-   对齐文墨天机标准：
-   - 完整星曜 + 亮度（庙旺平陷）
-   - 宫干 + 大限范围
-   - 博士/长生十二神 + 杂曜
-   - 命主/身主 + 纳音五行
+   Natal chart visualization
+   Follows the full Wenmo Tianji display standard:
+   - Complete stars + brightness levels
+   - Palace stems + decadal ranges
+   - Boshi/Changsheng cycle gods + adjective stars
+   - Life/Body masters + Na Yin element
+
+   The iztro chart is kept in zh-CN internally; every string is
+   translated to English at this presentation layer via the glossary.
    ============================================================ */
 
 import { useState } from 'react'
 import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
+import {
+  translateBrightness,
+  translateFiveElementsClass,
+  translateGanZhi,
+  translateMutagen,
+  translateNayin,
+  translatePalaceName,
+  translateShichen,
+  translateStarLabel,
+  translateStem,
+  translateBranch,
+  translateZodiac,
+  translateWesternSign,
+} from '@/lib/ziwei-glossary'
 
 /* ------------------------------------------------------------
-   十二宫位置映射
+   Palace grid positions (keyed by earthly branch, zh-CN internal)
    ------------------------------------------------------------ */
 
 const PALACE_POSITIONS: Record<string, { row: number; col: number }> = {
@@ -25,7 +42,7 @@ const PALACE_POSITIONS: Record<string, { row: number; col: number }> = {
 }
 
 /* ------------------------------------------------------------
-   纳音五行表（六十甲子）
+   Na Yin table (sixty jiazi, zh-CN keys from the engine)
    ------------------------------------------------------------ */
 
 const NAYIN_TABLE: Record<string, string> = {
@@ -47,17 +64,12 @@ const NAYIN_TABLE: Record<string, string> = {
 }
 
 function getNayin(ganZhi: string): string {
-  return NAYIN_TABLE[ganZhi] || ''
+  return translateNayin(NAYIN_TABLE[ganZhi])
 }
 
 /* ------------------------------------------------------------
-   亮度映射
+   Brightness styling (keys are zh-CN from the engine)
    ------------------------------------------------------------ */
-
-const BRIGHTNESS_MAP: Record<string, string> = {
-  '庙': '庙', '旺': '旺', '得': '得', '利': '利',
-  '平': '平', '不': '不', '陷': '陷',
-}
 
 const BRIGHTNESS_STYLE: Record<string, string> = {
   '庙': 'text-fortune',
@@ -70,7 +82,7 @@ const BRIGHTNESS_STYLE: Record<string, string> = {
 }
 
 /* ------------------------------------------------------------
-   数据类型
+   Data types
    ------------------------------------------------------------ */
 
 interface StarData {
@@ -85,7 +97,7 @@ interface PalaceData {
   branch: string
   majorStars: StarData[]
   minorStars: StarData[]
-  adjectiveStars: string[]  // 杂曜
+  adjectiveStars: string[]
   decadal: { range: [number, number] }
   boshi12: string
   changsheng12: string
@@ -94,7 +106,7 @@ interface PalaceData {
 }
 
 /* ------------------------------------------------------------
-   星曜标签组件 - 带亮度和四化
+   Star tag — with brightness and transformation
    ------------------------------------------------------------ */
 
 interface StarTagProps {
@@ -105,8 +117,9 @@ interface StarTagProps {
 function StarTag({ star, showBrightness = true }: StarTagProps) {
   const { name, brightness, mutagen } = star
   const hasMutagen = !!mutagen
-  const brightnessChar = brightness ? BRIGHTNESS_MAP[brightness] || '' : ''
+  const brightnessInfo = translateBrightness(brightness)
   const brightnessStyle = brightness ? BRIGHTNESS_STYLE[brightness] || '' : ''
+  const mutagenInfo = translateMutagen(mutagen)
 
   const mutagenStyle = {
     '禄': 'bg-gradient-to-r from-fortune/20 to-fortune/10 text-fortune',
@@ -123,17 +136,17 @@ function StarTag({ star, showBrightness = true }: StarTagProps) {
         ${hasMutagen ? mutagenStyle + ' font-medium' : 'bg-white/5 text-text-secondary hover:bg-white/10'}
       `}
     >
-      {name}
-      {showBrightness && brightnessChar && (
-        <span className={`text-[9px] ${brightnessStyle}`}>{brightnessChar}</span>
+      {translateStarLabel(name)}
+      {showBrightness && brightnessInfo && (
+        <span className={`text-[9px] ${brightnessStyle}`}>{brightnessInfo.code}</span>
       )}
-      {mutagen && <span className="text-[9px]">{mutagen}</span>}
+      {mutagenInfo && <span className="text-[9px]">{mutagenInfo.code}</span>}
     </span>
   )
 }
 
 /* ------------------------------------------------------------
-   宫位卡片组件
+   Palace card
    ------------------------------------------------------------ */
 
 interface PalaceCardProps extends PalaceData {
@@ -161,9 +174,9 @@ function PalaceCard({
         ${isSelected ? 'ring-2 ring-star' : ''}
       `}
     >
-      {/* 宫位头部: 宫干支 + 宫名 + 大限 */}
+      {/* Header: palace stem-branch + name + decadal range */}
       <div className="flex items-center justify-between mb-1.5 text-[10px]">
-        <span className="text-text-muted font-mono">{stem}{branch}</span>
+        <span className="text-text-muted font-mono">{translateStem(stem)}-{translateBranch(branch)}</span>
         <div className="flex items-center gap-1">
           {decadalRange && (
             <span className="text-star-light/60 font-mono">{decadalRange}</span>
@@ -174,47 +187,47 @@ function PalaceCard({
             ${isBody ? 'bg-star/20 text-star-light' : ''}
             ${!isLife && !isBody ? 'text-text-secondary' : ''}
           `}>
-            {name}
+            {translatePalaceName(name)}
           </span>
         </div>
       </div>
 
-      {/* 主星 */}
+      {/* Major stars */}
       <div className="flex flex-wrap gap-0.5 mb-1">
         {majorStars.map((star, i) => (
           <StarTag key={i} star={star} />
         ))}
       </div>
 
-      {/* 辅星 */}
+      {/* Minor stars */}
       <div className="flex flex-wrap gap-0.5 mb-1">
         {minorStars.map((star, i) => (
           <StarTag key={i} star={star} showBrightness={false} />
         ))}
       </div>
 
-      {/* 杂曜 */}
+      {/* Adjective stars */}
       {adjectiveStars.length > 0 && (
         <div className="flex flex-wrap gap-0.5 mb-1 flex-1">
           {adjectiveStars.map((name, i) => (
             <span key={i} className="text-[9px] px-1 py-0.5 rounded bg-white/[0.03] text-text-muted/70">
-              {name}
+              {translateStarLabel(name)}
             </span>
           ))}
         </div>
       )}
 
-      {/* 底部: 十二神 */}
+      {/* Footer: cycle gods */}
       <div className="flex justify-between text-[9px] text-text-muted/60 mt-auto pt-1 border-t border-white/[0.04]">
-        <span>{changsheng12}</span>
-        <span>{boshi12}</span>
+        <span>{translateStarLabel(changsheng12)}</span>
+        <span>{translateStarLabel(boshi12)}</span>
       </div>
     </div>
   )
 }
 
 /* ------------------------------------------------------------
-   中央信息区域
+   Center info panel
    ------------------------------------------------------------ */
 
 interface CenterInfoProps {
@@ -225,7 +238,6 @@ interface CenterInfoProps {
 }
 
 function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
-  // 计算年柱纳音
   const yearGanZhi = chart.chineseDate?.split(' ')[0] || ''
   const nayin = getNayin(yearGanZhi)
   const resolvedTime = birthInfo.resolvedBirthTime
@@ -239,49 +251,48 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       bg-gradient-to-br from-white/[0.04] to-white/[0.02]
       backdrop-blur-md border border-white/[0.08] rounded-xl
     ">
-      {/* 背景装饰 */}
+      {/* Backdrop ring */}
       <div className="absolute inset-0 opacity-[0.02]">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full border-2 border-white" />
       </div>
 
-      {/* 标题 */}
+      {/* Title */}
       <h3 className="
         text-lg lg:text-xl font-semibold mb-3
         bg-gradient-to-r from-gold via-gold-light to-gold bg-clip-text text-transparent
       " style={{ fontFamily: 'var(--font-serif)' }}>
-        紫微斗数命盘
+        Zi Wei Natal Chart
       </h3>
 
-      {/* 信息列表 */}
+      {/* Info list */}
       <div className="text-xs lg:text-sm text-text-secondary space-y-1.5 text-center">
-        <p><span className="text-text-muted">阳历</span> <span className="text-text">{solarDate}</span></p>
-        <p><span className="text-text-muted">农历</span> <span className="text-text">{chart.lunarDate}</span></p>
-        <p><span className="text-text-muted">干支</span> <span className="text-text font-mono">{chart.chineseDate}</span></p>
-        <p><span className="text-text-muted">时辰</span> <span className="text-text">{chart.time} {chart.timeRange}</span></p>
+        <p><span className="text-text-muted">Born</span> <span className="text-text">{solarDate}</span></p>
+        <p><span className="text-text-muted">Pillars</span> <span className="text-text font-mono">{translateGanZhi(yearGanZhi)} year</span></p>
+        <p><span className="text-text-muted">Hour</span> <span className="text-text">{translateShichen(chart.time)} {chart.timeRange}</span></p>
         {showCorrection && resolvedTime && (
           <p>
-            <span className="text-text-muted">真太阳时</span>{' '}
+            <span className="text-text-muted">True solar time</span>{' '}
             <span className="text-gold">
-              {resolvedTime.location?.name} {formatTime(resolvedTime.hour, resolvedTime.minute)}
+              {resolvedTime.location?.enName ?? resolvedTime.location?.name} {formatTime(resolvedTime.hour, resolvedTime.minute)}
               {resolvedTime.originalShichen !== resolvedTime.correctedShichen
-                ? `，${resolvedTime.originalShichen}校正为${resolvedTime.correctedShichen}`
-                : '，时辰不变'}
+                ? ` — ${translateShichen(resolvedTime.originalShichen)} corrected to ${translateShichen(resolvedTime.correctedShichen)}`
+                : ' — hour unchanged'}
             </span>
           </p>
         )}
         {showUnmatched && (
           <p>
-            <span className="text-text-muted">真太阳时</span>{' '}
-            <span className="text-text-muted">未匹配出生地，按原时辰排盘</span>
+            <span className="text-text-muted">True solar time</span>{' '}
+            <span className="text-text-muted">cast with your entered time</span>
           </p>
         )}
-        <p><span className="text-text-muted">性别</span> <span className="text-text">{gender}</span></p>
+        <p><span className="text-text-muted">Gender</span> <span className="text-text">{gender}</span></p>
         {nayin && (
-          <p><span className="text-text-muted">纳音</span> <span className="text-gold">{nayin}</span></p>
+          <p><span className="text-text-muted">Na Yin</span> <span className="text-gold">{nayin}</span></p>
         )}
       </div>
 
-      {/* 五行局 + 命主身主 */}
+      {/* Five elements class + life/body masters */}
       <div className="mt-3 pt-3 border-t border-white/[0.06] w-full">
         <div className="flex justify-center gap-2 mb-2">
           <span className="
@@ -289,16 +300,16 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
             bg-gradient-to-r from-star/20 to-gold/20
             text-star-light font-medium border border-star/20
           ">
-            {chart.fiveElementsClass}
+            {translateFiveElementsClass(chart.fiveElementsClass)}
           </span>
         </div>
         <div className="flex justify-center gap-4 text-xs">
-          <p><span className="text-text-muted">命主</span> <span className="text-gold">{chart.soul}</span></p>
-          <p><span className="text-text-muted">身主</span> <span className="text-star-light">{chart.body}</span></p>
+          <p><span className="text-text-muted">Life Master</span> <span className="text-gold">{translateStarLabel(chart.soul)}</span></p>
+          <p><span className="text-text-muted">Body Master</span> <span className="text-star-light">{translateStarLabel(chart.body)}</span></p>
         </div>
         <div className="flex justify-center gap-4 text-xs mt-1">
-          <p><span className="text-text-muted">生肖</span> <span className="text-text">{chart.zodiac}</span></p>
-          <p><span className="text-text-muted">星座</span> <span className="text-text">{chart.sign}</span></p>
+          <p><span className="text-text-muted">Zodiac</span> <span className="text-text">{translateZodiac(chart.zodiac)}</span></p>
+          <p><span className="text-text-muted">Sign</span> <span className="text-text">{translateWesternSign(chart.sign)}</span></p>
         </div>
       </div>
     </div>
@@ -310,26 +321,23 @@ function formatTime(hour: number, minute: number): string {
 }
 
 /* ------------------------------------------------------------
-   解析命盘数据 - 完整版
+   Chart parsing — full detail
    ------------------------------------------------------------ */
 
 function parsePalaces(chart: FunctionalAstrolabe): PalaceData[] {
   return (chart.palaces || []).map((palace) => {
-    // 主星（带亮度和四化）
     const majorStars: StarData[] = (palace.majorStars || []).map((s) => ({
       name: s.name as string,
       brightness: s.brightness as string | undefined,
       mutagen: s.mutagen as string | undefined,
     }))
 
-    // 辅星（完整，带亮度）
     const minorStars: StarData[] = (palace.minorStars || []).map((s) => ({
       name: s.name as string,
       brightness: s.brightness as string | undefined,
       mutagen: s.mutagen as string | undefined,
     }))
 
-    // 杂曜
     const adjectiveStars: string[] = (palace.adjectiveStars || []).map(
       (s) => String(s.name)
     )
@@ -351,8 +359,13 @@ function parsePalaces(chart: FunctionalAstrolabe): PalaceData[] {
 }
 
 /* ------------------------------------------------------------
-   主命盘组件
+   Main chart component
    ------------------------------------------------------------ */
+
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
 
 export function ChartDisplay() {
   const { chart, birthInfo } = useChartStore()
@@ -368,8 +381,8 @@ export function ChartDisplay() {
     if (pos) grid[pos.row][pos.col] = p
   })
 
-  const solarDate = `${birthInfo.year}年${birthInfo.month}月${birthInfo.day}日`
-  const gender = birthInfo.gender === 'male' ? '男' : '女'
+  const solarDate = `${MONTH_NAMES[birthInfo.month - 1]} ${birthInfo.day}, ${birthInfo.year}`
+  const gender = birthInfo.gender === 'male' ? 'Male' : 'Female'
 
   const renderPalace = (palace: PalaceData | null, key: string) => {
     if (!palace) return <div key={key} />
@@ -391,10 +404,10 @@ export function ChartDisplay() {
       shadow-[0_8px_32px_rgba(0,0,0,0.3)]
       max-w-6xl mx-auto
     ">
-      {/* 顶部发光线 */}
+      {/* Top glow line */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-star/50 to-transparent" />
 
-      {/* 4x4 网格 */}
+      {/* 4x4 grid */}
       <div className="grid grid-cols-4 gap-1.5 lg:gap-2">
         {/* Row 0 */}
         {grid[0].map((p, c) => renderPalace(p, `0-${c}`))}
@@ -414,29 +427,29 @@ export function ChartDisplay() {
         {grid[3].map((p, c) => renderPalace(p, `3-${c}`))}
       </div>
 
-      {/* 图例 */}
+      {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-white/[0.06] text-[10px]">
         <div className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-gold" />
-          <span className="text-text-muted">命宫</span>
+          <span className="text-text-muted">Life Palace</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-star-light" />
-          <span className="text-text-muted">身宫</span>
+          <span className="text-text-muted">Body Palace</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-fortune">禄</span>
-          <span className="text-gold">权</span>
-          <span className="text-star-light">科</span>
-          <span className="text-misfortune">忌</span>
-          <span className="text-text-muted">四化</span>
+          <span className="text-fortune">Lu</span>
+          <span className="text-gold">Quan</span>
+          <span className="text-star-light">Ke</span>
+          <span className="text-misfortune">Ji</span>
+          <span className="text-text-muted">Four Transformations</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-fortune">庙</span>
-          <span className="text-gold">旺</span>
-          <span className="text-text-muted">平</span>
-          <span className="text-misfortune">陷</span>
-          <span className="text-text-muted">亮度</span>
+          <span className="text-fortune">+3</span>
+          <span className="text-gold">+2</span>
+          <span className="text-text-muted">−1</span>
+          <span className="text-misfortune">−3</span>
+          <span className="text-text-muted">Brightness</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 /* ============================================================
-   全局状态管理
+   Global state management
    ============================================================ */
 
 import { create } from 'zustand'
@@ -7,9 +7,10 @@ import { persist } from 'zustand/middleware'
 import type { FunctionalAstrolabe } from '@/lib/astro'
 import type { BirthInfo } from '@/lib/astro'
 import type { LifetimeKLinePoint } from '@/lib/fortune-score'
+import type { Persona } from '@/lib/ai-prompts'
 
 /* ------------------------------------------------------------
-   命盘状态
+   Chart state
    ------------------------------------------------------------ */
 
 interface ChartState {
@@ -27,36 +28,36 @@ export const useChartStore = create<ChartState>()((set) => ({
   setChart: (chart) => set({ chart }),
   clear: () => {
     set({ birthInfo: null, chart: null })
-    // 同时清除内容缓存
+    // Also clear cached AI content
     useContentCacheStore.getState().clearAll()
   },
 }))
 
 /* ------------------------------------------------------------
-   内容缓存状态 (AI解读、K线等)
+   Content cache (AI readings, K-line, etc.)
    ------------------------------------------------------------ */
 
 interface KLineCache {
-  lifetime: LifetimeKLinePoint[]  // 1-100 岁完整数据
-  isGenerating: boolean           // 是否正在生成 reason
+  lifetime: LifetimeKLinePoint[]  // full ages 1-100 dataset
+  isGenerating: boolean           // whether reasons are still being generated
 }
 
 interface ContentCacheState {
-  // AI 命盘解读
+  // AI natal reading
   aiInterpretation: string | null
   setAiInterpretation: (content: string) => void
 
-  // 年度运势解读 (按年份缓存)
+  // Yearly fortune readings (cached per year)
   yearlyFortune: Record<number, string>
   setYearlyFortune: (year: number, content: string) => void
 
-  // K 线数据
+  // K-line data
   klineCache: KLineCache | null
   setKlineCache: (cache: KLineCache) => void
   updateKlineReasons: (reasons: { age: number; reason: string }[]) => void
   setKlineGenerating: (isGenerating: boolean) => void
 
-  // 清除所有缓存
+  // Clear all caches
   clearAll: () => void
 }
 
@@ -103,78 +104,22 @@ export const useContentCacheStore = create<ContentCacheState>()((set) => ({
 }))
 
 /* ------------------------------------------------------------
-   设置状态
+   Settings state — reader persona (Scholar / Old Sage)
    ------------------------------------------------------------ */
 
-type ModelProvider = 'kimi' | 'gemini' | 'claude' | 'deepseek' | 'custom'
-
-interface ProviderSettings {
-  apiKey: string
-  customBaseUrl: string
-  customModel: string
-}
-
-const DEFAULT_PROVIDER_SETTINGS: ProviderSettings = {
-  apiKey: '',
-  customBaseUrl: '',
-  customModel: '',
-}
-
 interface SettingsState {
-  provider: ModelProvider
-  providerSettings: Record<ModelProvider, ProviderSettings>
-  enableThinking: boolean
-  enableWebSearch: boolean   // 启用联网搜索
-  searchApiKey: string       // 第三方搜索 API (Tavily)
-
-  setProvider: (provider: ModelProvider) => void
-  updateCurrentProvider: (settings: Partial<ProviderSettings>) => void
-  setEnableThinking: (enable: boolean) => void
-  setEnableWebSearch: (enable: boolean) => void
-  setSearchApiKey: (key: string) => void
-
-  // 便捷访问当前厂商配置
-  getCurrentSettings: () => ProviderSettings
+  persona: Persona
+  setPersona: (persona: Persona) => void
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
-    (set, get) => ({
-      provider: 'kimi',
-      providerSettings: {
-        kimi: { ...DEFAULT_PROVIDER_SETTINGS },
-        gemini: { ...DEFAULT_PROVIDER_SETTINGS },
-        claude: { ...DEFAULT_PROVIDER_SETTINGS },
-        deepseek: { ...DEFAULT_PROVIDER_SETTINGS },
-        custom: { ...DEFAULT_PROVIDER_SETTINGS },
-      },
-      enableThinking: false,
-      enableWebSearch: false,
-      searchApiKey: '',
-
-      setProvider: (provider) => set({ provider }),
-
-      updateCurrentProvider: (settings) => set((state) => ({
-        providerSettings: {
-          ...state.providerSettings,
-          [state.provider]: {
-            ...state.providerSettings[state.provider],
-            ...settings,
-          },
-        },
-      })),
-
-      setEnableThinking: (enable) => set({ enableThinking: enable }),
-      setEnableWebSearch: (enable) => set({ enableWebSearch: enable }),
-      setSearchApiKey: (key) => set({ searchApiKey: key }),
-
-      getCurrentSettings: () => {
-        const state = get()
-        return state.providerSettings[state.provider]
-      },
+    (set) => ({
+      persona: 'scholar',
+      setPersona: (persona) => set({ persona }),
     }),
     {
-      name: 'ziwei-settings',
+      name: 'cinnabar-settings',
     }
   )
 )

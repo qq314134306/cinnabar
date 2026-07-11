@@ -1,5 +1,5 @@
 /* ============================================================
-   生辰输入表单 - 高级玻璃态设计
+   Birth details form
    ============================================================ */
 
 import { useEffect, useState } from 'react'
@@ -14,8 +14,8 @@ const MONTH_OPTIONS = getMonthOptions()
 const HOUR_OPTIONS = getShichenOptions()
 
 const GENDER_OPTIONS = [
-  { value: 'male', label: '男', icon: '♂' },
-  { value: 'female', label: '女', icon: '♀' },
+  { value: 'male', label: 'Male', icon: '♂' },
+  { value: 'female', label: 'Female', icon: '♀' },
 ]
 
 export function BirthForm() {
@@ -97,7 +97,7 @@ export function BirthForm() {
       setBirthInfo(birthInfo)
       setChart(chart)
     } catch (error) {
-      console.error('排盘失败:', error)
+      console.error('Chart generation failed:', error)
     } finally {
       setLoading(false)
     }
@@ -113,16 +113,16 @@ export function BirthForm() {
         shadow-[0_8px_40px_rgba(0,0,0,0.3)]
       "
     >
-      {/* 顶部发光线 */}
+      {/* Top glow line */}
       <div
         className="
           absolute top-0 left-1/2 -translate-x-1/2
           w-1/2 h-px
-          bg-gradient-to-r from-transparent via-star/40 to-transparent
+          bg-gradient-to-r from-transparent via-cinnabar/40 to-transparent
         "
       />
 
-      {/* 标题区域 */}
+      {/* Title */}
       <div className="text-center mb-8">
         <h2
           className="
@@ -132,18 +132,18 @@ export function BirthForm() {
           "
           style={{ fontFamily: 'var(--font-serif)' }}
         >
-          输入您的出生信息
+          Your Birth Chart Knows You
         </h2>
         <p className="text-sm text-text-muted">
-          精准排盘，探索命运轨迹
+          Share your birth date and time — Cinnabar casts your real chart.
         </p>
       </div>
 
       <div className="space-y-6">
-        {/* 出生日期区块 */}
+        {/* Birth date */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-secondary font-medium">出生日期</span>
+            <span className="text-sm text-text-secondary font-medium">Date of Birth</span>
             <span
               className="
                 text-xs px-2.5 py-1 rounded-full
@@ -151,7 +151,7 @@ export function BirthForm() {
                 text-gold border border-gold/20
               "
             >
-              阳历
+              Western calendar
             </span>
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -173,17 +173,17 @@ export function BirthForm() {
           </div>
         </div>
 
-        {/* 出生时辰 */}
+        {/* Birth hour */}
         <Select
-          label="出生时辰"
+          label="Time of Birth"
           options={HOUR_OPTIONS}
           value={hour}
           onChange={(e) => setHour(Number(e.target.value))}
         />
 
-        {/* 性别选择 - 胶囊按钮组 */}
+        {/* Gender */}
         <div className="space-y-2">
-          <span className="text-sm text-text-secondary font-medium">性别</span>
+          <span className="text-sm text-text-secondary font-medium">Gender</span>
           <div className="flex gap-3">
             {GENDER_OPTIONS.map((opt) => (
               <label
@@ -193,7 +193,7 @@ export function BirthForm() {
                   flex items-center justify-center gap-2
                   cursor-pointer transition-all duration-200
                   ${gender === opt.value
-                    ? 'bg-gradient-to-r from-star to-star-dark text-white shadow-[0_4px_20px_rgba(124,58,237,0.3)]'
+                    ? 'bg-gradient-to-r from-star to-star-dark text-white shadow-[0_4px_20px_rgba(91,58,140,0.3)]'
                     : 'bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.12]'
                   }
                 `}
@@ -215,29 +215,28 @@ export function BirthForm() {
                   {opt.icon}
                 </span>
                 <span className="font-medium">{opt.label}</span>
-                {/* 选中指示器 */}
                 {gender === opt.value && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gold shadow-[0_0_8px_rgba(212,175,55,0.6)]" />
+                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gold shadow-[0_0_8px_rgba(201,162,75,0.6)]" />
                 )}
               </label>
             ))}
           </div>
         </div>
 
-        {/* 出生地（可选） */}
+        {/* Birthplace (optional) */}
         <Input
-          label="出生地（可选）"
-          placeholder="如：北京、成都、乌鲁木齐"
+          label="Birthplace (optional)"
+          placeholder="e.g. New York, London, Tokyo"
           hint={
             trueSolarEnabled
               ? matchingBirthplace
-                ? '正在匹配出生地'
+                ? 'Matching your birthplace...'
                 : matchedBirthplace
-                ? `已匹配 ${matchedBirthplace.name}，系统会自动校正真太阳时`
+                ? `Matched ${matchedBirthplace.enName ?? matchedBirthplace.name}${matchedBirthplace.country ? `, ${matchedBirthplace.country}` : ''} — true solar time will be fine-tuned automatically.`
                 : birthplace.trim()
-                  ? '暂未匹配该出生地，将按原时辰排盘'
-                  : '直接输入出生地，系统会在后台自动匹配'
-              : '已关闭真太阳时校正'
+                  ? "That city isn't in our list yet — no problem, your chart will use your birth time exactly as entered."
+                  : 'Type your city and it will be matched automatically.'
+              : 'True solar time correction is off.'
           }
           value={birthplace}
           onChange={(e) => setBirthplace(e.target.value)}
@@ -251,9 +250,9 @@ export function BirthForm() {
           "
         >
           <span>
-            <span className="block text-sm text-text-secondary font-medium">自动真太阳时校正</span>
+            <span className="block text-sm text-text-secondary font-medium">Auto true solar time correction</span>
             <span className="block text-xs text-text-muted mt-0.5">
-              根据出生地自动处理，普通用户无需填写经纬度
+              Handled from your birthplace — no coordinates needed.
             </span>
           </span>
           <input
@@ -264,14 +263,14 @@ export function BirthForm() {
           />
         </label>
 
-        {/* 分隔线 */}
+        {/* Divider */}
         <div className="relative py-2">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-white/[0.06]" />
           </div>
         </div>
 
-        {/* 提交按钮 */}
+        {/* Submit */}
         <Button
           type="submit"
           variant="gold"
@@ -285,11 +284,11 @@ export function BirthForm() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              排盘中...
+              Casting your chart...
             </>
           ) : (
             <>
-              <span>开始排盘</span>
+              <span>Cast My Chart</span>
               <svg
                 className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
                 fill="none"
@@ -303,15 +302,15 @@ export function BirthForm() {
         </Button>
       </div>
 
-      {/* 底部提示 */}
+      {/* Footnote */}
       <p className="text-xs text-text-muted text-center mt-6 flex items-center justify-center gap-1.5">
         <svg className="w-3.5 h-3.5 text-star-light" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
         </svg>
-        请输入阳历（公历）日期，系统会自动转为农历排盘
+        Enter your Western (Gregorian) birth date — it is converted to the lunar calendar automatically.
       </p>
 
-      {/* 角落装饰 */}
+      {/* Corner ornament */}
       <div className="absolute -bottom-2 -right-2 w-16 h-16 opacity-20">
         <div className="absolute inset-0 rounded-full border border-star/30" />
         <div className="absolute inset-2 rounded-full border border-gold/20" />

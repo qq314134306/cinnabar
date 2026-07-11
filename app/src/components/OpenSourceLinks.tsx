@@ -57,7 +57,7 @@ export function OpenSourceFooterLinks() {
         rel="noreferrer"
         className="text-text-secondary hover:text-text transition-colors"
       >
-        MIT License
+        GPLv3 License
       </a>
     </span>
   )

@@ -1,6 +1,6 @@
 /* ============================================================
-   紫微斗数 App - 主入口
-   高级玻璃态设计 + 精致导航交互
+   Cinnabar — main entry
+   Eastern Astrology, in English.
    ============================================================ */
 
 import { useState, type ReactNode } from 'react'
@@ -8,38 +8,31 @@ import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
 import { ChartDisplay } from '@/components/chart'
 import { AIInterpretation } from '@/components/AIInterpretation'
-import { SettingsPanel } from '@/components/SettingsPanel'
-import { YearlyFortune } from '@/components/fortune'
-import { LifeKLine } from '@/components/kline'
-import { KLineIcon } from '@/components/icons/KLineIcon'
 import { MatchAnalysis } from '@/components/match'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ShareCard } from '@/components/share'
 import { useChartStore } from '@/stores'
 
-type TabType = 'chart' | 'fortune' | 'kline' | 'match' | 'share'
+type TabType = 'chart' | 'match' | 'share'
 
 const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
-  { key: 'chart', label: '命盘解读', icon: '☰' },
-  { key: 'fortune', label: '年度运势', icon: '◎' },
-  { key: 'kline', label: '人生K线', icon: <KLineIcon className="h-4 w-4" /> },
-  { key: 'match', label: '双人合盘', icon: '⚭' },
-  { key: 'share', label: '分享卡片', icon: '◈' },
+  { key: 'chart', label: 'Your Chart', icon: '☰' },
+  { key: 'match', label: 'Compatibility', icon: '⚭' },
+  { key: 'share', label: 'Share Card', icon: '◈' },
 ]
 
 export default function App() {
   const { chart } = useChartStore()
-  const [showSettings, setShowSettings] = useState(false)
   const [activeTab, setActiveTab] = useState<TabType>('chart')
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Aurora 极光背景 */}
+      {/* Aurora background */}
       <div className="aurora-bg" />
-      {/* 星点背景 */}
+      {/* Star field background */}
       <div className="star-bg" />
 
-      {/* 头部 - 毛玻璃导航 */}
+      {/* Header — glass navigation */}
       <header
         className="
           sticky top-0 z-40
@@ -49,43 +42,43 @@ export default function App() {
         "
       >
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
-          {/* Logo + 导航 */}
+          {/* Logo + nav */}
           <div className="flex items-center gap-10">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              {/* Logo 图标 */}
+              {/* Seal mark */}
               <div
                 className="
                   relative w-10 h-10 rounded-xl
-                  bg-gradient-to-br from-star/20 to-gold/20
+                  bg-gradient-to-br from-cinnabar to-cinnabar-dark
                   border border-white/[0.1]
                   flex items-center justify-center
-                  shadow-[0_0_20px_rgba(124,58,237,0.2)]
+                  shadow-[0_0_20px_rgba(178,58,46,0.35)]
                 "
               >
                 <span className="text-lg text-gold">☆</span>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-star/10 to-transparent animate-pulse" />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-transparent animate-pulse" />
               </div>
-              {/* Logo 文字 */}
+              {/* Wordmark */}
               <div>
                 <h1
                   className="
-                    text-xl font-bold
-                    bg-gradient-to-r from-star-light via-gold to-star-light
+                    text-xl font-bold tracking-wide
+                    bg-gradient-to-r from-gold via-gold-light to-gold
                     bg-clip-text text-transparent
                     bg-[length:200%_auto] animate-[shimmer_4s_ease-in-out_infinite]
                   "
                   style={{ fontFamily: 'var(--font-serif)' }}
                 >
-                  紫微知道
+                  Cinnabar
                 </h1>
                 <p className="text-text-muted text-xs hidden sm:block">
-                  AI 命理工具
+                  Eastern Astrology, in English
                 </p>
               </div>
             </div>
 
-            {/* 桌面端导航 */}
+            {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-1">
               {TABS.map((tab) => (
                 <button
@@ -100,7 +93,6 @@ export default function App() {
                     }
                   `}
                 >
-                  {/* 背景 */}
                   <span
                     className={`
                       absolute inset-0 rounded-lg transition-all duration-200
@@ -110,7 +102,6 @@ export default function App() {
                       }
                     `}
                   />
-                  {/* 内容 */}
                   <span className="relative flex items-center gap-2">
                     <span className={`
                       inline-flex h-4 w-4 items-center justify-center text-xs transition-all duration-200
@@ -120,12 +111,11 @@ export default function App() {
                     </span>
                     {tab.label}
                   </span>
-                  {/* 下划线指示器 */}
                   <span
                     className={`
                       absolute -bottom-1 left-1/2 -translate-x-1/2
                       h-0.5 rounded-full
-                      bg-gradient-to-r from-star via-gold to-star
+                      bg-gradient-to-r from-cinnabar via-gold to-cinnabar
                       transition-all duration-300
                       ${activeTab === tab.key ? 'w-2/3 opacity-100' : 'w-0 opacity-0'}
                     `}
@@ -137,43 +127,11 @@ export default function App() {
 
           <div className="flex items-center gap-2">
             <GitHubLinkButton />
-
-            {/* 设置按钮 */}
-            <button
-              onClick={() => setShowSettings(true)}
-              className="
-                group relative p-2.5 rounded-xl
-                bg-white/[0.04] border border-white/[0.08]
-                hover:bg-white/[0.08] hover:border-white/[0.12]
-                transition-all duration-200
-              "
-              title="设置"
-            >
-              <svg
-                className="w-5 h-5 text-text-muted group-hover:text-text transition-colors"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-            </button>
           </div>
         </div>
       </header>
 
-      {/* 移动端底部导航 */}
+      {/* Mobile bottom nav */}
       <nav
         className="
           md:hidden fixed bottom-0 left-0 right-0 z-40
@@ -198,7 +156,6 @@ export default function App() {
             >
               <span className="inline-flex h-5 w-5 items-center justify-center text-base">{tab.icon}</span>
               <span className="text-xs">{tab.label}</span>
-              {/* 选中指示点 */}
               {activeTab === tab.key && (
                 <span className="absolute -top-1 w-1 h-1 rounded-full bg-gold shadow-[0_0_6px_rgba(212,175,55,0.6)]" />
               )}
@@ -207,10 +164,10 @@ export default function App() {
         </div>
       </nav>
 
-      {/* 主内容 */}
+      {/* Main content */}
       <main className="flex-1 px-4 lg:px-12 py-8 pb-24 md:pb-8">
         <div className="max-w-[1600px] mx-auto">
-          {/* 命盘解读标签 */}
+          {/* Your Chart tab */}
           {activeTab === 'chart' && (
             !chart ? (
               <div className="flex items-center justify-center min-h-[60vh]">
@@ -218,17 +175,14 @@ export default function App() {
               </div>
             ) : (
               <div className="animate-fade-in space-y-8">
-                {/* 命盘 - 横向展开 */}
                 <div className="w-full">
                   <ChartDisplay />
                 </div>
 
-                {/* AI 解读 - 下方展示，与命盘等宽 */}
                 <div className="w-full max-w-6xl mx-auto">
                   <AIInterpretation />
                 </div>
 
-                {/* 重新输入按钮 */}
                 <div className="text-center">
                   <button
                     onClick={() => useChartStore.getState().clear()}
@@ -242,54 +196,24 @@ export default function App() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    重新输入
+                    Start Over
                   </button>
                 </div>
               </div>
             )
           )}
 
-          {/* 年度运势标签 */}
-          {activeTab === 'fortune' && (
-            !chart ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
-                <EmptyState
-                  message="请先在「命盘解读」中输入您的生辰信息"
-                  action={() => setActiveTab('chart')}
-                  actionLabel="前往输入"
-                />
-              </div>
-            ) : (
-              <YearlyFortune />
-            )
-          )}
-
-          {/* 人生K线标签 */}
-          {activeTab === 'kline' && (
-            !chart ? (
-              <div className="flex items-center justify-center min-h-[60vh]">
-                <EmptyState
-                  message="请先在「命盘解读」中输入您的生辰信息"
-                  action={() => setActiveTab('chart')}
-                  actionLabel="前往输入"
-                />
-              </div>
-            ) : (
-              <LifeKLine />
-            )
-          )}
-
-          {/* 双人合盘标签 */}
+          {/* Compatibility tab */}
           {activeTab === 'match' && <MatchAnalysis />}
 
-          {/* 分享卡片标签 */}
+          {/* Share Card tab */}
           {activeTab === 'share' && (
             !chart ? (
               <div className="flex items-center justify-center min-h-[60vh]">
                 <EmptyState
-                  message="请先在「命盘解读」中输入您的生辰信息"
+                  message="Cast your chart under Your Chart first."
                   action={() => setActiveTab('chart')}
-                  actionLabel="前往输入"
+                  actionLabel="Go to Your Chart"
                 />
               </div>
             ) : (
@@ -301,35 +225,22 @@ export default function App() {
         </div>
       </main>
 
-      {/* 设置弹窗 */}
-      {showSettings && (
-        <div
-          className="
-            fixed inset-0 z-50
-            bg-black/60 backdrop-blur-sm
-            flex items-center justify-center p-4
-          "
-          onClick={(e) => e.target === e.currentTarget && setShowSettings(false)}
-        >
-          <div className="animate-fade-in">
-            <SettingsPanel onClose={() => setShowSettings(false)} />
-          </div>
-        </div>
-      )}
-
-      {/* 底部 - 仅桌面端显示 */}
+      {/* Footer — desktop only */}
       <footer
         className="
           hidden md:block
-          py-6 text-center text-text-muted text-sm
+          py-6 text-center text-text-muted text-xs
           border-t border-white/[0.04]
+          space-y-1.5
         "
       >
         <p className="flex items-center justify-center gap-2">
           <span className="text-gold/60">☆</span>
-          紫微知道 · 开源命理工具 · <OpenSourceFooterLinks />
-          <span className="text-star/60">☆</span>
+          Cinnabar · Eastern Astrology, in English · <OpenSourceFooterLinks />
+          <span className="text-cinnabar/70">☆</span>
         </p>
+        <p>For entertainment &amp; self-discovery only. Not professional advice.</p>
+        <p>Chart engine based on the open-source ziwei project (GPLv3).</p>
       </footer>
 
       <Analytics />
@@ -338,7 +249,7 @@ export default function App() {
 }
 
 /* ------------------------------------------------------------
-   空状态组件
+   Empty state
    ------------------------------------------------------------ */
 
 interface EmptyStateProps {
@@ -362,8 +273,8 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
         className="
           inline-flex items-center gap-2
           px-4 py-2 rounded-lg
-          bg-star/20 text-star-light
-          hover:bg-star/30 transition-colors
+          bg-cinnabar/20 text-cinnabar-light
+          hover:bg-cinnabar/30 transition-colors
         "
       >
         {actionLabel}

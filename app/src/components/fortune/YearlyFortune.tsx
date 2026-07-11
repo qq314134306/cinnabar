@@ -6,8 +6,8 @@
 import { useState, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
-import { streamChat, type ChatMessage, type LLMConfig } from '@/lib/llm'
+import { useChartStore, useContentCacheStore } from '@/stores'
+import { streamChat, type ChatMessage } from '@/lib/llm'
 import { extractKnowledge, buildPromptContext } from '@/knowledge'
 import { buildGuidancePromptContext } from '@/knowledge-db'
 import { Button, Select } from '@/components/ui'
@@ -180,9 +180,7 @@ function buildYearlyContext(
 
 export function YearlyFortune() {
   const { chart, birthInfo } = useChartStore()
-  const { provider, providerSettings, enableThinking, enableWebSearch, searchApiKey } = useSettingsStore()
   const { yearlyFortune, setYearlyFortune } = useContentCacheStore()
-  const currentSettings = providerSettings[provider]
 
   const [year, setYear] = useState(currentYear)
   const [fortune, setFortune] = useState(yearlyFortune[currentYear] || '')
@@ -197,10 +195,6 @@ export function YearlyFortune() {
 
   const handleAnalyze = useCallback(async () => {
     if (!chart || !birthInfo) return
-    if (!currentSettings.apiKey) {
-      setError('请先在设置中配置 API Key')
-      return
-    }
 
     setLoading(true)
     setError(null)
@@ -243,18 +237,8 @@ ${guidanceContext}
         { role: 'user', content: userMessage },
       ]
 
-      const config: LLMConfig = {
-        provider,
-        apiKey: currentSettings.apiKey,
-        baseUrl: currentSettings.customBaseUrl || undefined,
-        model: currentSettings.customModel || undefined,
-        enableThinking,
-        enableWebSearch,
-        searchApiKey: searchApiKey || undefined,
-      }
-
       let fullText = ''
-      for await (const token of streamChat(config, messages)) {
+      for await (const token of streamChat(messages)) {
         fullText += token
         setFortune(fullText)
       }
@@ -266,7 +250,7 @@ ${guidanceContext}
     } finally {
       setLoading(false)
     }
-  }, [chart, birthInfo, year, provider, currentSettings, enableThinking, enableWebSearch, searchApiKey, setYearlyFortune])
+  }, [chart, birthInfo, year, setYearlyFortune])
 
   if (!chart) return null
 
@@ -311,7 +295,7 @@ ${guidanceContext}
 
             <Button
               onClick={handleAnalyze}
-              disabled={loading || !currentSettings.apiKey}
+              disabled={loading}
               size="sm"
               variant="gold"
             >
@@ -320,7 +304,7 @@ ${guidanceContext}
                   <span className="w-3 h-3 border-2 border-night border-t-transparent rounded-full animate-spin" />
                   分析中
                 </span>
-              ) : currentSettings.apiKey ? '查看运势' : '请先配置 API'}
+              ) : '查看运势'}
             </Button>
           </div>
         </div>
@@ -351,16 +335,8 @@ ${guidanceContext}
           "
         />
 
-        {/* 未配置提示 */}
-        {!currentSettings.apiKey && !fortune && (
-          <div className="text-text-muted text-sm py-8 text-center">
-            <div className="text-3xl mb-3 opacity-30">◎</div>
-            请先在设置中配置 AI 模型的 API Key，即可获得年度运势分析。
-          </div>
-        )}
-
         {/* 未分析提示 */}
-        {currentSettings.apiKey && !fortune && !loading && (
+        {!fortune && !loading && (
           <div className="text-text-muted text-sm py-8 text-center">
             <div className="text-3xl mb-3 opacity-30">◎</div>
             选择年份并点击「查看运势」开始分析
