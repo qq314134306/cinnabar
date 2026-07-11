@@ -226,16 +226,16 @@ export function BirthForm() {
         {/* Birthplace (optional) */}
         <Input
           label="Birthplace (optional)"
-          placeholder="e.g. Beijing, Chengdu, Shanghai"
+          placeholder="e.g. New York, London, Tokyo"
           hint={
             trueSolarEnabled
               ? matchingBirthplace
                 ? 'Matching your birthplace...'
                 : matchedBirthplace
-                ? `Matched ${matchedBirthplace.name} — true solar time will be corrected automatically.`
+                ? `Matched ${matchedBirthplace.enName ?? matchedBirthplace.name}${matchedBirthplace.country ? `, ${matchedBirthplace.country}` : ''} — true solar time will be fine-tuned automatically.`
                 : birthplace.trim()
-                  ? 'No match found for this birthplace; the chart will use your entered time as-is.'
-                  : 'Type your birthplace and it will be matched automatically.'
+                  ? "That city isn't in our list yet — no problem, your chart will use your birth time exactly as entered."
+                  : 'Type your city and it will be matched automatically.'
               : 'True solar time correction is off.'
           }
           value={birthplace}

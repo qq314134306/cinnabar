@@ -52,8 +52,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates.
 - `app/src/lib/llm.ts` - streaming client for `/api/interpret`.
-- `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers.
-- `app/src/lib/birthplace-data.json` - local city/region coordinate dataset.
+- `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via Intl).
+- `app/src/lib/birthplace-data.json` - local Chinese city/region coordinate dataset.
+- `app/src/lib/world-cities.json` - curated global city dataset (name, country, longitude, IANA timezone, aliases).
 - `app/src/lib/birth-date.ts` - birth date handling.
 - `app/src/lib/astro.ts` - chart-facing astrology helpers.
 - `app/src/knowledge-db/retrieval/retrieve.ts` - guidance retrieval.

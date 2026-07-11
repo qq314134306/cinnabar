@@ -74,9 +74,15 @@ free-reading / compatibility prompt templates.
 `src/lib/llm.ts`: Streaming client for the `/api/interpret` proxy.
 
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
+Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city
+English names; UTC offsets are DST-aware via the built-in Intl API (China
+entries default to Asia/Shanghai).
 
-`src/lib/birthplace-data.json`: Local coordinate dataset used for birthplace
-matching.
+`src/lib/birthplace-data.json`: Local Chinese coordinate dataset used for
+birthplace matching (pinyin keys generated at load via pinyin-pro).
+
+`src/lib/world-cities.json`: Curated global city dataset (name, country,
+longitude, IANA timezone, aliases) for overseas true-solar-time correction.
 
 `src/knowledge-db/`: Structured guidance database and retrieval pipeline.
 

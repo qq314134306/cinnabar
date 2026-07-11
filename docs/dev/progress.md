@@ -13,6 +13,12 @@
 
 ## Recently Completed
 
+- Review feedback round: birthplace matching now accepts pinyin ("Zhu Zhou" /
+  "zhuzhou" / "ZHUZHOU" all match 株洲, shown as "Zhuzhou") via pinyin-pro, and
+  supports ~230 major world cities (`app/src/lib/world-cities.json`) with
+  DST-aware true-solar-time correction using each city's IANA timezone through
+  the built-in Intl API — no timezone library. Unmatched cities degrade
+  gracefully with friendly copy. Placeholder now "e.g. New York, London, Tokyo".
 - Rebranded the site as Cinnabar ("Eastern Astrology, in English"): full English
   UI, new Midnight Indigo / Cinnabar Red / Imperial Purple / Celestial Gold /
   Parchment palette, English fonts, and English chart terminology via a new

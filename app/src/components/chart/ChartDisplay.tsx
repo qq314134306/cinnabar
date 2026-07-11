@@ -273,7 +273,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
           <p>
             <span className="text-text-muted">True solar time</span>{' '}
             <span className="text-gold">
-              {resolvedTime.location?.name} {formatTime(resolvedTime.hour, resolvedTime.minute)}
+              {resolvedTime.location?.enName ?? resolvedTime.location?.name} {formatTime(resolvedTime.hour, resolvedTime.minute)}
               {resolvedTime.originalShichen !== resolvedTime.correctedShichen
                 ? ` — ${translateShichen(resolvedTime.originalShichen)} corrected to ${translateShichen(resolvedTime.correctedShichen)}`
                 : ' — hour unchanged'}
@@ -283,7 +283,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
         {showUnmatched && (
           <p>
             <span className="text-text-muted">True solar time</span>{' '}
-            <span className="text-text-muted">birthplace not matched; using the entered hour</span>
+            <span className="text-text-muted">cast with your entered time</span>
           </p>
         )}
         <p><span className="text-text-muted">Gender</span> <span className="text-text">{gender}</span></p>
