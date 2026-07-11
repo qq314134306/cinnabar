@@ -22,7 +22,7 @@ import { renderPayPalButtons, type PayPalCheckoutHandle } from '@/lib/paypal'
 import { Button } from '@/components/ui'
 
 const TIER_PRICES: Record<ForecastTier, string> = {
-  '1-year': '6.90',
+  '1-year': '9.90',
   '5-year': '14.90',
 }
 
@@ -44,6 +44,8 @@ const CONTAINER_ID: Record<ForecastTier, string> = {
   '1-year': 'cinnabar-paypal-1-year',
   '5-year': 'cinnabar-paypal-5-year',
 }
+
+const FIVE_YEAR_PER_YEAR = (Number(TIER_PRICES['5-year']) / 5).toFixed(2)
 
 type Status = 'idle' | 'generating' | 'error'
 
@@ -284,11 +286,16 @@ export function FutureReportPaywall() {
               )}
               <h4 className="text-base font-semibold text-text mb-1">{FORECAST_TIER_LABELS[tier]}</h4>
               <p
-                className={`text-3xl font-bold mb-3 ${tier === '5-year' ? 'text-gold' : 'text-text'}`}
+                className={`text-3xl font-bold ${tier === '5-year' ? 'text-gold mb-1' : 'text-text mb-3'}`}
                 style={{ fontFamily: 'var(--font-serif)' }}
               >
                 ${TIER_PRICES[tier]}
               </p>
+              {tier === '5-year' && (
+                <p className="text-xs font-medium text-gold/80 mb-3">
+                  just ${FIVE_YEAR_PER_YEAR}/year — best value
+                </p>
+              )}
               <ul className="space-y-1.5 mb-4 text-sm text-text-secondary">
                 {TIER_FEATURES[tier].map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
