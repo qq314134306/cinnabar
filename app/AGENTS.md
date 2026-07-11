@@ -42,10 +42,17 @@ npm run test -- sync-zwknows
 
 `src/main.tsx`: React entry point and app mounting.
 
-`src/App.tsx`: Top-level application composition.
+`src/App.tsx`: Top-level application composition (Cinnabar shell: Your Chart,
+Compatibility, Share Card; Yearly Fortune and Life K-Line remain in the codebase
+but are hidden from navigation).
+
+`api/interpret.ts`: Vercel Edge Function that proxies DeepSeek chat completions.
+The only place `DEEPSEEK_API_KEY` is read; the key never reaches the browser.
 
 `src/components/`: Feature UI components. Keep deterministic calculation logic in
-`src/lib/` instead of embedding it in components.
+`src/lib/` instead of embedding it in components. All user-facing text is
+English; the iztro engine output stays zh-CN internally and is translated at the
+presentation layer.
 
 `src/components/ui/`: Small reusable UI primitives.
 
@@ -55,6 +62,17 @@ open source attribution in the app shell.
 `src/lib/`: Business helpers for date handling, astrology support, true solar
 time, birthplace data, LLM wiring, and scoring.
 
+`src/lib/ziwei-glossary.ts`: Chinese→English translation dictionaries for stars,
+palaces, transformations, brightness, stems/branches, shichen, and Na Yin.
+Follows the Cinnabar glossary; covered by `ziwei-glossary.test.ts`.
+
+`src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI prompts.
+
+`src/lib/ai-prompts.ts`: Base system prompt, Scholar/Old Sage personas, and the
+free-reading / compatibility prompt templates.
+
+`src/lib/llm.ts`: Streaming client for the `/api/interpret` proxy.
+
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 
 `src/lib/birthplace-data.json`: Local coordinate dataset used for birthplace
@@ -62,9 +80,11 @@ matching.
 
 `src/knowledge-db/`: Structured guidance database and retrieval pipeline.
 
-`src/knowledge/`: Static domain knowledge used by the app.
+`src/knowledge/`: Static domain knowledge used by the app (zh-CN; used by the
+hidden fortune/K-line features).
 
-`src/stores/`: Zustand state boundaries.
+`src/stores/`: Zustand state boundaries. Settings persist only the reader
+persona; API keys are no longer stored client-side.
 
 `tests/`: Tests that sit outside `src`, including workflow contract tests.
 
