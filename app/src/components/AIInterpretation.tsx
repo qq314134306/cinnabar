@@ -12,6 +12,7 @@ import { buildZiWeiChartFacts } from '@/lib/chart-facts'
 import { buildFreeReadingPrompt, buildSystemPrompt, DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
 import { streamChat, type ChatMessage } from '@/lib/llm'
 import { Button } from '@/components/ui'
+import { FutureReportPaywall } from '@/components/FutureReportPaywall'
 
 /* ------------------------------------------------------------
    Character reveal speed (ms per character)
@@ -249,6 +250,8 @@ export function AIInterpretation() {
           <span>Casting your reading...</span>
         </div>
       )}
+
+      {displayText && !animating && <FutureReportPaywall />}
     </div>
   )
 }

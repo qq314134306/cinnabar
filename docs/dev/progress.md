@@ -13,6 +13,22 @@
 
 ## Recently Completed
 
+- Added a paywall below the free reading: "Unlock Your Future Report" with
+  1-Year ($6.90) and 5-Year ($14.90, "Most Popular", gold-bordered) tiers,
+  checked out via PayPal Smart Payment Buttons (`app/src/lib/paypal.ts`,
+  client-side createOrder/capture — the standard MVP integration). On
+  approval, a persona-aware Paid Future Report streams from the existing
+  `/api/interpret` proxy, grounded in new year-by-year Liu Nian facts
+  (`buildYearlyChartFacts` in `app/src/lib/chart-facts.ts`) and the section-5
+  Paid Future Report prompt (`buildFutureReportPrompt` in `ai-prompts.ts`;
+  1-year tier covers this year + next year only, 5-year covers the full
+  span). The report is cached in `useContentCacheStore.futureReport` so it
+  survives tab switches, shows "✓ Purchase confirmed — Your Future Report"
+  with a Print/Save button (`window.print`), and cancel/error states show a
+  friendly retry notice without touching the free reading. Fixed a
+  pre-existing ~3px mobile overflow in the natal chart's palace grid
+  (`ChartDisplay.tsx`, tighter gap/padding on the smallest breakpoint only)
+  found while verifying the new paywall on mobile.
 - Review feedback round: birthplace matching now accepts pinyin ("Zhu Zhou" /
   "zhuzhou" / "ZHUZHOU" all match 株洲, shown as "Zhuzhou") via pinyin-pro, and
   supports ~230 major world cities (`app/src/lib/world-cities.json`) with

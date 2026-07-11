@@ -7,7 +7,7 @@ import { persist } from 'zustand/middleware'
 import type { FunctionalAstrolabe } from '@/lib/astro'
 import type { BirthInfo } from '@/lib/astro'
 import type { LifetimeKLinePoint } from '@/lib/fortune-score'
-import type { Persona } from '@/lib/ai-prompts'
+import type { ForecastTier, Persona } from '@/lib/ai-prompts'
 
 /* ------------------------------------------------------------
    Chart state
@@ -42,10 +42,20 @@ interface KLineCache {
   isGenerating: boolean           // whether reasons are still being generated
 }
 
+export interface FutureReportCache {
+  tier: ForecastTier
+  text: string
+  orderId: string
+}
+
 interface ContentCacheState {
   // AI natal reading
   aiInterpretation: string | null
   setAiInterpretation: (content: string) => void
+
+  // Paid Future Report (set once payment is captured and the report streams in)
+  futureReport: FutureReportCache | null
+  setFutureReport: (report: FutureReportCache | null) => void
 
   // Yearly fortune readings (cached per year)
   yearlyFortune: Record<number, string>
@@ -63,10 +73,12 @@ interface ContentCacheState {
 
 export const useContentCacheStore = create<ContentCacheState>()((set) => ({
   aiInterpretation: null,
+  futureReport: null,
   yearlyFortune: {},
   klineCache: null,
 
   setAiInterpretation: (content) => set({ aiInterpretation: content }),
+  setFutureReport: (report) => set({ futureReport: report }),
 
   setYearlyFortune: (year, content) => set((state) => ({
     yearlyFortune: { ...state.yearlyFortune, [year]: content },
@@ -98,6 +110,7 @@ export const useContentCacheStore = create<ContentCacheState>()((set) => ({
 
   clearAll: () => set({
     aiInterpretation: null,
+    futureReport: null,
     yearlyFortune: {},
     klineCache: null,
   }),

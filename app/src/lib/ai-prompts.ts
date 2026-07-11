@@ -67,6 +67,48 @@ ${chartFacts}`
 }
 
 /* ------------------------------------------------------------
+   Paid Future Report — 1-year or 5-year forecast
+   ------------------------------------------------------------ */
+
+export type ForecastTier = '1-year' | '5-year'
+
+export const FORECAST_TIER_LABELS: Record<ForecastTier, string> = {
+  '1-year': '1-Year Forecast',
+  '5-year': '5-Year Forecast',
+}
+
+/** Calendar years covered by a tier, starting from the given current year. */
+export function forecastYears(tier: ForecastTier, currentYear: number): number[] {
+  const span = tier === '1-year' ? 2 : 5
+  return Array.from({ length: span }, (_, i) => currentYear + i)
+}
+
+export function buildFutureReportPrompt(
+  chartFacts: string,
+  yearlyFacts: string,
+  tier: ForecastTier
+): string {
+  const isOneYear = tier === '1-year'
+  const yearSpan = isOneYear ? 'this year and next year (2 years)' : 'this year and the next four years (5 years)'
+  const wordCount = isOneYear ? '250-350' : '450-650'
+
+  return `Write a PAID Future Report of about ${wordCount} words covering ${yearSpan}, grounded in the CHART FACTS below — especially the Luck Cycle (Da Yun) and annual pillars/limits (Liu Nian / Da Xian).
+
+Structure:
+1. A short framing of their current major luck cycle and its overall theme.
+2. Year by year (${yearSpan}): for EACH year, 2-4 sentences on (a) career/direction, (b) wealth/opportunity, (c) relationships/love — each tied to how that year interacts with their chart. Name the timing driver, e.g. "this year's branch clashes your Spouse Palace, so...".
+3. Practical guidance: what to lean into, what to handle with care, and the best windows of timing.
+4. Close on an empowering, non-deterministic note.
+
+Everything is tendencies and timing, never fixed fate. Entertainment & self-discovery only.
+
+CHART FACTS:
+${chartFacts}
+
+${yearlyFacts}`
+}
+
+/* ------------------------------------------------------------
    Compatibility — two-person reading
    ------------------------------------------------------------ */
 
@@ -94,3 +136,6 @@ export function buildSystemPrompt(persona: Persona): string {
 }
 
 export const DISCLAIMER = 'For entertainment & self-discovery only. Not professional advice.'
+
+export const PAYWALL_DISCLAIMER =
+  "For entertainment & self-discovery only. Personalized digital content — all sales final; if it doesn't resonate, contact us and we'll make it right."

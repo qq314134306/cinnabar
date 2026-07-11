@@ -164,7 +164,7 @@ function PalaceCard({
     <div
       onClick={onClick}
       className={`
-        group relative p-2 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col
+        group relative p-1.5 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col
         bg-white/[0.03] backdrop-blur-sm
         border border-white/[0.06] rounded-xl
         transition-all duration-300 cursor-pointer
@@ -408,7 +408,7 @@ export function ChartDisplay() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-px bg-gradient-to-r from-transparent via-star/50 to-transparent" />
 
       {/* 4x4 grid */}
-      <div className="grid grid-cols-4 gap-1.5 lg:gap-2">
+      <div className="grid grid-cols-4 gap-1 lg:gap-2">
         {/* Row 0 */}
         {grid[0].map((p, c) => renderPalace(p, `0-${c}`))}
 

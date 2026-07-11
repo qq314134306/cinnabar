@@ -12,6 +12,7 @@ import {
   SIHUA_EN,
   translateBranch,
   translateFiveElementsClass,
+  translateGanZhi,
   translatePalaceName,
 } from './ziwei-glossary'
 
@@ -141,6 +142,69 @@ export function buildZiWeiChartFacts(
     lines.push(
       `Current Major Limit (Da Xian, ages ${start}-${end}): passing through the ${translatePalaceName(currentDecadal.name)}`
     )
+  }
+
+  return lines.join('\n')
+}
+
+/* ------------------------------------------------------------
+   Year-by-year facts (Liu Nian) for the paid Future Report
+   ------------------------------------------------------------ */
+
+const SIHUA_ORDER = ['禄', '权', '科', '忌']
+
+interface MinimalHoroscopeYearly {
+  heavenlyStem: string
+  earthlyBranch: string
+  /** Star names carrying this year's transformations, in Lu/Quan/Ke/Ji order. */
+  mutagen: string[]
+  /** Parallel to `chart.palaces` — this year's palace label at that natal position. */
+  palaceNames: string[]
+}
+
+function findNatalPalaceForStar(palaces: MinimalPalace[], starName: string): MinimalPalace | undefined {
+  return palaces.find((p) => [...p.majorStars, ...p.minorStars].some((s) => s.name === starName))
+}
+
+/**
+ * Builds one line per requested year: the year's Four Transformations mapped
+ * onto natal palaces, and which natal palace hosts this year's Life Palace —
+ * all computed by the engine (`chart.horoscope`), never invented.
+ */
+export function buildYearlyChartFacts(
+  chart: FunctionalAstrolabe,
+  birthInfo: BirthInfo,
+  years: number[]
+): string {
+  const palaces = chart.palaces as unknown as MinimalPalace[]
+  const lines: string[] = ['Year-by-Year Timing (Liu Nian):']
+
+  for (const year of years) {
+    const age = year - birthInfo.year + 1
+    const horoscope = chart.horoscope(new Date(year, 5, 15)) as unknown as { yearly: MinimalHoroscopeYearly }
+    const yearly = horoscope.yearly
+    const ganzhi = translateGanZhi(`${yearly.heavenlyStem}${yearly.earthlyBranch}`)
+
+    const transformationLines = SIHUA_ORDER
+      .map((code, i) => {
+        const starName = yearly.mutagen[i]
+        if (!starName) return null
+        const hostPalace = findNatalPalaceForStar(palaces, starName)
+        const { code: sihuaCode } = SIHUA_EN[code]
+        return hostPalace
+          ? `${sihuaCode} on ${describeStarLabel(starName)} (natal ${translatePalaceName(hostPalace.name)})`
+          : `${sihuaCode} on ${describeStarLabel(starName)}`
+      })
+      .filter((line): line is string => !!line)
+      .join(', ')
+
+    const lifeIdx = yearly.palaceNames.indexOf('命宫')
+    const lifeHostPalace = lifeIdx >= 0 ? palaces[lifeIdx] : undefined
+    const lifeHostLine = lifeHostPalace
+      ? ` This year's Life Palace falls on your natal ${translatePalaceName(lifeHostPalace.name)}.`
+      : ''
+
+    lines.push(`- ${year} (age ${age}, ${ganzhi} year): ${transformationLines}.${lifeHostLine}`)
   }
 
   return lines.join('\n')
