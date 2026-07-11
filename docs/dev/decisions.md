@@ -93,3 +93,18 @@ API key settings panel were removed.
 Consequence: deployments must set `DEEPSEEK_API_KEY` in the Vercel project
 environment. Local `vite dev`/`vite preview` do not serve the function; use
 `vercel dev` to exercise AI readings locally.
+
+## D006 - Client-Side PayPal Checkout for the MVP Paywall
+
+The Future Report paywall uses PayPal's Smart Payment Buttons with a
+client-only integration: `createOrder`/`actions.order.capture()` run entirely
+in the browser (`app/src/lib/paypal.ts`), with no server-side order
+verification. The PayPal client ID is a public identifier (safe to ship in
+the bundle, analogous to a Stripe publishable key).
+
+Consequence: this is intentionally an MVP tradeoff — a malicious client could
+in principle tamper with the charged amount before `createOrder`. Hardening
+for production would move order creation and capture to a server endpoint
+(mirroring the `/api/interpret` proxy pattern) that sets the amount from a
+trusted tier lookup rather than trusting the client. Until then, treat
+payment amounts as advisory, not authoritative.

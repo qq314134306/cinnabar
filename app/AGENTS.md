@@ -66,12 +66,22 @@ time, birthplace data, LLM wiring, and scoring.
 palaces, transformations, brightness, stems/branches, shichen, and Na Yin.
 Follows the Cinnabar glossary; covered by `ziwei-glossary.test.ts`.
 
-`src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI prompts.
+`src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI
+prompts, including `buildYearlyChartFacts` (year-by-year Liu Nian facts via
+`chart.horoscope()`) for the paid Future Report.
 
 `src/lib/ai-prompts.ts`: Base system prompt, Scholar/Old Sage personas, and the
-free-reading / compatibility prompt templates.
+free-reading / compatibility / paid Future Report prompt templates.
 
 `src/lib/llm.ts`: Streaming client for the `/api/interpret` proxy.
+
+`src/lib/paypal.ts`: Client-side PayPal Smart Payment Buttons wrapper
+(createOrder/capture — the standard MVP integration; no server order
+verification, see decision D006).
+
+`src/components/FutureReportPaywall.tsx`: Pricing tiers (1-Year/5-Year),
+PayPal checkout, and the purchased report view rendered below the free
+reading in `AIInterpretation.tsx`.
 
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city
