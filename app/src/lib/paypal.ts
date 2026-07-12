@@ -67,7 +67,7 @@ function loadPayPalSdk(): Promise<PayPalNamespace> {
 
     const script = document.createElement('script')
     script.id = 'paypal-sdk-script'
-    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(PAYPAL_CLIENT_ID)}&currency=USD&intent=capture`
+    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(PAYPAL_CLIENT_ID)}&currency=USD&intent=capture&locale=en_US`
     script.async = true
     script.onload = () => {
       if (window.paypal) resolve(window.paypal)
@@ -81,7 +81,7 @@ function loadPayPalSdk(): Promise<PayPalNamespace> {
 }
 
 export interface PayPalCheckoutOptions {
-  /** Decimal string, e.g. "6.90" */
+  /** Decimal string, e.g. "9.90" */
   amount: string
   /** DOM id of the (empty) container element the buttons render into. */
   containerId: string
