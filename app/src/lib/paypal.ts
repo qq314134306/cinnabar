@@ -88,6 +88,8 @@ export interface PayPalCheckoutOptions {
   onApprove: (details: PayPalOrderDetails) => void
   onError: (error: Error) => void
   onCancel?: () => void
+  /** Fires when the buyer clicks the button and an order is created. */
+  onCheckoutStart?: () => void
 }
 
 export interface PayPalCheckoutHandle {
@@ -100,10 +102,12 @@ export async function renderPayPalButtons(options: PayPalCheckoutOptions): Promi
 
   const buttons = paypal.Buttons({
     style: { layout: 'vertical', color: 'gold', shape: 'pill', label: 'pay' },
-    createOrder: (_data, actions) =>
-      actions.order.create({
+    createOrder: (_data, actions) => {
+      options.onCheckoutStart?.()
+      return actions.order.create({
         purchase_units: [{ amount: { value: options.amount, currency_code: 'USD' } }],
-      }),
+      })
+    },
     onApprove: async (_data, actions) => {
       try {
         const details = await actions.order.capture()

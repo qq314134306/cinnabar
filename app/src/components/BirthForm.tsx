@@ -8,6 +8,7 @@ import { generateChart, getShichenOptions, type BirthInfo, type Gender } from '@
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
 import { findBirthplaceAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
 import { useChartStore } from '@/stores'
+import { trackEvent } from '@/lib/analytics'
 
 const YEAR_OPTIONS = getYearOptions()
 const MONTH_OPTIONS = getMonthOptions()
@@ -31,6 +32,11 @@ export function BirthForm() {
   const [matchedBirthplace, setMatchedBirthplace] = useState<Birthplace | null>(null)
   const [matchingBirthplace, setMatchingBirthplace] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  // Landing page exposure — the birth form is only shown before a chart exists.
+  useEffect(() => {
+    trackEvent('view_landing')
+  }, [])
 
   const dayOptions = getDayOptions(year, month)
 

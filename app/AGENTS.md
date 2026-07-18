@@ -75,6 +75,11 @@ free-reading / compatibility / paid Future Report prompt templates.
 
 `src/lib/llm.ts`: Streaming client for the `/api/interpret` proxy.
 
+`src/lib/analytics.ts`: Google Analytics 4 (gtag.js) wrapper — SPA `page_view`
+and the Cinnabar funnel events (view_landing, start_reading, complete_reading,
+view_paywall, begin_checkout, purchase_success). gtag.js is loaded in
+`index.html`; the Measurement ID is a public value and no secret is involved.
+
 `src/lib/paypal.ts`: Client-side PayPal Smart Payment Buttons wrapper
 (createOrder/capture — the standard MVP integration; no server order
 verification, see decision D006).

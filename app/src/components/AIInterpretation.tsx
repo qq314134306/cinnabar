@@ -11,6 +11,7 @@ import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
 import { buildZiWeiChartFacts } from '@/lib/chart-facts'
 import { buildFreeReadingPrompt, buildSystemPrompt, DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
 import { streamChat, type ChatMessage } from '@/lib/llm'
+import { trackEvent } from '@/lib/analytics'
 import { Button } from '@/components/ui'
 import { FutureReportPaywall } from '@/components/FutureReportPaywall'
 
@@ -113,6 +114,8 @@ export function AIInterpretation() {
   const handleInterpret = useCallback(async () => {
     if (!chart || !birthInfo) return
 
+    trackEvent('start_reading', { persona })
+
     loadingRef.current = true
     setLoading(true)
     setError(null)
@@ -139,6 +142,7 @@ export function AIInterpretation() {
       }
 
       setAiInterpretation(fullTextRef.current)
+      trackEvent('complete_reading', { persona })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'The reading failed. Please try again.')
     } finally {

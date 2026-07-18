@@ -3,8 +3,9 @@
    Eastern Astrology, in English.
    ============================================================ */
 
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
+import { trackPageView } from '@/lib/analytics'
 import { BirthForm } from '@/components/BirthForm'
 import { ChartDisplay } from '@/components/chart'
 import { AIInterpretation } from '@/components/AIInterpretation'
@@ -21,9 +22,25 @@ const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
   { key: 'share', label: 'Share Card', icon: '◈' },
 ]
 
+/** Maps the current tab + chart state to a virtual page for GA4. */
+function resolveVirtualPage(activeTab: TabType, hasChart: boolean): { path: string; title: string } {
+  if (activeTab === 'match') return { path: '/compatibility', title: 'Compatibility · Cinnabar' }
+  if (activeTab === 'share') return { path: '/share-card', title: 'Share Card · Cinnabar' }
+  if (hasChart) return { path: '/chart', title: 'Your Chart · Cinnabar' }
+  return { path: '/', title: 'Cinnabar — Eastern Astrology, in English' }
+}
+
 export default function App() {
   const { chart } = useChartStore()
   const [activeTab, setActiveTab] = useState<TabType>('chart')
+
+  // Report a GA4 page_view on every in-app navigation. This SPA has no router,
+  // so we treat each tab / chart-state combination as a distinct page.
+  const hasChart = Boolean(chart)
+  useEffect(() => {
+    const { path, title } = resolveVirtualPage(activeTab, hasChart)
+    trackPageView(path, title)
+  }, [activeTab, hasChart])
 
   return (
     <div className="min-h-screen flex flex-col">
