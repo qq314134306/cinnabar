@@ -49,6 +49,24 @@ but are hidden from navigation).
 `api/interpret.ts`: Vercel Edge Function that proxies DeepSeek chat completions.
 The only place `DEEPSEEK_API_KEY` is read; the key never reaches the browser.
 
+`api/subscribe.ts`: Vercel Edge Function for email capture. The only place
+`MAKE_WEBHOOK_URL` is read; it validates the email server-side, applies a body-size
+cap and a best-effort in-memory rate limit, then forwards
+`{ email, source, created_at }` to the Make webhook. Independent of the
+DeepSeek/PayPal flow. Covered by `tests/subscribe.test.ts`.
+
+`src/components/email/`: Reusable `EmailCapture` (posts to `/api/subscribe` with a
+`source`) and `ExitIntentModal` (one desktop exit-intent invite per session).
+
+`src/components/soul/SoulCard.tsx`: Shareable vertical Soul Card built from the
+already-cast chart (Life Palace star + element + keywords via `src/lib/soul-card.ts`),
+exported with html2canvas, with a homepage QR (qrcode), a locked self-discovery
+teaser, and share/email optimistic unlock. Shown under the free reading; never
+unlocks the paid Future Report.
+
+`src/lib/soul-card.ts`: Derives Soul Card data (core star, element theme, keywords,
+teaser) from the chart — reads and translates only, never invents.
+
 `src/components/`: Feature UI components. Keep deterministic calculation logic in
 `src/lib/` instead of embedding it in components. All user-facing text is
 English; the iztro engine output stays zh-CN internally and is translated at the
@@ -87,8 +105,8 @@ reading in `AIInterpretation.tsx`.
 `index.html` with automatic page_view disabled; `App.tsx` sends a manual
 page_view per tab change, and components fire named custom events
 (view_landing, start_reading, complete_reading, view_paywall,
-begin_checkout, purchase_success). The GA4 Measurement ID is public; no
-secrets belong here.
+begin_checkout, purchase_success, soul_card_view, share_click, email_capture).
+The GA4 Measurement ID is public; no secrets belong here.
 
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city

@@ -71,6 +71,17 @@ matching documentation is incomplete.
 For code changes, include fresh verification evidence. If a command is not run,
 state the reason in the PR.
 
+## Vercel Environment Variables
+
+Server-side secrets are read only inside `app/api/*` Edge Functions and never
+reach the client bundle:
+
+- `DEEPSEEK_API_KEY` — DeepSeek proxy (`app/api/interpret.ts`).
+- `MAKE_WEBHOOK_URL` — email-capture webhook target (`app/api/subscribe.ts`).
+  When unset, `/api/subscribe` returns 500 and no email is forwarded.
+
+The GA4 Measurement ID stays public in the client and is not a secret.
+
 ## GitHub Sync to Vercel Repository
 
 Source repo: `ruijayfeng/ziwei`

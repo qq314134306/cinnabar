@@ -108,3 +108,19 @@ for production would move order creation and capture to a server endpoint
 (mirroring the `/api/interpret` proxy pattern) that sets the amount from a
 trusted tier lookup rather than trusting the client. Until then, treat
 payment amounts as advisory, not authoritative.
+
+## D007 - Email Capture Proxied Server-Side; Soul Card Unlock Is Optimistic
+
+Email opt-ins post to `/api/subscribe`, a Vercel Edge Function that validates
+the email, rate-limits, and forwards `{ email, source, created_at }` to the
+Make webhook. `MAKE_WEBHOOK_URL` is read only on the server — mirroring the
+`/api/interpret` pattern — so the webhook URL never ships in the client bundle.
+
+The Soul Card's teaser is a growth/viral reward, not gated content: any share
+action or email submit unlocks it *optimistically* in the browser, with no
+server verification. The teaser is a deliberately hooky-but-shallow
+self-discovery line and is entirely separate from the paid Future Report.
+
+Consequence: deployments must set `MAKE_WEBHOOK_URL`. The unlock must never
+reveal or gate the paid report, and Soul Card copy stays within
+self-discovery / entertainment framing (no divination/fortune/psychic terms).

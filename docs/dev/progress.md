@@ -13,6 +13,25 @@
 
 ## Recently Completed
 
+- Added Soul Card sharing + email capture on a shared backend. New Edge
+  Function `app/api/subscribe.ts` is the only reader of `MAKE_WEBHOOK_URL`:
+  it validates the email server-side, caps body size, applies a best-effort
+  in-memory rate limit, and forwards `{ email, source, created_at }` to the
+  Make webhook (DeepSeek/PayPal untouched; covered by
+  `app/tests/subscribe.test.ts`). A reusable `EmailCapture`
+  (`app/src/components/email/`) posts to `/api/subscribe` and appears in three
+  places: a low-key entry under the free reading (`source=reading`), a
+  one-per-session desktop exit-intent modal (`source=exit_intent`), and the
+  Soul Card unlock (`source=soul_card`). The Soul Card
+  (`app/src/components/soul/SoulCard.tsx`, data from
+  `app/src/lib/soul-card.ts`) renders a vertical, element-themed card from the
+  already-cast chart (Life Palace star + element + keywords), exports via
+  html2canvas, embeds a homepage QR (`qrcode`), and optimistically unlocks a
+  self-discovery teaser on any share (Download/Pinterest/X/Copy link) or email
+  submit — it never unlocks the paid Future Report and does not touch the
+  paywall or pricing. New GA4 events on the existing wrapper:
+  `soul_card_view`, `share_click(platform)`, `email_capture(source)`. All copy
+  uses self-discovery / entertainment framing only.
 - Added Google Analytics 4 (Measurement ID `G-NB3DMJB5NB`, a public value):
   gtag.js loads in `app/index.html` with `send_page_view:false`; a thin
   guarded wrapper (`app/src/lib/analytics.ts`) forwards manual SPA page_views
