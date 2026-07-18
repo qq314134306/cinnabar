@@ -19,6 +19,7 @@ import {
 } from '@/lib/ai-prompts'
 import { streamChat, type ChatMessage } from '@/lib/llm'
 import { renderPayPalButtons, type PayPalCheckoutHandle } from '@/lib/paypal'
+import { trackEvent } from '@/lib/analytics'
 import { Button } from '@/components/ui'
 
 const TIER_PRICES: Record<ForecastTier, string> = {
@@ -90,6 +91,11 @@ export function FutureReportPaywall() {
 
   const handles = useRef<Partial<Record<ForecastTier, PayPalCheckoutHandle>>>({})
 
+  // The paywall is visible as soon as this component mounts below the free reading.
+  useEffect(() => {
+    trackEvent('view_paywall')
+  }, [])
+
   const generateReport = useCallback(async (tier: ForecastTier, orderId: string) => {
     const { chart, birthInfo } = useChartStore.getState()
     if (!chart || !birthInfo) {
@@ -141,8 +147,21 @@ export function FutureReportPaywall() {
         const handle = await renderPayPalButtons({
           amount: TIER_PRICES[tier],
           containerId: CONTAINER_ID[tier],
+          onCheckoutStart: () => {
+            trackEvent('begin_checkout', {
+              tier,
+              value: Number(TIER_PRICES[tier]),
+              currency: 'USD',
+            })
+          },
           onApprove: (details) => {
             setNotice(null)
+            trackEvent('purchase_success', {
+              tier,
+              value: Number(TIER_PRICES[tier]),
+              currency: 'USD',
+              transaction_id: details.id,
+            })
             void generateReport(tier, details.id)
           },
           onCancel: () => {

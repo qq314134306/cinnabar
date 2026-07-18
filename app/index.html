@@ -8,6 +8,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#1A1B3A" />
     <meta name="description" content="Your real Chinese birth chart (Zi Wei Dou Shu), read in English. Character, gifts, and what's coming. For entertainment & self-discovery." />
+    <!-- Google Analytics 4 (gtag.js). Measurement ID is a public value.
+         send_page_view is disabled so this React SPA can emit a page_view on
+         every in-app navigation (see src/lib/analytics.ts). -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NB3DMJB5NB"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NB3DMJB5NB', { send_page_view: false });
+    </script>
     <title>Cinnabar — Eastern Astrology, in English</title>
     <!-- Google Fonts: Cormorant Garamond (display) + Inter (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -54,6 +54,7 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/paypal.ts` - client-side PayPal Smart Payment Buttons (createOrder/capture).
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.
 - `app/src/lib/llm.ts` - streaming client for `/api/interpret`.
+- `app/src/lib/analytics.ts` - Google Analytics 4 (gtag.js) wrapper: SPA page_view and funnel events (view_landing, start_reading, complete_reading, view_paywall, begin_checkout, purchase_success). gtag.js loads in `app/index.html`; the Measurement ID is public, no secret involved.
 - `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via Intl).
 - `app/src/lib/birthplace-data.json` - local Chinese city/region coordinate dataset.
 - `app/src/lib/world-cities.json` - curated global city dataset (name, country, longitude, IANA timezone, aliases).
