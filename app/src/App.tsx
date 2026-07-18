@@ -11,6 +11,7 @@ import { AIInterpretation } from '@/components/AIInterpretation'
 import { MatchAnalysis } from '@/components/match'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ShareCard } from '@/components/share'
+import { ExitIntentModal } from '@/components/ExitIntentModal'
 import { useChartStore } from '@/stores'
 import { trackPageView } from '@/lib/analytics'
 
@@ -257,6 +258,9 @@ export default function App() {
         <p>For entertainment &amp; self-discovery only. Not professional advice.</p>
         <p>Chart engine based on the open-source ziwei project (GPLv3).</p>
       </footer>
+
+      {/* Exit-intent email capture (once per session, desktop leave signal) */}
+      <ExitIntentModal />
 
       <Analytics />
     </div>

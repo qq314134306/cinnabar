@@ -49,6 +49,11 @@ but are hidden from navigation).
 `api/interpret.ts`: Vercel Edge Function that proxies DeepSeek chat completions.
 The only place `DEEPSEEK_API_KEY` is read; the key never reaches the browser.
 
+`api/subscribe.ts`: Vercel Edge Function for email capture (shared by
+EmailCapture and the Soul Card unlock). The only place `MAKE_WEBHOOK_URL` is
+read; it forwards `{email, source, created_at}` to Make with body-size and
+per-IP rate limits. Set `MAKE_WEBHOOK_URL` in the Vercel project env.
+
 `src/components/`: Feature UI components. Keep deterministic calculation logic in
 `src/lib/` instead of embedding it in components. All user-facing text is
 English; the iztro engine output stays zh-CN internally and is translated at the

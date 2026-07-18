@@ -13,6 +13,20 @@
 
 ## Recently Completed
 
+- Added Soul Card share fission + email capture on one shared backend:
+  `api/subscribe` (Vercel Edge Function) validates the email, reads the
+  `MAKE_WEBHOOK_URL` secret server-side only, forwards
+  `{email, source, created_at}` to Make, and adds body-size + per-IP rate
+  limiting. `EmailCapture` is a reusable client component (source-tagged,
+  compliant copy) placed in three spots: the reading panel (`reading`), an
+  exit-intent modal (`exit_intent`, once per session), and the Soul Card
+  unlock (`soul_card`). The `SoulCard` renders a vertical html2canvas image
+  from the already-computed chart (Life Palace star + element accent + 2–3
+  keywords via deterministic maps in `lib/soul-card.ts`, brand + URL + QR),
+  with a locked "hidden strength" teaser that unlocks optimistically on
+  share or email — the teaser is never the paid report and pricing/paywall
+  are untouched. New GA4 events: `soul_card_view`, `share_click(platform)`,
+  `email_capture(source)`. DeepSeek/PayPal keys and the paywall are untouched.
 - Added Google Analytics 4 (Measurement ID `G-NB3DMJB5NB`, a public value):
   gtag.js loads in `app/index.html` with `send_page_view:false`; a thin
   guarded wrapper (`app/src/lib/analytics.ts`) forwards manual SPA page_views

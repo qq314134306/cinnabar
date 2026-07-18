@@ -65,4 +65,15 @@ export const analytics = {
       currency: 'USD',
       transaction_id: params.transactionId,
     }),
+
+  /** The Soul Card became visible on the results page. */
+  soulCardView: (): void => sendGtag('event', 'soul_card_view'),
+
+  /** User clicked a share action (download / pinterest / x / copy-link). */
+  shareClick: (platform: string): void =>
+    sendGtag('event', 'share_click', { platform }),
+
+  /** An email was successfully captured. */
+  emailCapture: (source: string): void =>
+    sendGtag('event', 'email_capture', { source }),
 }

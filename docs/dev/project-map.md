@@ -53,6 +53,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates (free reading, compatibility, paid Future Report).
 - `app/src/lib/paypal.ts` - client-side PayPal Smart Payment Buttons (createOrder/capture; `onInitiate` fires begin_checkout).
 - `app/src/lib/analytics.ts` - guarded gtag.js wrapper: manual SPA page_views + named GA4 custom events.
+- `app/api/subscribe.ts` - Edge function relaying captured emails to the Make webhook (the only reader of `MAKE_WEBHOOK_URL`).
+- `app/src/lib/subscribe.ts` - client POST helper for `/api/subscribe`.
+- `app/src/components/EmailCapture.tsx` - reusable, source-tagged email opt-in.
+- `app/src/components/SoulCard.tsx` + `app/src/lib/soul-card.ts` - shareable Soul Card (deterministic derivation from the chart) with locked teaser + share/email unlock.
+- `app/src/components/ExitIntentModal.tsx` - once-per-session exit-intent email capture.
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.
 - `app/src/lib/llm.ts` - streaming client for `/api/interpret`.
 - `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via Intl).
