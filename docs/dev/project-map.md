@@ -29,11 +29,14 @@ Primary runtime flow:
    from navigation.
 7. AI readings send an English CHART FACTS block plus persona prompts to
    `/api/interpret`, a Vercel Edge Function that proxies DeepSeek server-side.
+8. After a free reading, a shareable Soul Card and email-capture entries appear.
+   Email opt-ins post to `/api/subscribe`, a separate Vercel Edge Function that
+   forwards to the Make webhook server-side (`MAKE_WEBHOOK_URL`).
 
 ## App Module Map
 
 <directory>
-app/api/ - Vercel Edge Functions (DeepSeek proxy; server-side API key).
+app/api/ - Vercel Edge Functions (DeepSeek proxy + email-capture webhook proxy; server-side secrets).
 app/src/components/ - React UI components grouped by feature.
 app/src/components/ui/ - Small reusable UI primitives.
 app/src/lib/ - Business logic helpers and calculation support.
@@ -46,6 +49,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 ## Important Files
 
 - `app/api/interpret.ts` - Edge proxy for DeepSeek; the only reader of `DEEPSEEK_API_KEY`.
+- `app/api/subscribe.ts` - Edge email-capture proxy; the only reader of `MAKE_WEBHOOK_URL`. Validates, rate-limits, and forwards `{ email, source, created_at }`.
+- `app/src/components/email/` - reusable `EmailCapture` and one-per-session `ExitIntentModal`.
+- `app/src/components/soul/SoulCard.tsx` - shareable Soul Card (html2canvas + QR) with an optimistic self-discovery teaser unlock; never unlocks the paid report.
+- `app/src/lib/soul-card.ts` - derives Soul Card data (core star, element theme, keywords, teaser) from the cast chart.
 - `app/src/components/BirthForm.tsx` - birth input, birthplace matching entry, and true solar time options.
 - `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
