@@ -3,7 +3,7 @@
    Eastern Astrology, in English.
    ============================================================ */
 
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
 import { ChartDisplay } from '@/components/chart'
@@ -12,6 +12,7 @@ import { MatchAnalysis } from '@/components/match'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ShareCard } from '@/components/share'
 import { useChartStore } from '@/stores'
+import { trackPageView } from '@/lib/analytics'
 
 type TabType = 'chart' | 'match' | 'share'
 
@@ -21,9 +22,23 @@ const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
   { key: 'share', label: 'Share Card', icon: '◈' },
 ]
 
+/** Virtual SPA routes reported to GA4 on each tab change. */
+const TAB_ROUTES: Record<TabType, { path: string; title: string }> = {
+  chart: { path: '/', title: 'Cinnabar — Your Chart' },
+  match: { path: '/compatibility', title: 'Cinnabar — Compatibility' },
+  share: { path: '/share-card', title: 'Cinnabar — Share Card' },
+}
+
 export default function App() {
   const { chart } = useChartStore()
   const [activeTab, setActiveTab] = useState<TabType>('chart')
+
+  // Report a page_view on first load and on every tab change (the SPA has no
+  // router, so tabs are our virtual routes).
+  useEffect(() => {
+    const route = TAB_ROUTES[activeTab]
+    trackPageView(route.path, route.title)
+  }, [activeTab])
 
   return (
     <div className="min-h-screen flex flex-col">
