@@ -13,6 +13,8 @@ import { buildFreeReadingPrompt, buildSystemPrompt, DISCLAIMER, PERSONA_LABELS, 
 import { streamChat, type ChatMessage } from '@/lib/llm'
 import { Button } from '@/components/ui'
 import { FutureReportPaywall } from '@/components/FutureReportPaywall'
+import { SoulCard } from '@/components/soul'
+import { EmailCapture } from '@/components/email'
 import { analytics } from '@/lib/analytics'
 
 /* ------------------------------------------------------------
@@ -255,7 +257,37 @@ export function AIInterpretation() {
         </div>
       )}
 
-      {displayText && !animating && <FutureReportPaywall />}
+      {displayText && !animating && (
+        <>
+          {/* Low-key self-discovery updates entry (source: reading) */}
+          <div className="mt-6 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <EmailCapture
+              source="reading"
+              title="Want your self-discovery updates?"
+              description="Occasional reflections and new features — for entertainment and self-discovery only. Unsubscribe anytime."
+              submitLabel="Keep me posted"
+            />
+          </div>
+
+          {/* Shareable Soul Card built from this chart */}
+          <div className="mt-8 pt-6 border-t border-white/[0.06]">
+            <div className="mb-5 text-center">
+              <h3
+                className="text-lg lg:text-xl font-semibold text-gold"
+                style={{ fontFamily: 'var(--font-serif)' }}
+              >
+                Your Cinnabar Soul Card
+              </h3>
+              <p className="mt-1 text-sm text-text-muted">
+                A shareable snapshot of your chart — save it or send it to a friend.
+              </p>
+            </div>
+            <SoulCard />
+          </div>
+
+          <FutureReportPaywall />
+        </>
+      )}
     </div>
   )
 }

@@ -35,6 +35,12 @@ export function trackPageView(path: string, title?: string): void {
 
 export type ForecastTierName = '1-year' | '5-year'
 
+/** Where an email capture / soul card interaction originated. */
+export type CaptureSource = 'reading' | 'exit_intent' | 'soul_card'
+
+/** Social/share destinations tracked on the Soul Card. */
+export type SharePlatform = 'download' | 'pinterest' | 'x' | 'copy_link'
+
 /** Named custom events, so call sites stay typo-free and consistent. */
 export const analytics = {
   /** Landing page (birth form) came into view. */
@@ -65,4 +71,15 @@ export const analytics = {
       currency: 'USD',
       transaction_id: params.transactionId,
     }),
+
+  /** The Soul Card came into view on the results page. */
+  soulCardView: (): void => sendGtag('event', 'soul_card_view'),
+
+  /** User tapped a share action on the Soul Card. */
+  shareClick: (platform: SharePlatform): void =>
+    sendGtag('event', 'share_click', { platform }),
+
+  /** A visitor submitted their email through an EmailCapture entry point. */
+  emailCapture: (source: CaptureSource): void =>
+    sendGtag('event', 'email_capture', { source }),
 }
