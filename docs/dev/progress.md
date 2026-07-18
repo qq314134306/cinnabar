@@ -13,6 +13,16 @@
 
 ## Recently Completed
 
+- Added Google Analytics 4 (Measurement ID `G-NB3DMJB5NB`, a public value):
+  gtag.js loads in `app/index.html` with `send_page_view:false`; a thin
+  guarded wrapper (`app/src/lib/analytics.ts`) forwards manual SPA page_views
+  and custom events. Because the app has no router, `App.tsx` fires `page_view`
+  on every tab change (chart/compatibility/share-card virtual paths). Custom
+  events: `view_landing` (BirthForm mount), `start_reading` + `complete_reading`
+  (AIInterpretation), `view_paywall` + `begin_checkout` + `purchase_success`
+  (FutureReportPaywall; `purchase_success` carries value/currency/tier/
+  transaction_id, wired via a new `onInitiate` hook in `paypal.ts`). No secrets
+  touch analytics — DeepSeek/PayPal credentials remain server-side only.
 - Pricing/PayPal follow-up: raised the 1-Year Forecast to $9.90 (5-Year stays
   $14.90); added a "just $2.98/year — best value" badge on the 5-Year card
   (computed from `TIER_PRICES`, not hardcoded); forced the PayPal JS SDK to

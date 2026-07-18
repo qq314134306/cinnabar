@@ -83,6 +83,13 @@ verification, see decision D006).
 PayPal checkout, and the purchased report view rendered below the free
 reading in `AIInterpretation.tsx`.
 
+`src/lib/analytics.ts`: Guarded gtag.js wrapper. gtag.js loads in
+`index.html` with automatic page_view disabled; `App.tsx` sends a manual
+page_view per tab change, and components fire named custom events
+(view_landing, start_reading, complete_reading, view_paywall,
+begin_checkout, purchase_success). The GA4 Measurement ID is public; no
+secrets belong here.
+
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city
 English names; UTC offsets are DST-aware via the built-in Intl API (China

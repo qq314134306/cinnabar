@@ -51,7 +51,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates (free reading, compatibility, paid Future Report).
-- `app/src/lib/paypal.ts` - client-side PayPal Smart Payment Buttons (createOrder/capture).
+- `app/src/lib/paypal.ts` - client-side PayPal Smart Payment Buttons (createOrder/capture; `onInitiate` fires begin_checkout).
+- `app/src/lib/analytics.ts` - guarded gtag.js wrapper: manual SPA page_views + named GA4 custom events.
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.
 - `app/src/lib/llm.ts` - streaming client for `/api/interpret`.
 - `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via Intl).

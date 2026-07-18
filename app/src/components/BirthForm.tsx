@@ -8,6 +8,7 @@ import { generateChart, getShichenOptions, type BirthInfo, type Gender } from '@
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
 import { findBirthplaceAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
 import { useChartStore } from '@/stores'
+import { analytics } from '@/lib/analytics'
 
 const YEAR_OPTIONS = getYearOptions()
 const MONTH_OPTIONS = getMonthOptions()
@@ -33,6 +34,11 @@ export function BirthForm() {
   const [loading, setLoading] = useState(false)
 
   const dayOptions = getDayOptions(year, month)
+
+  // Landing impression: the birth form only renders on the landing view.
+  useEffect(() => {
+    analytics.viewLanding()
+  }, [])
 
   useEffect(() => {
     let active = true

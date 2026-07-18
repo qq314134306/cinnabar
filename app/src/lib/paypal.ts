@@ -85,6 +85,8 @@ export interface PayPalCheckoutOptions {
   amount: string
   /** DOM id of the (empty) container element the buttons render into. */
   containerId: string
+  /** Fired when the buyer starts checkout (order creation begins). */
+  onInitiate?: () => void
   onApprove: (details: PayPalOrderDetails) => void
   onError: (error: Error) => void
   onCancel?: () => void
@@ -100,10 +102,12 @@ export async function renderPayPalButtons(options: PayPalCheckoutOptions): Promi
 
   const buttons = paypal.Buttons({
     style: { layout: 'vertical', color: 'gold', shape: 'pill', label: 'pay' },
-    createOrder: (_data, actions) =>
-      actions.order.create({
+    createOrder: (_data, actions) => {
+      options.onInitiate?.()
+      return actions.order.create({
         purchase_units: [{ amount: { value: options.amount, currency_code: 'USD' } }],
-      }),
+      })
+    },
     onApprove: async (_data, actions) => {
       try {
         const details = await actions.order.capture()
