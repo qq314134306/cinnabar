@@ -20,6 +20,7 @@ import {
 import { streamChat, type ChatMessage } from '@/lib/llm'
 import { renderPayPalButtons, type PayPalCheckoutHandle } from '@/lib/paypal'
 import { Button } from '@/components/ui'
+import { analytics } from '@/lib/analytics'
 
 const TIER_PRICES: Record<ForecastTier, string> = {
   '1-year': '9.90',
@@ -132,6 +133,12 @@ export function FutureReportPaywall() {
     }
   }, [setFutureReport])
 
+  // The paywall only renders once a free reading exists, so mounting it is the
+  // moment it becomes visible to the user.
+  useEffect(() => {
+    analytics.viewPaywall()
+  }, [])
+
   useEffect(() => {
     let cancelled = false
     const mounted = handles.current
@@ -141,8 +148,16 @@ export function FutureReportPaywall() {
         const handle = await renderPayPalButtons({
           amount: TIER_PRICES[tier],
           containerId: CONTAINER_ID[tier],
+          onInitiate: () => {
+            analytics.beginCheckout(tier, Number(TIER_PRICES[tier]))
+          },
           onApprove: (details) => {
             setNotice(null)
+            analytics.purchaseSuccess({
+              tier,
+              value: Number(TIER_PRICES[tier]),
+              transactionId: details.id,
+            })
             void generateReport(tier, details.id)
           },
           onCancel: () => {

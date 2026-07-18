@@ -13,6 +13,7 @@ import { buildFreeReadingPrompt, buildSystemPrompt, DISCLAIMER, PERSONA_LABELS, 
 import { streamChat, type ChatMessage } from '@/lib/llm'
 import { Button } from '@/components/ui'
 import { FutureReportPaywall } from '@/components/FutureReportPaywall'
+import { analytics } from '@/lib/analytics'
 
 /* ------------------------------------------------------------
    Character reveal speed (ms per character)
@@ -125,6 +126,8 @@ export function AIInterpretation() {
       timerRef.current = null
     }
 
+    analytics.startReading()
+
     try {
       const chartFacts = buildZiWeiChartFacts(chart, birthInfo)
       const messages: ChatMessage[] = [
@@ -139,6 +142,7 @@ export function AIInterpretation() {
       }
 
       setAiInterpretation(fullTextRef.current)
+      analytics.completeReading()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'The reading failed. Please try again.')
     } finally {
