@@ -54,6 +54,16 @@ EmailCapture and the Soul Card unlock). The only place `MAKE_WEBHOOK_URL` is
 read; it forwards `{email, source, created_at}` to Make with body-size and
 per-IP rate limits. Set `MAKE_WEBHOOK_URL` in the Vercel project env.
 
+`api/_supabase-admin.ts`: SERVER-ONLY Supabase service-role client. The
+underscore keeps it out of Vercel routing; it must never be imported from
+`src/`. The only place `SUPABASE_SECRET_KEY` is read. `src/lib/supabase.ts` is
+the browser client and uses only the public `VITE_SUPABASE_URL` +
+`VITE_SUPABASE_PUBLISHABLE_KEY`. Auth is passwordless magic link
+(`useAuthStore` in `src/stores`); the `profiles` table + RLS live in
+`supabase/migrations/` and are applied manually in the Supabase SQL Editor.
+Env vars: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (client),
+`SUPABASE_SECRET_KEY` (server only).
+
 `src/components/`: Feature UI components. Keep deterministic calculation logic in
 `src/lib/` instead of embedding it in components. All user-facing text is
 English; the iztro engine output stays zh-CN internally and is translated at the

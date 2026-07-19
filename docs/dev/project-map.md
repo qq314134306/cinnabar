@@ -54,6 +54,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/paypal.ts` - client-side PayPal Smart Payment Buttons (createOrder/capture; `onInitiate` fires begin_checkout).
 - `app/src/lib/analytics.ts` - guarded gtag.js wrapper: manual SPA page_views + named GA4 custom events.
 - `app/api/subscribe.ts` - Edge function relaying captured emails to the Make webhook (the only reader of `MAKE_WEBHOOK_URL`).
+- `app/src/lib/supabase.ts` - browser Supabase client (public publishable key; guarded when env absent).
+- `app/api/_supabase-admin.ts` - server-only service-role client (`SUPABASE_SECRET_KEY`; underscore = not a route; never imported by src/).
+- `app/src/components/AuthModal.tsx` + `AuthControl.tsx` - magic-link sign-in modal and header sign-in/out control; `useAuthStore` in `src/stores`.
+- `supabase/migrations/*.sql` - profiles table + auto-provision trigger + RLS (run manually in the Supabase SQL Editor).
 - `app/src/lib/subscribe.ts` - client POST helper for `/api/subscribe`.
 - `app/src/components/EmailCapture.tsx` - reusable, source-tagged email opt-in.
 - `app/src/components/SoulCard.tsx` + `app/src/lib/soul-card.ts` - shareable Soul Card (deterministic derivation from the chart) with locked teaser + share/email unlock.

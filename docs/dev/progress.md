@@ -13,6 +13,21 @@
 
 ## Recently Completed
 
+- Added Supabase user accounts (auth + profiles only; no credits-spending
+  logic yet). Frontend client `app/src/lib/supabase.ts` uses the public
+  `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` (guarded — degrades to
+  signed-out when env is absent). `useAuthStore` hydrates the session and binds
+  the auth listener; passwordless magic-link login via `signInWithOtp`. Header
+  shows a Sign in button, or the user's email + Sign out once authenticated;
+  the session persists across refresh. Server-only admin helper
+  `app/api/_supabase-admin.ts` (underscore = not a Vercel route) reads
+  `SUPABASE_SECRET_KEY` for future privileged writes and is never imported by
+  the client. DB schema lives in `supabase/migrations/` (run manually in the
+  SQL Editor): `profiles` table (id→auth.users, email, created_at, credits
+  default 30, unique referral_code, referred_by), a `handle_new_user` trigger
+  that auto-provisions the row with a unique referral code, and RLS allowing a
+  user to SELECT only their own row with no client writes (all writes go through
+  the server secret key). DeepSeek/PayPal/paywall untouched.
 - Added Soul Card share fission + email capture on one shared backend:
   `api/subscribe` (Vercel Edge Function) validates the email, reads the
   `MAKE_WEBHOOK_URL` secret server-side only, forwards
