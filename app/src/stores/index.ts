@@ -4,10 +4,12 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { Session, User } from '@supabase/supabase-js'
 import type { FunctionalAstrolabe } from '@/lib/astro'
 import type { BirthInfo } from '@/lib/astro'
 import type { LifetimeKLinePoint } from '@/lib/fortune-score'
 import type { ForecastTier, Persona } from '@/lib/ai-prompts'
+import { supabase } from '@/lib/supabase'
 
 /* ------------------------------------------------------------
    Chart state
@@ -136,3 +138,63 @@ export const useSettingsStore = create<SettingsState>()(
     }
   )
 )
+
+/* ------------------------------------------------------------
+   Auth state — Supabase magic-link session (persisted by Supabase)
+   ------------------------------------------------------------ */
+
+interface AuthState {
+  session: Session | null
+  user: User | null
+  /** True once the initial session has been resolved (avoids UI flash). */
+  initialized: boolean
+  /** Sets up session hydration + the auth change listener. Idempotent. */
+  init: () => void
+  /** Sends a passwordless magic-link / OTP email. */
+  signInWithEmail: (email: string) => Promise<void>
+  signOut: () => Promise<void>
+}
+
+let authListenerBound = false
+
+export const useAuthStore = create<AuthState>()((set) => ({
+  session: null,
+  user: null,
+  initialized: false,
+
+  init: () => {
+    if (authListenerBound) return
+    authListenerBound = true
+
+    if (!supabase) {
+      // No env configured (e.g. local build) — resolve as signed-out.
+      set({ initialized: true })
+      return
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      set({ session: data.session, user: data.session?.user ?? null, initialized: true })
+    })
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      set({ session, user: session?.user ?? null, initialized: true })
+    })
+  },
+
+  signInWithEmail: async (email: string) => {
+    if (!supabase) throw new Error('Sign-in is not available right now.')
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      },
+    })
+    if (error) throw new Error(error.message)
+  },
+
+  signOut: async () => {
+    if (!supabase) return
+    await supabase.auth.signOut()
+    set({ session: null, user: null })
+  },
+}))

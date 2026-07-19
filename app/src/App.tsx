@@ -12,7 +12,8 @@ import { MatchAnalysis } from '@/components/match'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ShareCard } from '@/components/share'
 import { ExitIntentModal } from '@/components/ExitIntentModal'
-import { useChartStore } from '@/stores'
+import { AuthControl } from '@/components/AuthControl'
+import { useChartStore, useAuthStore } from '@/stores'
 import { trackPageView } from '@/lib/analytics'
 
 type TabType = 'chart' | 'match' | 'share'
@@ -32,7 +33,13 @@ const TAB_ROUTES: Record<TabType, { path: string; title: string }> = {
 
 export default function App() {
   const { chart } = useChartStore()
+  const initAuth = useAuthStore((s) => s.init)
   const [activeTab, setActiveTab] = useState<TabType>('chart')
+
+  // Hydrate the Supabase session + bind the auth listener once.
+  useEffect(() => {
+    initAuth()
+  }, [initAuth])
 
   // Report a page_view on first load and on every tab change (the SPA has no
   // router, so tabs are our virtual routes).
@@ -142,6 +149,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
+            <AuthControl />
             <GitHubLinkButton />
           </div>
         </div>
