@@ -4,8 +4,9 @@
    ============================================================ */
 
 import { useState, type FormEvent } from 'react'
-import { useAuthStore } from '@/stores'
+import { useAuthStore, type OAuthProvider } from '@/stores'
 import { isValidEmail } from '@/lib/subscribe'
+import { SocialSignInButton } from '@/components/SocialSignInButton'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
@@ -14,10 +15,26 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ onClose }: AuthModalProps) {
-  const { signInWithEmail } = useAuthStore()
+  const { signInWithEmail, signInWithOAuth } = useAuthStore()
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [message, setMessage] = useState<string | null>(null)
+  // OAuth is a separate concern from the email form (different loading/error).
+  const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null)
+  const [oauthError, setOauthError] = useState<string | null>(null)
+
+  const handleOAuth = async (provider: OAuthProvider) => {
+    if (oauthLoading) return
+    setOauthLoading(provider)
+    setOauthError(null)
+    try {
+      // On success the browser redirects to the provider; this stays "loading".
+      await signInWithOAuth(provider)
+    } catch (err) {
+      setOauthError(err instanceof Error ? err.message : 'Could not start sign-in. Please try again.')
+      setOauthLoading(null)
+    }
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -78,9 +95,29 @@ export function AuthModal({ onClose }: AuthModalProps) {
                 Sign in to Cinnabar
               </h3>
               <p className="text-sm text-text-muted">
-                Save your charts and cards across visits. We'll email you a secure
-                sign-in link — no password needed.
+                Save your charts and cards across visits — no password needed.
               </p>
+            </div>
+
+            {/* Social sign-in (Google now; Facebook reserved) */}
+            <div className="space-y-2.5">
+              <SocialSignInButton
+                provider="google"
+                onClick={() => void handleOAuth('google')}
+                loading={oauthLoading === 'google'}
+                disabled={oauthLoading !== null}
+              />
+            </div>
+
+            {oauthError && (
+              <p className="mt-2 text-xs text-misfortune text-center">{oauthError}</p>
+            )}
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-4">
+              <span className="h-px flex-1 bg-white/[0.1]" />
+              <span className="text-xs text-text-muted">or</span>
+              <span className="h-px flex-1 bg-white/[0.1]" />
             </div>
 
             <form onSubmit={handleSubmit}>

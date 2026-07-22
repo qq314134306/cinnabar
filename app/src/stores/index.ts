@@ -143,6 +143,9 @@ export const useSettingsStore = create<SettingsState>()(
    Auth state — Supabase magic-link session (persisted by Supabase)
    ------------------------------------------------------------ */
 
+/** Social identity providers we support (Facebook reserved for later). */
+export type OAuthProvider = 'google' | 'facebook'
+
 interface AuthState {
   session: Session | null
   user: User | null
@@ -152,6 +155,8 @@ interface AuthState {
   init: () => void
   /** Sends a passwordless magic-link / OTP email. */
   signInWithEmail: (email: string) => Promise<void>
+  /** Starts an OAuth redirect flow (e.g. Google). Resolves before the redirect. */
+  signInWithOAuth: (provider: OAuthProvider) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -187,6 +192,19 @@ export const useAuthStore = create<AuthState>()((set) => ({
       email: email.trim(),
       options: {
         emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      },
+    })
+    if (error) throw new Error(error.message)
+  },
+
+  signInWithOAuth: async (provider: OAuthProvider) => {
+    if (!supabase) throw new Error('Sign-in is not available right now.')
+    // On success this triggers a full-page redirect to the provider, so there
+    // is no in-page success state — only errors resolve back here.
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
       },
     })
     if (error) throw new Error(error.message)
