@@ -13,6 +13,14 @@
 
 ## Recently Completed
 
+- Added "Continue with Google" to the sign-in modal: a reusable, config-driven
+  `SocialSignInButton` (official Google G logo; Facebook config reserved but
+  not yet wired) sits above the email magic-link form with an "or" divider.
+  `useAuthStore.signInWithOAuth(provider)` calls
+  `supabase.auth.signInWithOAuth({ provider, options: { redirectTo: origin } })`
+  with its own loading/error state; on return the session, header, and
+  auto-provisioned profile work unchanged (no DB change). Supabase secret stays
+  server-only; DeepSeek/PayPal/paywall untouched.
 - Added Supabase user accounts (auth + profiles only; no credits-spending
   logic yet). Frontend client `app/src/lib/supabase.ts` uses the public
   `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY` (guarded — degrades to
