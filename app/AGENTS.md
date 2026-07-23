@@ -298,11 +298,11 @@ retry, and the purchased report view rendered below the free reading in
 `AIInterpretation.tsx`.
 
 `src/components/LocalChartSnapshot.tsx`: deterministic, current-model-year
-chart summary rendered whenever a natal chart exists and public AI is off. It
-derives its English identity locally and exposes overall, Career, Wealth,
-Relationships, and Well-being scores without an account, API, payment, cache,
-or analytics. Keep this base result available when public AI is unavailable;
-AI is an optional narrative layer, not the feature's sole output.
+chart summary rendered whenever a natal chart exists, regardless of the public
+AI flag. It derives its English identity locally and exposes overall, Career,
+Wealth, Relationships, and Well-being scores without an account, API, payment,
+cache, or analytics. Keep this base result visible when the optional AI
+narrative is enabled or unavailable.
 
 `api/future-report-order.ts`, `future-report-capture.ts`,
 `future-report-access.ts`, `future-report-generate.ts`: Authenticated Future
@@ -363,6 +363,11 @@ Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city
 English names; UTC offsets are DST-aware via the built-in Intl API (China
 entries default to Asia/Shanghai).
 
+`src/components/BirthForm.tsx` + `BirthForm.test.ts`: chart-casting entry. The
+year, month, and day controls retain explicit accessible names, invalid
+month/day combinations are clamped, and a generation failure must leave the
+form retryable with a visible alert rather than only a console message.
+
 `src/lib/birthplace-data.json`: Local Chinese coordinate dataset used for
 birthplace matching (pinyin keys generated at load via pinyin-pro).
 
@@ -401,6 +406,9 @@ chart-summary card and local PNG export. The quote renderer uses an
 html2canvas-stable fixed-width Georgia/Times stack with explicit wrapping;
 changes to its font or layout require inspecting a real exported PNG, because
 the browser preview alone does not reveal canvas text-measurement regressions.
+The default quote and customization path work without AI; an existing AI
+narrative may supply a quote but product copy must not present it as a
+prerequisite.
 
 `tests/api-typecheck.test.ts`: Contract coverage that keeps
 `tsconfig.api.json` in the root build graph, keeps strict API type checking

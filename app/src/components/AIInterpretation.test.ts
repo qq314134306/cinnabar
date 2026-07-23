@@ -121,6 +121,13 @@ afterEach(() => {
 })
 
 describe('AIInterpretation public AI gate', () => {
+  it('keeps the local snapshot visible when the optional AI layer is enabled', () => {
+    render(createElement(AIInterpretation))
+
+    expect(screen.getByText('LOCAL CHART SNAPSHOT')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Get My Free Reading' })).toBeTruthy()
+  })
+
   it('shows a clear unavailable state and exposes no request action when disabled', () => {
     vi.stubEnv('VITE_ENABLE_PUBLIC_AI_READINGS', 'false')
     useContentCacheStore.setState({

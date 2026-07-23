@@ -37,6 +37,7 @@ export function BirthForm() {
   const [matchedBirthplace, setMatchedBirthplace] = useState<Birthplace | null>(null)
   const [matchingBirthplace, setMatchingBirthplace] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const dayOptions = getDayOptions(year, month)
 
@@ -81,6 +82,7 @@ export function BirthForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMessage(null)
     setLoading(true)
 
     try {
@@ -110,6 +112,9 @@ export function BirthForm() {
       setChart(chart)
     } catch (error) {
       console.error('Chart generation failed:', error)
+      setErrorMessage(
+        "We couldn't cast this chart. Check the birth details and try again.",
+      )
     } finally {
       setLoading(false)
     }
@@ -168,16 +173,19 @@ export function BirthForm() {
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Select
+              aria-label="Year of birth"
               options={YEAR_OPTIONS}
               value={year}
               onChange={(e) => handleYearChange(Number(e.target.value))}
             />
             <Select
+              aria-label="Month of birth"
               options={MONTH_OPTIONS}
               value={month}
               onChange={(e) => handleMonthChange(Number(e.target.value))}
             />
             <Select
+              aria-label="Day of birth"
               options={dayOptions}
               value={day}
               onChange={(e) => setDay(Number(e.target.value))}
@@ -320,6 +328,14 @@ export function BirthForm() {
             </>
           )}
         </Button>
+        {errorMessage && (
+          <p
+            role="alert"
+            className="rounded-lg border border-misfortune/30 bg-misfortune/10 px-4 py-3 text-sm text-misfortune"
+          >
+            {errorMessage}
+          </p>
+        )}
       </div>
 
       {/* Footnote */}

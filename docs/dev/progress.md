@@ -96,9 +96,10 @@
   identity, overall score, and Career, Wealth, Relationships, and Well-being
   dimensions. It needs no account, API, payment, cache, or analytics and is
   labeled as reflective rather than scientific or professional advice. The
-  unavailable AI state is now a separate optional-narrative notice. Desktop
-  and 390-by-844 Chrome acceptance passed with four accessible progress bars,
-  no page-level horizontal overflow, and no current-build browser warnings or
+  unavailable AI state is now a separate optional-narrative notice, and the
+  snapshot remains visible when the AI layer is enabled. Desktop and
+  390-by-844 Chrome acceptance passed with four accessible progress bars, no
+  page-level horizontal overflow, and no current-build browser warnings or
   errors.
 - Verified the Share Card path against its real downloaded PNG rather than the
   browser preview alone. The export worked, but Cormorant italic text measured
@@ -107,7 +108,16 @@
   2x PNG showed clean two-line text, and focused tests now cover custom-copy
   preservation plus the canvas/download contract. The fixed 360px preview now
   receives enough mobile container width, eliminating page-level horizontal
-  overflow at 390-by-844 without changing the exported dimensions.
+  overflow at 390-by-844 without changing the exported dimensions. The
+  no-reading hint now presents the built-in/default customization path first;
+  an available AI narrative is an optional quote source rather than a
+  prerequisite.
+- Made chart casting failures visible and recoverable. The birth year, month,
+  and day selects now have explicit accessible names. If birth-time resolution
+  or chart generation fails, the form restores its submit action and shows a
+  concise alert; a retry clears the alert and can commit the chart normally.
+  Component tests cover the accessible fields, failure state, and successful
+  retry.
 - Hardened the public email subscription boundary. `/api/subscribe` is now an
   exact same-origin JSON POST with a 2 KiB streamed byte cap, exact
   `{email, source}` schema, normalized bounded email, fixed source allowlist,
@@ -570,7 +580,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 57 Vitest files / 589 tests in
+The current cumulative local baseline passed 58 Vitest files / 595 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the

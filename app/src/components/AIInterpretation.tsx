@@ -288,21 +288,22 @@ export function AIInterpretation() {
   }
 
   return (
-    <div
-      className="
-        relative p-6 lg:p-8
-        bg-gradient-to-br from-white/[0.04] to-transparent
-        backdrop-blur-xl border border-white/[0.08] rounded-2xl
-        shadow-[0_8px_32px_rgba(0,0,0,0.3)]
-      "
-    >
+    <div className="space-y-4">
+      <LocalChartSnapshot />
       <div
         className="
-          absolute top-0 left-1/2 -translate-x-1/2
-          w-1/3 h-px
-          bg-gradient-to-r from-transparent via-gold/50 to-transparent
+          relative rounded-2xl border border-white/[0.08]
+          bg-gradient-to-br from-white/[0.04] to-transparent p-6
+          shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl lg:p-8
         "
-      />
+      >
+        <div
+          className="
+            absolute top-0 left-1/2 -translate-x-1/2
+            w-1/3 h-px
+            bg-gradient-to-r from-transparent via-gold/50 to-transparent
+          "
+        />
 
       {/* Header */}
       <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
@@ -402,9 +403,10 @@ export function AIInterpretation() {
         </div>
       )}
 
-      {/* Soul Card share/fission + locked teaser, then the paid paywall */}
-      {displayText && !animating && <SoulCard />}
-      {displayText && !animating && <FutureReportPaywall />}
+        {/* Soul Card share/fission + locked teaser, then the paid paywall */}
+        {displayText && !animating && <SoulCard />}
+        {displayText && !animating && <FutureReportPaywall />}
+      </div>
     </div>
   )
 }

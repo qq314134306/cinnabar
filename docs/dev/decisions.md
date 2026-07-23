@@ -715,13 +715,14 @@ controller/request-key/input-identity ownership unchanged.
 
 ## D027 - Your Chart Works Locally Before AI
 
-Your Chart is the primary product surface, so a disabled public-AI flag must
-not reduce a completed chart to an availability message. After chart
-generation, the default-off experience now derives a deterministic
-current-model-year snapshot in the browser: an English chart identity, overall
-score, and Career, Wealth, Relationships, and Well-being dimensions.
+Your Chart is the primary product surface, so its base result cannot depend on
+the public-AI flag. After chart generation, the app always derives and displays
+a deterministic current-model-year snapshot in the browser: an English chart
+identity, overall score, and Career, Wealth, Relationships, and Well-being
+dimensions.
 
 The snapshot requires no account, API, payment, cache, or analytics and is
 explicitly a reflective model rather than scientific evidence or professional
-advice. Public AI remains an optional narrative layer. Enabling or disabling it
-must not be described as changing the underlying natal chart.
+advice. Public AI remains a separate optional narrative layer below that
+snapshot. Enabling or disabling it must neither hide nor be described as
+changing the underlying natal chart.

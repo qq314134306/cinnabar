@@ -111,7 +111,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/llm.ts` + `llm.test.ts` - the only public-reading browser client.
   It posts a strict request, supports cancellation, and parses SSE across chunk,
   multiline, UTF-8, `[DONE]`, and tail-buffer boundaries.
-- `app/src/components/BirthForm.tsx` - birth input, birthplace matching entry, and true solar time options.
+- `app/src/components/BirthForm.tsx` + `BirthForm.test.ts` - birth input,
+  birthplace matching entry, and true solar time options. Date selects have
+  explicit accessible names; chart-generation failures remain visibly
+  retryable.
 - `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
@@ -171,7 +174,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   editable chart-summary card and 2x PNG export. The quote area uses an
   html2canvas-stable Georgia/Times font stack, explicit width, and word wrapping
   because the display webfont previously produced overlapping words only in the
-  saved artifact.
+  saved artifact. Its default/custom quote path works without AI; an available
+  AI narrative is only an optional quote source.
 - `app/src/lib/supabase.ts` - lazy browser Supabase client for `legacy` rollback
   only (public publishable key; never constructed for a new `dual`/`opaque`
   login).
@@ -294,9 +298,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/ExitIntentModal.tsx` - once-per-session exit-intent email capture.
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.
 - `app/src/components/LocalChartSnapshot.tsx` - deterministic current-model-year
-  chart summary shown when public AI is off. It derives an English chart
-  identity plus overall, Career, Wealth, Relationships, and Well-being scores
-  locally, with no account, API, payment, cache, or analytics.
+  chart summary shown regardless of the public-AI flag. It derives an English
+  chart identity plus overall, Career, Wealth, Relationships, and Well-being
+  scores locally, with no account, API, payment, cache, or analytics.
 - `app/src/components/AIInterpretation.tsx` - request-keyed natal-reading cache
   and guarded streaming UI. Retry and chart/persona changes abort the old
   controller and reject late tokens, cache writes, errors, and analytics.

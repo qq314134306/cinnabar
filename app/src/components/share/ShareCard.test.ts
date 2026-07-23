@@ -58,6 +58,28 @@ afterEach(() => {
 })
 
 describe('ShareCard', () => {
+  it('offers a useful local default without directing users to AI', () => {
+    render(createElement(ShareCard))
+
+    expect(screen.getByText(/Use the default line or customize it below/)).toBeTruthy()
+    expect(screen.queryByText(/Get your AI reading first/)).toBeNull()
+    expect(screen.getByText(
+      '"Your chart holds the map. How you walk it is yours to choose."',
+    )).toBeTruthy()
+  })
+
+  it('uses an available AI narrative as an optional quote source', () => {
+    useContentCacheStore.setState({
+      aiInterpretation: '"Steady choices turn insight into a life you can inhabit."',
+    })
+    render(createElement(ShareCard))
+
+    expect(screen.getByText(
+      '"Steady choices turn insight into a life you can inhabit."',
+    )).toBeTruthy()
+    expect(screen.queryByText(/Use the default line or customize it below/)).toBeNull()
+  })
+
   it('uses an export-stable quote layout and preserves custom copy', () => {
     render(createElement(ShareCard))
 

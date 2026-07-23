@@ -32,7 +32,7 @@ function yearToGanZhi(year: number): string {
 }
 
 /* ------------------------------------------------------------
-   Pull a quotable passage from the AI reading
+   Pull a quotable passage from an optional AI narrative
    ------------------------------------------------------------ */
 
 function extractQuote(content: string): string | null {
@@ -147,7 +147,10 @@ export function ShareCard() {
       {/* Hint */}
       {!extractedQuote && (
         <div className="text-center text-text-muted text-sm px-4">
-          <p>💡 Get your AI reading first and a quote will be pulled from it automatically.</p>
+          <p>
+            💡 Use the default line or customize it below. If an AI narrative is
+            available, its opening is used automatically.
+          </p>
         </div>
       )}
 
