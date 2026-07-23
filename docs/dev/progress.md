@@ -96,7 +96,9 @@
   incorrectly in html2canvas and overlapped words. The quote area now uses a
   fixed-width Georgia/Times stack with explicit wrapping and spacing. A second
   2x PNG showed clean two-line text, and focused tests now cover custom-copy
-  preservation plus the canvas/download contract.
+  preservation plus the canvas/download contract. The fixed 360px preview now
+  receives enough mobile container width, eliminating page-level horizontal
+  overflow at 390-by-844 without changing the exported dimensions.
 - Hardened the public email subscription boundary. `/api/subscribe` is now an
   exact same-origin JSON POST with a 2 KiB streamed byte cap, exact
   `{email, source}` schema, normalized bounded email, fixed source allowlist,

@@ -143,7 +143,7 @@ export function ShareCard() {
   }
 
   return (
-    <div className="space-y-6 max-w-lg mx-auto">
+    <div className="-mx-1 max-w-lg space-y-6 sm:mx-auto">
       {/* Hint */}
       {!extractedQuote && (
         <div className="text-center text-text-muted text-sm px-4">
