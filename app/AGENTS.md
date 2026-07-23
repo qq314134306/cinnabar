@@ -389,6 +389,12 @@ uncached; its controller, exact request key, and both input identities own
 every streamed commit. Keep both paths free of analytics unless product and
 privacy requirements explicitly change.
 
+`src/components/share/ShareCard.tsx` + `ShareCard.test.ts`: deterministic
+chart-summary card and local PNG export. The quote renderer uses an
+html2canvas-stable fixed-width Georgia/Times stack with explicit wrapping;
+changes to its font or layout require inspecting a real exported PNG, because
+the browser preview alone does not reveal canvas text-measurement regressions.
+
 `tests/api-typecheck.test.ts`: Contract coverage that keeps
 `tsconfig.api.json` in the root build graph, keeps strict API type checking
 enabled, and keeps `npm run build` on `tsc -b`. It does not replace executing
@@ -494,6 +500,9 @@ ciphertext makes concurrency tests flaky and invalid.
   `npm run test -- src/lib/compatibility-score.test.ts
   src/components/match/MatchAnalysis.test.ts`, then lint and the complete root
   build.
+- Share Card change: run
+  `npm run test -- src/components/share/ShareCard.test.ts`, inspect one real
+  exported PNG, then lint and the complete root build.
 - Subscription change: run `npm run test -- tests/subscribe-api.test.ts`, lint,
   and the complete root build. A mocked webhook and warm-isolate limiter remain
   local contract evidence, not deployed delivery or distributed-rate proof.

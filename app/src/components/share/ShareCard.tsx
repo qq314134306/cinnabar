@@ -16,6 +16,7 @@ import { translateFiveElementsClass, translateGanZhi, translateStarLabel } from 
 
 const FONT_DISPLAY = "'Cormorant Garamond', 'Georgia', serif"
 const FONT_BODY = "'Inter', system-ui, sans-serif"
+const FONT_QUOTE = "'Georgia', 'Times New Roman', serif"
 
 /* ------------------------------------------------------------
    Sexagenary year (stem-branch) helpers
@@ -232,11 +233,17 @@ export function ShareCard() {
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div
               style={{
-                fontSize: '19px',
-                lineHeight: '1.8',
+                width: '100%',
+                maxWidth: '288px',
+                fontSize: '18px',
+                lineHeight: '1.6',
                 color: '#F3ECDD',
                 whiteSpace: 'pre-line',
-                fontFamily: FONT_DISPLAY,
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
+                letterSpacing: '0',
+                wordSpacing: '0.08em',
+                fontFamily: FONT_QUOTE,
                 fontStyle: 'italic',
                 textAlign: 'center',
                 padding: '0 16px',

@@ -91,6 +91,12 @@
   relationship advice. The existing guarded stream remains an optional “Add AI
   Reading” layer. Desktop and 390-by-844 Chrome acceptance passed with no new
   current-build warning/error log.
+- Verified the Share Card path against its real downloaded PNG rather than the
+  browser preview alone. The export worked, but Cormorant italic text measured
+  incorrectly in html2canvas and overlapped words. The quote area now uses a
+  fixed-width Georgia/Times stack with explicit wrapping and spacing. A second
+  2x PNG showed clean two-line text, and focused tests now cover custom-copy
+  preservation plus the canvas/download contract.
 - Hardened the public email subscription boundary. `/api/subscribe` is now an
   exact same-origin JSON POST with a 2 KiB streamed byte cap, exact
   `{email, source}` schema, normalized bounded email, fixed source allowlist,
@@ -553,7 +559,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 55 Vitest files / 585 tests in
+The current cumulative local baseline passed 56 Vitest files / 587 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; real

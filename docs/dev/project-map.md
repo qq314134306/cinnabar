@@ -167,6 +167,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership; changes, retries, and unmount reject stale tokens
   and errors.
+- `app/src/components/share/ShareCard.tsx` + `ShareCard.test.ts` - local
+  editable chart-summary card and 2x PNG export. The quote area uses an
+  html2canvas-stable Georgia/Times font stack, explicit width, and word wrapping
+  because the display webfont previously produced overlapping words only in the
+  saved artifact.
 - `app/src/lib/supabase.ts` - lazy browser Supabase client for `legacy` rollback
   only (public publishable key; never constructed for a new `dual`/`opaque`
   login).
