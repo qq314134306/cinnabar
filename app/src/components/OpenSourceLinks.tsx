@@ -1,4 +1,4 @@
-const GITHUB_REPOSITORY_URL = 'https://github.com/ruijayfeng/ziwei'
+const GITHUB_REPOSITORY_URL = 'https://github.com/qq314134306/cinnabar'
 const LICENSE_URL = `${GITHUB_REPOSITORY_URL}/blob/main/LICENSE`
 
 function GitHubIcon({ className = 'h-5 w-5' }: { className?: string }) {

@@ -27,7 +27,6 @@ import { KLineIcon } from '@/components/icons/KLineIcon'
 import { ScoreRadar } from './ScoreRadar'
 import {
   generateLifetimeKLines,
-  generateKLinesWithLLM,
   type LifetimeKLinePoint,
 } from '@/lib/fortune-score'
 
@@ -216,26 +215,22 @@ export function LifeKLine() {
   const [selectedPoint, setSelectedPoint] = useState<LifetimeKLinePoint | null>(null)
 
   /* ------------------------------------------------------------
-     生成 K 线数据 (由 AI 决定涨跌，服务端代理，失败时算法兜底)
+     生成 K 线数据（本地确定性算法）
      ------------------------------------------------------------ */
 
-  const generateKLines = useCallback(async () => {
+  const generateKLines = useCallback(() => {
     if (!chart || !birthInfo) return
 
     setIsGenerating(true)
-    setProgress('初始化...')
+    setProgress('正在生成...')
 
     try {
-      const lifetime = await generateKLinesWithLLM(chart, birthInfo.year, setProgress)
+      const lifetime = generateLifetimeKLines(chart, birthInfo.year)
       setKlineCache({ lifetime, isGenerating: false })
       setProgress('')
     } catch (error) {
       console.error('K 线生成失败:', error)
       setProgress('生成失败，请重试')
-
-      // 失败时使用算法兜底
-      const lifetime = generateLifetimeKLines(chart, birthInfo.year)
-      setKlineCache({ lifetime, isGenerating: false })
     }
 
     setIsGenerating(false)

@@ -1,24 +1,32 @@
 /* ============================================================
-   Sign-in modal — passwordless magic link / OTP via Supabase.
+   Sign-in modal — passwordless email and OAuth via the active auth authority.
    Brand-styled, mobile-first, self-discovery / entertainment tone.
    ============================================================ */
 
-import { useState, type FormEvent } from 'react'
+import { useState, type ClipboardEvent, type FormEvent } from 'react'
 import { useAuthStore, type OAuthProvider } from '@/stores'
+import { EMAIL_OTP_VERIFICATION_ERROR_MESSAGE } from '@/lib/supabase'
 import { isValidEmail } from '@/lib/subscribe'
 import { SocialSignInButton } from '@/components/SocialSignInButton'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
+type VerificationStatus = 'idle' | 'verifying' | 'error'
+const EMAIL_OTP_PATTERN = /^[0-9]{6}$/
 
 interface AuthModalProps {
   onClose: () => void
 }
 
 export function AuthModal({ onClose }: AuthModalProps) {
-  const { signInWithEmail, signInWithOAuth } = useAuthStore()
+  const { signInWithEmail, signInWithOAuth, verifyEmailOtp } = useAuthStore()
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [message, setMessage] = useState<string | null>(null)
+  const [otp, setOtp] = useState('')
+  const [emailVerificationStarted, setEmailVerificationStarted] = useState(false)
+  const [verificationCsrfToken, setVerificationCsrfToken] = useState<string | null>(null)
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>('idle')
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null)
   // OAuth is a separate concern from the email form (different loading/error).
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null)
   const [oauthError, setOauthError] = useState<string | null>(null)
@@ -47,12 +55,65 @@ export function AuthModal({ onClose }: AuthModalProps) {
     setStatus('sending')
     setMessage(null)
     try {
-      await signInWithEmail(email)
+      const submittedEmail = email.trim()
+      const result = await signInWithEmail(submittedEmail)
+      setEmail(submittedEmail)
+      setEmailVerificationStarted(Boolean(result))
+      setVerificationCsrfToken(result?.verificationCsrfToken ?? null)
+      setOtp('')
+      setVerificationStatus('idle')
+      setVerificationMessage(null)
       setStatus('sent')
     } catch (err) {
       setStatus('error')
       setMessage(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     }
+  }
+
+  const updateOtp = (value: string) => {
+    setOtp(value.replace(/[^0-9]/gu, '').slice(0, 6))
+    if (verificationStatus === 'error') {
+      setVerificationStatus('idle')
+      setVerificationMessage(null)
+    }
+  }
+
+  const handleOtpPaste = (event: ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    updateOtp(event.clipboardData.getData('text'))
+  }
+
+  const handleVerify = async (event: FormEvent) => {
+    event.preventDefault()
+    if (verificationStatus === 'verifying' || !verificationCsrfToken) return
+    if (!EMAIL_OTP_PATTERN.test(otp)) {
+      setVerificationStatus('error')
+      setVerificationMessage('Enter the 6-digit code from your email.')
+      return
+    }
+
+    setVerificationStatus('verifying')
+    setVerificationMessage(null)
+    try {
+      await verifyEmailOtp(email, otp, verificationCsrfToken)
+      onClose()
+    } catch {
+      // Verification attempts are terminal server-side. Destroy the in-memory
+      // synchronizer token so this UI cannot retry an already-consumed flow.
+      setVerificationCsrfToken(null)
+      setVerificationStatus('error')
+      setVerificationMessage(EMAIL_OTP_VERIFICATION_ERROR_MESSAGE)
+    }
+  }
+
+  const handleStartAgain = () => {
+    setStatus('idle')
+    setMessage(null)
+    setOtp('')
+    setEmailVerificationStarted(false)
+    setVerificationCsrfToken(null)
+    setVerificationStatus('idle')
+    setVerificationMessage(null)
   }
 
   return (
@@ -76,7 +137,92 @@ export function AuthModal({ onClose }: AuthModalProps) {
           ✕
         </button>
 
-        {status === 'sent' ? (
+        {status === 'sent' && emailVerificationStarted ? (
+          <div className="text-center py-4">
+            <div className="text-3xl mb-3 text-gold/80">✉</div>
+            <h3 className="text-xl font-semibold text-text mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
+              Enter your verification code
+            </h3>
+            <p className="text-sm text-text-muted">
+              We sent a 6-digit code to{' '}
+              <span className="text-text-secondary">{email}</span>.
+            </p>
+
+            <form className="mt-5" onSubmit={handleVerify}>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                value={otp}
+                disabled={!verificationCsrfToken}
+                onChange={(event) => updateOtp(event.target.value)}
+                onPaste={handleOtpPaste}
+                aria-label="6-digit verification code"
+                aria-invalid={verificationStatus === 'error'}
+                aria-describedby={
+                  verificationMessage
+                    ? `${verificationCsrfToken ? 'email-otp-help ' : ''}email-otp-error`
+                    : verificationCsrfToken
+                      ? 'email-otp-help'
+                      : undefined
+                }
+                className="
+                  w-full px-4 py-3 rounded-lg text-center text-xl tracking-[0.35em]
+                  bg-white/[0.04] border border-white/[0.1]
+                  text-text placeholder:text-text-muted/60
+                  focus:outline-none focus:border-gold/40 focus:bg-white/[0.06]
+                  transition-colors
+                "
+                placeholder="000000"
+              />
+              {verificationCsrfToken && (
+                <p id="email-otp-help" className="mt-2 text-xs text-text-muted">
+                  You can also use the secure link in your email.
+                </p>
+              )}
+
+              {verificationCsrfToken ? (
+                <button
+                  type="submit"
+                  disabled={
+                    verificationStatus === 'verifying'
+                    || !EMAIL_OTP_PATTERN.test(otp)
+                  }
+                  className="
+                    mt-4 w-full px-4 py-2.5 rounded-lg text-sm font-semibold
+                    bg-gradient-to-r from-gold to-gold-dark text-night
+                    hover:from-gold-light hover:to-gold
+                    disabled:opacity-60 disabled:cursor-not-allowed
+                    transition-all
+                  "
+                >
+                  {verificationStatus === 'verifying' ? 'Verifying' : 'Verify'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleStartAgain}
+                  className="
+                    mt-4 w-full px-4 py-2.5 rounded-lg text-sm font-semibold
+                    bg-gradient-to-r from-gold to-gold-dark text-night
+                    hover:from-gold-light hover:to-gold
+                    transition-all
+                  "
+                >
+                  Start again
+                </button>
+              )}
+
+              {verificationMessage && (
+                <p id="email-otp-error" role="alert" className="mt-2 text-xs text-misfortune">
+                  {verificationMessage}
+                </p>
+              )}
+            </form>
+          </div>
+        ) : status === 'sent' ? (
           <div className="text-center py-4">
             <div className="text-3xl mb-3 text-gold/80">✉</div>
             <h3 className="text-xl font-semibold text-text mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
@@ -95,7 +241,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
                 Sign in to Cinnabar
               </h3>
               <p className="text-sm text-text-muted">
-                Save your charts and cards across visits — no password needed.
+                Sign in to access your Cinnabar account — no password needed.
               </p>
             </div>
 
@@ -110,7 +256,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
             </div>
 
             {oauthError && (
-              <p className="mt-2 text-xs text-misfortune text-center">{oauthError}</p>
+              <p role="alert" className="mt-2 text-xs text-misfortune text-center">{oauthError}</p>
             )}
 
             {/* Divider */}
@@ -166,7 +312,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
               </button>
 
               {status === 'error' && message && (
-                <p className="mt-2 text-xs text-misfortune">{message}</p>
+                <p role="alert" className="mt-2 text-xs text-misfortune">{message}</p>
               )}
             </form>
 

@@ -5,7 +5,7 @@
  * [PROTOCOL]: Update this header when changed, then check AGENTS.md/CLAUDE.md
  */
 
-import type { BirthInfo, FunctionalAstrolabe } from './astro'
+import { hourToShichen, type BirthInfo, type FunctionalAstrolabe } from './astro'
 import {
   describeStarLabel,
   PALACE_PINYIN,
@@ -106,6 +106,15 @@ export function buildZiWeiChartFacts(
   const lines: string[] = []
   if (options.label) lines.push(`${options.label}`)
   lines.push('System: Zi Wei Dou Shu (Purple Star Astrology)')
+  if (birthInfo.birthTimeReliable !== true) {
+    lines.push('Birth Time Reliability: approximate; time-specific pillar omitted')
+  } else {
+    const chartHour = birthInfo.resolvedBirthTime?.hour ?? birthInfo.hour
+    const correctionLabel = birthInfo.resolvedBirthTime?.applied
+      ? ' after true solar correction'
+      : ''
+    lines.push(`Birth Hour${correctionLabel}: ${hourToShichen(chartHour)}`)
+  }
 
   if (lifePalace) {
     lines.push(

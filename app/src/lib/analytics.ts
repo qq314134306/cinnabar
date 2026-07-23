@@ -1,7 +1,7 @@
 /**
- * [INPUT]: Event names/params from UI components and tab changes
+ * [INPUT]: Event names/PII-free params from UI components and tab changes
  * [OUTPUT]: Forwards page_view and custom events to Google Analytics 4 (gtag.js)
- * [POS]: Thin client-side wrapper over the window.gtag loaded in index.html
+ * [POS]: Thin client-side wrapper that initializes and calls GA4 without inline scripts
  * [PROTOCOL]: Update this header when changed, then check AGENTS.md/CLAUDE.md
  *
  * The GA4 Measurement ID is a public value and is safe to ship in the client.
@@ -21,6 +21,25 @@ declare global {
 function sendGtag(...args: unknown[]): void {
   if (typeof window === 'undefined' || typeof window.gtag !== 'function') return
   window.gtag(...args)
+}
+
+/** Initialize GA4 from the local bundle so CSP does not need unsafe-inline. */
+export function initializeAnalytics(): void {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return
+  if (typeof window.gtag === 'function') return
+
+  window.dataLayer = window.dataLayer ?? []
+  window.gtag = (...args: unknown[]) => {
+    window.dataLayer!.push(args)
+  }
+  window.gtag('js', new Date())
+  window.gtag('config', GA_MEASUREMENT_ID, { send_page_view: false })
+
+  const script = document.createElement('script')
+  script.async = true
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA_MEASUREMENT_ID)}`
+  script.dataset.cinnabarAnalytics = 'true'
+  document.head.appendChild(script)
 }
 
 /** Manual SPA page_view — automatic collection is disabled in index.html. */
@@ -76,4 +95,7 @@ export const analytics = {
   /** An email was successfully captured. */
   emailCapture: (source: string): void =>
     sendGtag('event', 'email_capture', { source }),
+
+  /** An authenticated user opened the credit wallet. Sends no account data. */
+  viewWallet: (): void => sendGtag('event', 'view_wallet'),
 }

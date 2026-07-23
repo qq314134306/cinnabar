@@ -1,51 +1,83 @@
-# 紫微知道
+# Cinnabar
 
 <p align="center">
-  <img width="820" alt="紫微知道" src="./assets/logo.ja.svg" />
+  <img width="820" alt="Cinnabar" src="./assets/logo.svg" />
 </p>
 
 <p align="center">
-  <strong>現代的な紫微斗数チャート分析ツール</strong>
+  <a href="../README.md">简体中文</a> ·
+  <a href="./README.zh-TW.md">繁體中文</a> ·
+  <a href="./README.ja.md">日本語</a> ·
+  <a href="./README.en.md">English</a>
 </p>
 
 <p align="center">
-  精密な命盤作成 · AI 解釈 · 年運分析 · 相性診断 · ライフカーブ可視化
+  <strong>東洋占星術を英語で提供するオープンソース Web アプリ</strong>
 </p>
 
 ## 概要
 
-紫微知道は、伝統的な紫微斗数の知識、モダンな Web UI、複数モデル対応の AI を組み合わせたセルフホスト可能なアプリです。
+Cinnabar は React、TypeScript、Vite で構築された紫微斗数アプリです。現在の公開 UI は英語で、命盤、AI リーディング、二人の相性、共有カードに重点を置いています。
 
-命盤を表示するだけでなく、「理解しやすいこと」「使いやすいこと」「共有しやすいこと」を重視しています。
+## 現在表示される機能
 
-## 主な機能
+- **Your Chart**：出生情報と場所を入力し、必要に応じて真太陽時を補正してから、`iztro` で命盤を生成します。
+- **AI Reading**：ブラウザーからサーバー側の `/api/interpret` へ送るのは、
+  バージョン化された `reading.v1` の出生情報／persona リクエストだけです。
+  命盤とプロンプトの再構築、18 歳以上の確認、日次クォータはサーバー側で
+  実行します。messages、prompt、命盤 facts、補正済み時刻、座標、タイム
+  ゾーンはブラウザーから送信しません。DeepSeek のキーもブラウザーには
+  渡りません。
+- **Compatibility**：二人の命盤と関係性を比較します。
+- **Share Card**：生成済みの命盤から共有用カードを作成します。
 
-- **精密な命盤作成** - `iztro` ベースで 12 宮を含むチャートを生成
-- **AI 解釈** - 構造化された命盤分析を出力
-- **年運分析** - 月次トレンドまで含めた運勢推移
-- **相性診断** - 二人の命盤を比較して関係性を分析
-- **ライフカーブ** - 長期的な運勢の流れを可視化
-- **共有カード** - 共有向けの金言カードを生成
-
-## はじめに
+## ローカル開発
 
 ```bash
-git clone https://github.com/ruijayfeng/ziwei.git
+git clone https://github.com/qq314134306/cinnabar.git
 cd ziwei/app
-npm install
+npm ci
 npm run dev
+```
+
+`npm run dev` が起動するのは Vite のフロントエンド開発サーバーだけで、`app/api/` のサーバー API は提供しません。AI リーディング、ログイン、その他の API を含むフローを確認するには、Vercel Functions と互換性のあるランタイムを使用してください。Vercel CLI をインストールして設定済みの場合は、次のように実行できます。
+
+```bash
+cd app
+vercel dev
+```
+
+AI リーディングには、サーバー環境の `DEEPSEEK_API_KEY` が必要です。アプリ内に API キー設定はなく、ブラウザーから複数の AI モデルを切り替える機能もありません。
+
+公開 AI はデフォルトで無効です。有効化する前に Supabase のクォータ
+migration を適用し、`ENABLE_PUBLIC_AI_READINGS=true` と
+`VITE_ENABLE_PUBLIC_AI_READINGS=true`（どちらも完全一致）、
+`APP_ORIGIN`、`DEEPSEEK_API_KEY`、`SUPABASE_SECRET_KEY`、
+`PUBLIC_AI_QUOTA_HMAC_KEY`、`PUBLIC_AI_DAILY_IP_LIMIT`、
+`PUBLIC_AI_DAILY_GLOBAL_LIMIT` を設定してください。ローカルテストだけでは、
+実際の DeepSeek ストリーム、外部クォータ、コストアラートを検証したことに
+なりません。
+
+## 検証
+
+```bash
+cd app
+npm ci
+npm run lint
+npm run test
+npm run build
 ```
 
 ## デプロイ
 
-### Vercel
+プロジェクトの Root Directory を `app` に設定し、`app/api/` の Vercel Functions 互換ルートを実行できる環境へデプロイしてください。Vite の静的出力だけを配信しても、完全な機能は利用できません。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ruijayfeng/ziwei&project-name=ziwei&root-directory=app)
+Future Report の決済機能はデフォルトで無効です：`ENABLE_FUTURE_REPORT_PAYMENTS=false`、`VITE_ENABLE_FUTURE_REPORT_PAYMENTS=false`。PayPal のライブ環境や完全な本番フローを検証した証拠もまだありません。ローカルテストやワークフロー設定だけを根拠に、決済フラグを有効にしないでください。
 
-### Cloudflare Pages
+## 注意
 
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ruijayfeng/ziwei)
+Cinnabar は娯楽と自己理解のためのものであり、医療、法律、金融、その他の専門的助言ではありません。
 
-## 設定
+## ライセンス
 
-アプリ内の設定画面から LLM API を設定できます。OpenAI-compatible API に加えて、Kimi、Gemini、Claude、DeepSeek なども利用できます。
+本プロジェクトは [GPLv3（GNU General Public License v3.0）](../LICENSE) の下で公開されています。

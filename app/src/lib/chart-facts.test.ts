@@ -17,6 +17,7 @@ const birthInfo: BirthInfo = {
   day: 16,
   hour: 2,
   gender: 'male',
+  birthTimeReliable: true,
 }
 
 const CJK = /[一-鿿]/
@@ -28,7 +29,19 @@ describe('buildZiWeiChartFacts', () => {
 
     expect(facts).toContain('System: Zi Wei Dou Shu')
     expect(facts).toContain('Life Palace')
+    expect(facts).toContain('Birth Hour: Ox Hour')
     expect(CJK.test(facts)).toBe(false)
+  })
+
+  it('omits the birth-hour fact when the time is approximate', () => {
+    const chart = astro.bySolar('2000-8-16', 2, '男', true)
+    const facts = buildZiWeiChartFacts(chart, {
+      ...birthInfo,
+      birthTimeReliable: false,
+    })
+
+    expect(facts).toContain('Birth Time Reliability: approximate')
+    expect(facts).not.toContain('Birth Hour:')
   })
 })
 

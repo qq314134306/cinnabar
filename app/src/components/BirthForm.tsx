@@ -13,6 +13,10 @@ import { analytics } from '@/lib/analytics'
 const YEAR_OPTIONS = getYearOptions()
 const MONTH_OPTIONS = getMonthOptions()
 const HOUR_OPTIONS = getShichenOptions()
+const BIRTH_TIME_RELIABILITY_OPTIONS = [
+  { value: 'recorded', label: 'Recorded or known accurately' },
+  { value: 'approximate', label: 'Approximate or uncertain' },
+]
 
 const GENDER_OPTIONS = [
   { value: 'male', label: 'Male', icon: '♂' },
@@ -26,6 +30,7 @@ export function BirthForm() {
   const [month, setMonth] = useState(1)
   const [day, setDay] = useState(1)
   const [hour, setHour] = useState(12)
+  const [birthTimeReliability, setBirthTimeReliability] = useState<'recorded' | 'approximate'>('recorded')
   const [gender, setGender] = useState<Gender>('male')
   const [birthplace, setBirthplace] = useState('')
   const [trueSolarEnabled, setTrueSolarEnabled] = useState(true)
@@ -97,6 +102,7 @@ export function BirthForm() {
         birthplace: birthplace.trim() || undefined,
         trueSolarEnabled,
         resolvedBirthTime,
+        birthTimeReliable: birthTimeReliability === 'recorded',
       }
       const chart = generateChart(birthInfo)
 
@@ -185,6 +191,14 @@ export function BirthForm() {
           options={HOUR_OPTIONS}
           value={hour}
           onChange={(e) => setHour(Number(e.target.value))}
+        />
+        <Select
+          label="How accurate is this time?"
+          options={BIRTH_TIME_RELIABILITY_OPTIONS}
+          value={birthTimeReliability}
+          onChange={(e) => setBirthTimeReliability(
+            e.target.value === 'approximate' ? 'approximate' : 'recorded',
+          )}
         />
 
         {/* Gender */}

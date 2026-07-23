@@ -1,0 +1,64 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/auth/:route",
+      "destination": "/api/auth?__cinnabar_auth_route=:route"
+    }
+  ],
+  "functions": {
+    "api/interpret.ts": {
+      "maxDuration": 300,
+      "supportsCancellation": true
+    },
+    "api/future-report-generate.ts": {
+      "maxDuration": 90
+    },
+    "api/future-report-order.ts": {
+      "maxDuration": 60
+    },
+    "api/future-report-capture.ts": {
+      "maxDuration": 60
+    },
+    "api/future-report-access.ts": {
+      "maxDuration": 60
+    },
+    "api/paypal-webhook.ts": {
+      "maxDuration": 120
+    },
+    "api/cron/paypal-reconciliation.ts": {
+      "maxDuration": 300
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy-Report-Only",
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' https://www.googletagmanager.com https://www.paypal.com https://www.sandbox.paypal.com https://www.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://*.paypal.com https://*.paypalobjects.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://*.supabase.co https://api-m.paypal.com https://api-m.sandbox.paypal.com; frame-src https://www.paypal.com https://www.sandbox.paypal.com; worker-src 'self' blob:; manifest-src 'self'; report-uri /api/csp-report"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(self \"https://www.paypal.com\" \"https://www.sandbox.paypal.com\")"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000"
+        }
+      ]
+    }
+  ]
+}

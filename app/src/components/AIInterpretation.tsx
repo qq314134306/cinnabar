@@ -8,9 +8,14 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
-import { buildZiWeiChartFacts } from '@/lib/chart-facts'
-import { buildFreeReadingPrompt, buildSystemPrompt, DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
-import { streamChat, type ChatMessage } from '@/lib/llm'
+import { DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
+import { streamReading } from '@/lib/llm'
+import {
+  isPublicAiReadingEnabled,
+  PUBLIC_AI_UNAVAILABLE_MESSAGE,
+} from '@/lib/public-ai'
+import { buildNatalReadingRequest } from '@/lib/reading-contract'
+import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 import { Button } from '@/components/ui'
 import { FutureReportPaywall } from '@/components/FutureReportPaywall'
 import { SoulCard } from '@/components/SoulCard'
@@ -24,6 +29,13 @@ import { analytics } from '@/lib/analytics'
 const CHAR_INTERVAL = 35
 
 const PERSONAS: Persona[] = ['scholar', 'sage']
+
+function getNatalReadingRequestKey(
+  birthInfo: BirthInfo,
+  persona: Persona,
+): string {
+  return JSON.stringify(buildNatalReadingRequest(birthInfo, persona))
+}
 
 /* ------------------------------------------------------------
    Markdown styling
@@ -70,24 +82,38 @@ const MarkdownComponents = {
 export function AIInterpretation() {
   const { chart, birthInfo } = useChartStore()
   const { persona, setPersona } = useSettingsStore()
-  const { aiInterpretation, setAiInterpretation } = useContentCacheStore()
+  const publicAiEnabled = isPublicAiReadingEnabled()
+  const {
+    aiInterpretation,
+    aiInterpretationKey,
+    setAiInterpretation,
+  } = useContentCacheStore()
 
-  const [displayText, setDisplayText] = useState('')
-  const fullTextRef = useRef('')
-  const displayIndexRef = useRef(0)
+  const requestKey = birthInfo
+    ? getNatalReadingRequestKey(birthInfo, persona)
+    : null
+  const initialText = (
+    requestKey
+    && aiInterpretationKey === requestKey
+    && aiInterpretation
+  ) || ''
+
+  const [displayText, setDisplayText] = useState(initialText)
+  const fullTextRef = useRef(initialText)
+  const displayIndexRef = useRef(initialText.length)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const requestRef = useRef<AbortController | null>(null)
+  const previousRequestKeyRef = useRef(requestKey)
+  const previousChartRef = useRef<FunctionalAstrolabe | null>(chart)
+  const latestRequestKeyRef = useRef(requestKey)
+  const latestChartRef = useRef<FunctionalAstrolabe | null>(chart)
   const loadingRef = useRef(false)
   const [loading, setLoading] = useState(false)
   const [animating, setAnimating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (aiInterpretation && !displayText) {
-      setDisplayText(aiInterpretation)
-      fullTextRef.current = aiInterpretation
-      displayIndexRef.current = aiInterpretation.length
-    }
-  }, [aiInterpretation, displayText])
+  latestRequestKeyRef.current = requestKey
+  latestChartRef.current = chart
 
   const startAnimation = useCallback(() => {
     if (timerRef.current) return
@@ -108,13 +134,67 @@ export function AIInterpretation() {
   }, [])
 
   useEffect(() => {
+    const contextChanged = (
+      previousRequestKeyRef.current !== requestKey
+      || previousChartRef.current !== chart
+    )
+    previousRequestKeyRef.current = requestKey
+    previousChartRef.current = chart
+
+    if (!contextChanged) {
+      if (
+        (aiInterpretation !== null || aiInterpretationKey !== null)
+        && aiInterpretationKey !== requestKey
+      ) {
+        setAiInterpretation(null, null)
+      }
+      return
+    }
+
+    const controller = requestRef.current
+    requestRef.current = null
+    controller?.abort()
+
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+
+    loadingRef.current = false
+    fullTextRef.current = ''
+    displayIndexRef.current = 0
+    setLoading(false)
+    setAnimating(false)
+    setError(null)
+    setDisplayText('')
+    setAiInterpretation(null, null)
+  }, [
+    aiInterpretation,
+    aiInterpretationKey,
+    chart,
+    requestKey,
+    setAiInterpretation,
+  ])
+
+  useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
+      const controller = requestRef.current
+      requestRef.current = null
+      loadingRef.current = false
+      controller?.abort()
     }
   }, [])
 
   const handleInterpret = useCallback(async () => {
-    if (!chart || !birthInfo) return
+    if (!publicAiEnabled || !chart || !birthInfo || !requestKey) return
+
+    requestRef.current?.abort()
+    const controller = new AbortController()
+    requestRef.current = controller
+    const activeChart = chart
+    const activeRequestKey = requestKey
+    const request = buildNatalReadingRequest(birthInfo, persona)
 
     loadingRef.current = true
     setLoading(true)
@@ -122,6 +202,7 @@ export function AIInterpretation() {
     setDisplayText('')
     fullTextRef.current = ''
     displayIndexRef.current = 0
+    setAiInterpretation(null, null)
 
     if (timerRef.current) {
       clearInterval(timerRef.current)
@@ -131,29 +212,76 @@ export function AIInterpretation() {
     analytics.startReading()
 
     try {
-      const chartFacts = buildZiWeiChartFacts(chart, birthInfo)
-      const messages: ChatMessage[] = [
-        { role: 'system', content: buildSystemPrompt(persona) },
-        { role: 'user', content: buildFreeReadingPrompt(chartFacts) },
-      ]
-
       startAnimation()
 
-      for await (const token of streamChat(messages)) {
+      for await (const token of streamReading(request, { signal: controller.signal })) {
+        if (
+          requestRef.current !== controller
+          || latestRequestKeyRef.current !== activeRequestKey
+          || latestChartRef.current !== activeChart
+        ) return
         fullTextRef.current += token
       }
 
-      setAiInterpretation(fullTextRef.current)
+      if (
+        requestRef.current !== controller
+        || latestRequestKeyRef.current !== activeRequestKey
+        || latestChartRef.current !== activeChart
+      ) return
+      setAiInterpretation(fullTextRef.current, activeRequestKey)
       analytics.completeReading()
     } catch (err) {
+      if (
+        controller.signal.aborted
+        || requestRef.current !== controller
+        || latestRequestKeyRef.current !== activeRequestKey
+        || latestChartRef.current !== activeChart
+      ) return
       setError(err instanceof Error ? err.message : 'The reading failed. Please try again.')
     } finally {
-      loadingRef.current = false
-      setLoading(false)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        loadingRef.current = false
+        setLoading(false)
+      }
     }
-  }, [chart, birthInfo, persona, startAnimation, setAiInterpretation])
+  }, [
+    birthInfo,
+    chart,
+    persona,
+    publicAiEnabled,
+    requestKey,
+    setAiInterpretation,
+    startAnimation,
+  ])
 
   if (!chart) return null
+
+  if (!publicAiEnabled) {
+    return (
+      <div
+        className="
+          relative p-6 lg:p-8
+          bg-gradient-to-br from-white/[0.04] to-transparent
+          backdrop-blur-xl border border-white/[0.08] rounded-2xl
+          shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+        "
+      >
+        <h2
+          className="text-xl lg:text-2xl font-semibold text-gold mb-4"
+          style={{ fontFamily: 'var(--font-serif)' }}
+        >
+          Your Cinnabar Reading
+        </h2>
+        <div
+          role="status"
+          className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-sm text-text-secondary"
+        >
+          {PUBLIC_AI_UNAVAILABLE_MESSAGE}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -192,8 +320,10 @@ export function AIInterpretation() {
               <button
                 key={p}
                 onClick={() => setPersona(p)}
+                disabled={loading}
                 className={`
                   px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200
+                  disabled:cursor-not-allowed disabled:opacity-50
                   ${persona === p ? 'bg-gold/20 text-gold' : 'text-text-muted hover:text-text-secondary'}
                 `}
               >

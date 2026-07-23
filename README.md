@@ -1,5 +1,7 @@
+# Cinnabar
+
 <p align="center">
-  <img width="820" alt="紫微知道" src="./docs/assets/logo.svg" />
+  <strong>Eastern Astrology, in English</strong>
 </p>
 
 <p align="center">
@@ -9,144 +11,113 @@
   <a href="./docs/README.en.md">English</a>
 </p>
 
-<p align="center">
-  <strong>现代化的紫微斗数命盘分析工具</strong>
-</p>
+Cinnabar 是一款面向英语读者的紫微斗数 Web 应用。它基于 `iztro`
+生成命盘，在展示层使用统一的英语术语，并提供 AI 解读、合盘和分享体验。
 
-<p align="center">
-  精准排盘 · AI 深度解读 · 年度运势 · 双人合盘 · 人生 K 线
-</p>
+> 内容仅供娱乐与自我探索，不构成医疗、法律、财务或其他专业建议。
 
-<p align="center">
-  <a href="https://github.com/ruijayfeng/ziwei"><img alt="Stars" src="https://img.shields.io/github/stars/ruijayfeng/ziwei?style=social" /></a>
-  <a href="https://github.com/ruijayfeng/ziwei"><img alt="Forks" src="https://img.shields.io/github/forks/ruijayfeng/ziwei?style=social" /></a>
-  <a href="https://github.com/ruijayfeng/ziwei/blob/main/LICENSE"><img alt="GPLv3 License" src="https://img.shields.io/badge/License-GPLv3-blue.svg" /></a>
-  <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-blue" /></a>
-  <a href="https://react.dev/"><img alt="React" src="https://img.shields.io/badge/React-19-61DAFB" /></a>
-  <a href="https://vite.dev/"><img alt="Vite" src="https://img.shields.io/badge/Vite-7-646CFF" /></a>
-</p>
+## 当前可见功能
 
-<p align="center">
-  <img width="1920" height="911" alt="紫微知道界面预览" src="https://github.com/user-attachments/assets/756c0de6-e31c-4166-913e-c2d0afd1cf15" />
-</p>
+- **Your Chart（你的命盘）**：输入出生日期、时间和地点，生成英语十二宫命盘；
+  支持出生地匹配和真太阳时修正。
+- **AI Reading（AI 解读）**：在命盘下方生成结构化解读，可选择 Scholar 或
+  Old Sage 表达风格。
+- **Compatibility（合盘）**：比较两人的命盘，生成关系与互动分析。
+- **Share Card（分享卡片）**：把命盘摘要生成为适合保存和分享的卡片。
 
-## 概览
+部署 Supabase 后可启用免密码账号。已登录用户可以只读查看 credits
+余额与近期活动；credits 写入仍然只允许在服务端完成。
 
-紫微知道把传统紫微斗数知识、现代前端交互和多模型 AI 能力整合到一个可自部署的 Web 应用中。
+## AI 与密钥边界
 
-它不只是展示命盘，而是围绕“看得懂、用得上、方便分享”这三件事，提供更完整的分析体验。
+浏览器只向同源 `/api/interpret` 提交版本化的 `reading.v1` 产品请求和
+允许的出生信息、解读风格等字段。浏览器不会提交聊天
+messages、prompt、命盘 facts、真太阳时解析结果、坐标或时区。服务端重新生成
+命盘与提示词、执行 18 岁门槛和每日配额，再调用 DeepSeek 并返回流式结果。
+`DEEPSEEK_API_KEY` 不会发送到浏览器，也不能在应用界面中配置。
 
-## 功能特性
-
-- **精准排盘** - 基于 `iztro`，支持完整十二宫配置与传统安星逻辑
-- **AI 命盘解读** - 提供结构化的命盘分析，支持多模型接入
-- **年度运势** - 结合限流叠宫与月度趋势，呈现阶段性变化
-- **双人合盘** - 支持四化互飞、关系匹配与互动分析
-- **人生 K 线** - 以可视化方式展示长期运势走势
-- **分享卡片** - 一键生成适合传播的命格金句卡
-
-## 技术栈
-
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
-- Zustand
-- ECharts / Recharts
-- `iztro`
-- OpenAI-compatible LLM API
+公开 AI 默认关闭。启用前必须应用 Supabase 配额迁移，并配置精确的
+`ENABLE_PUBLIC_AI_READINGS=true`、`VITE_ENABLE_PUBLIC_AI_READINGS=true`、
+`APP_ORIGIN`、`DEEPSEEK_API_KEY`、
+`SUPABASE_SECRET_KEY`、`PUBLIC_AI_QUOTA_HMAC_KEY`、
+`PUBLIC_AI_DAILY_IP_LIMIT` 和 `PUBLIC_AI_DAILY_GLOBAL_LIMIT`。仓库中的本地
+测试不等于真实 DeepSeek 流、外部 Supabase 配额或成本告警已经验证。
 
 ## 快速开始
 
+需要 Node.js 和 npm。使用锁文件安装依赖：
+
 ```bash
-git clone https://github.com/ruijayfeng/ziwei.git
+git clone https://github.com/qq314134306/cinnabar.git
 cd ziwei/app
-npm install
+npm ci
 npm run dev
 ```
 
-开发服务器启动后，在浏览器打开终端输出的本地地址即可。
+`npm run dev` 启动 Vite 静态 UI 开发服务器，适合查看前端界面，但不会提供
+`/api/*` Functions，因此 AI、账号等服务端流程不可用。
+
+需要在本地联调 Vercel API runtime 时，在 `app/` 中配置所需的服务端环境变量并运行：
+
+```bash
+npx vercel dev
+```
+
+不要给 `DEEPSEEK_API_KEY` 添加 `VITE_` 前缀，也不要把任何服务端密钥提交到仓库。
 
 ## 部署
 
-### Vercel
+完整功能以 Vercel 部署为基准，因为项目的 AI、账号和其他受信任操作依赖
+`app/api/` 中的 Vercel Functions。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ruijayfeng/ziwei&project-name=ziwei&root-directory=app)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/qq314134306/cinnabar&project-name=cinnabar&root-directory=app)
 
-点击仓库部署按钮或手动导入项目时，将 **Root Directory** 设置为 `app`。
+导入项目时将 **Root Directory** 设置为 `app`。AI 解读所需的完整服务端
+配置见上文，账号与 AI 配额还需要完成 Supabase 配置和数据库迁移。
 
-### Cloudflare Pages
+普通 Vite 静态托管（包括只部署 `dist/` 的 Cloudflare Pages 配置）只能提供
+静态 UI，不会运行 Vercel `/api/*` Functions。除非另行迁移这些 API，否则它
+不是 Cinnabar 的全功能部署。
 
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ruijayfeng/ziwei)
+## 支付状态
 
-- Framework preset: `Vite`
-- Root directory: `app`
-- Build command: `npm run build`
-- Build output directory: `dist`
+支付功能尚未上线，并且默认关闭。候选构建与部署必须保持：
 
-## 配置
+```text
+ENABLE_FUTURE_REPORT_PAYMENTS=false
+VITE_ENABLE_FUTURE_REPORT_PAYMENTS=false
+```
 
-在应用内打开设置，即可配置 LLM API。
+在完整的数据库、PayPal webhook、对账和端到端验证完成前，不应启用这两个开关。
 
-支持接入 OpenAI-compatible 接口，也可配置以下服务：
+## 验证
 
-| 服务商 | 地址 |
-| --- | --- |
-| Kimi | https://platform.moonshot.cn/ |
-| Gemini | https://ai.google.dev/ |
-| Claude | https://console.anthropic.com/ |
-| DeepSeek | https://platform.deepseek.com/ |
+从 `app/` 运行：
+
+```bash
+npm run lint
+npm run test
+npm run build
+```
 
 ## 项目结构
 
 ```text
 app/
-├── src/
-│   ├── components/     # 业务组件
-│   │   ├── chart/      # 命盘展示
-│   │   ├── kline/      # 人生 K 线
-│   │   ├── fortune/    # 年度运势
-│   │   ├── match/      # 双人合盘
-│   │   └── share/      # 分享卡片
-│   ├── lib/            # 领域工具与适配层
-│   ├── knowledge/      # 紫微知识库
-│   └── stores/         # 状态管理
-└── package.json
+├── src/        # React UI、命盘计算与浏览器客户端
+├── api/        # Vercel server/edge Functions
+└── tests/      # 跨模块与部署合同测试
+supabase/
+├── migrations/ # 数据库迁移
+├── templates/  # 登录邮件模板
+└── tests/      # 数据库 Release Proof
+docs/           # 多语言 README 与开发文档
 ```
 
-## 截图
+## 开源协议与致谢
 
-### 信息填写
-<img width="1920" height="911" alt="信息填写页面" src="https://github.com/user-attachments/assets/7e7cce4f-11bd-4cbd-beee-7e6fc0c1280a" />
+本项目采用 [GNU GPLv3](./LICENSE) 开源协议。
 
-### 命盘展示
-<img width="1920" height="911" alt="命盘展示" src="https://github.com/user-attachments/assets/756c0de6-e31c-4166-913e-c2d0afd1cf15" />
-
-### 解读结果
-<img width="1920" height="911" alt="解读结果" src="https://github.com/user-attachments/assets/3f151263-587d-4fdc-8017-e9eabdf6b47f" />
-
-### 年度运势
-<img width="1646" height="1990" alt="年度运势" src="https://github.com/user-attachments/assets/a79ba231-2e8f-4b08-a510-7eb456e40cbc" />
-
-### 人生 K 线
-<img width="1920" height="911" alt="人生 K 线" src="https://github.com/user-attachments/assets/09b64812-d247-4189-912b-0abea6051881" />
-
-### 双人合盘
-<img width="1920" height="911" alt="双人合盘" src="https://github.com/user-attachments/assets/88407e8a-7a7b-4be4-ba5d-20eaaddcd996" />
-
-### 分享卡片
-<img width="1920" height="911" alt="分享卡片" src="https://github.com/user-attachments/assets/921faecb-a35f-4386-85bf-89abf03f69d9" />
-
-## 开源协议
-
-GPLv3 License
-
-## 致谢
-
-- [iztro](https://github.com/SylarLong/iztro)
-- [lifekline](https://github.com/AICryptoHK/lifekline)
-- [ClaudeCode 镜像站](https://www.aicodemirror.com/register?invitecode=R2A5HD)
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ruijayfeng/ziwei&type=Date)](https://star-history.com/#ruijayfeng/ziwei&Date)
+- [`iztro`](https://github.com/SylarLong/iztro) - 紫微斗数命盘引擎
+- [`city-geo`](https://github.com/88250/city-geo) - 中国城市坐标数据来源
+- [`lifekline`](https://github.com/AICryptoHK/lifekline) - 早期研究参考

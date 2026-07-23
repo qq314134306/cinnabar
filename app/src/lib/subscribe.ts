@@ -15,15 +15,27 @@ export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
 }
 
-export async function subscribeEmail(email: string, source: string): Promise<void> {
+export async function subscribeEmail(
+  email: string,
+  source: string,
+  signal?: AbortSignal,
+): Promise<void> {
   const response = await fetch(SUBSCRIBE_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email.trim(), source }),
+    body: JSON.stringify({ email: email.trim().toLowerCase(), source }),
+    signal,
   })
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as { error?: string } | null
-    throw new Error(body?.error || 'Something went wrong. Please try again.')
+    const body = (await response.json().catch(() => null)) as {
+      error?: string | { code?: unknown; message?: unknown }
+    } | null
+    const message = typeof body?.error === 'string'
+      ? body.error
+      : typeof body?.error?.message === 'string'
+        ? body.error.message
+        : 'Something went wrong. Please try again.'
+    throw new Error(message)
   }
 }

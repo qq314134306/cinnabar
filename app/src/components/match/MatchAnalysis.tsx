@@ -2,15 +2,19 @@
    Compatibility — two-chart reading
    ============================================================ */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useSettingsStore } from '@/stores'
-import { generateChart, getShichenOptions, type BirthInfo, type Gender } from '@/lib/astro'
+import { getShichenOptions, type BirthInfo, type Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
-import { buildZiWeiChartFacts } from '@/lib/chart-facts'
-import { buildCompatibilityPrompt, buildSystemPrompt, DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
-import { streamChat, type ChatMessage } from '@/lib/llm'
+import { DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
+import { streamReading } from '@/lib/llm'
+import {
+  isPublicAiReadingEnabled,
+  PUBLIC_AI_UNAVAILABLE_MESSAGE,
+} from '@/lib/public-ai'
+import { buildCompatibilityReadingRequest } from '@/lib/reading-contract'
 import { Button, Select } from '@/components/ui'
 
 const YEAR_OPTIONS = getYearOptions()
@@ -74,9 +78,10 @@ interface PersonInputProps {
   label: string
   value: BirthInfo
   onChange: (info: BirthInfo) => void
+  disabled: boolean
 }
 
-function PersonInput({ label, value, onChange }: PersonInputProps) {
+function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
   const update = (field: keyof BirthInfo, val: number | Gender) => {
     const next = { ...value, [field]: val }
     if (field === 'year' || field === 'month') {
@@ -108,18 +113,21 @@ function PersonInput({ label, value, onChange }: PersonInputProps) {
             options={YEAR_OPTIONS}
             value={value.year}
             onChange={(e) => update('year', Number(e.target.value))}
+            disabled={disabled}
           />
           <Select
             label="Month"
             options={MONTH_OPTIONS}
             value={value.month}
             onChange={(e) => update('month', Number(e.target.value))}
+            disabled={disabled}
           />
           <Select
             label="Day"
             options={dayOptions}
             value={value.day}
             onChange={(e) => update('day', Number(e.target.value))}
+            disabled={disabled}
           />
         </div>
         <Select
@@ -127,13 +135,15 @@ function PersonInput({ label, value, onChange }: PersonInputProps) {
           options={HOUR_OPTIONS}
           value={value.hour}
           onChange={(e) => update('hour', Number(e.target.value))}
+          disabled={disabled}
         />
         <div className="flex gap-2">
           {GENDER_OPTIONS.map((opt) => (
             <label
               key={opt.value}
               className={`
-                flex-1 py-2 px-3 rounded-lg text-center text-sm cursor-pointer transition-all
+                flex-1 py-2 px-3 rounded-lg text-center text-sm transition-all
+                ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
                 ${value.gender === opt.value
                   ? 'bg-star text-white'
                   : 'bg-white/5 border border-white/10 hover:bg-white/10'
@@ -145,6 +155,7 @@ function PersonInput({ label, value, onChange }: PersonInputProps) {
                 value={opt.value}
                 checked={value.gender === opt.value}
                 onChange={() => update('gender', opt.value as Gender)}
+                disabled={disabled}
                 className="sr-only"
               />
               {opt.label}
@@ -162,6 +173,7 @@ function PersonInput({ label, value, onChange }: PersonInputProps) {
 
 export function MatchAnalysis() {
   const { persona, setPersona } = useSettingsStore()
+  const publicAiEnabled = isPublicAiReadingEnabled()
 
   const [person1, setPerson1] = useState<BirthInfo>({
     year: 1990, month: 1, day: 1, hour: 12, gender: 'male',
@@ -172,35 +184,126 @@ export function MatchAnalysis() {
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const requestRef = useRef<AbortController | null>(null)
+  const request = useMemo(
+    () => buildCompatibilityReadingRequest(person1, person2, persona),
+    [person1, person2, persona],
+  )
+  const requestKey = useMemo(() => JSON.stringify(request), [request])
+  const previousRequestKeyRef = useRef(requestKey)
+  const previousPerson1Ref = useRef(person1)
+  const previousPerson2Ref = useRef(person2)
+  const latestRequestKeyRef = useRef(requestKey)
+  const latestPerson1Ref = useRef(person1)
+  const latestPerson2Ref = useRef(person2)
+
+  latestRequestKeyRef.current = requestKey
+  latestPerson1Ref.current = person1
+  latestPerson2Ref.current = person2
+
+  useEffect(() => {
+    const contextChanged = (
+      previousRequestKeyRef.current !== requestKey
+      || previousPerson1Ref.current !== person1
+      || previousPerson2Ref.current !== person2
+    )
+    previousRequestKeyRef.current = requestKey
+    previousPerson1Ref.current = person1
+    previousPerson2Ref.current = person2
+    if (!contextChanged) return
+
+    const controller = requestRef.current
+    requestRef.current = null
+    controller?.abort()
+    setLoading(false)
+    setResult('')
+    setError(null)
+  }, [person1, person2, requestKey])
+
+  useEffect(() => {
+    return () => {
+      const controller = requestRef.current
+      requestRef.current = null
+      controller?.abort()
+    }
+  }, [])
 
   const handleAnalyze = useCallback(async () => {
+    if (!publicAiEnabled) return
+
+    const previousController = requestRef.current
+    requestRef.current = null
+    previousController?.abort()
+    const controller = new AbortController()
+    requestRef.current = controller
+    const activePerson1 = person1
+    const activePerson2 = person2
+    const activeRequestKey = requestKey
+
     setLoading(true)
     setError(null)
     setResult('')
 
     try {
-      const chart1 = generateChart(person1)
-      const chart2 = generateChart(person2)
-
-      const facts1 = buildZiWeiChartFacts(chart1, person1, { label: 'PERSON A' })
-      const facts2 = buildZiWeiChartFacts(chart2, person2, { label: 'PERSON B' })
-
-      const messages: ChatMessage[] = [
-        { role: 'system', content: buildSystemPrompt(persona) },
-        { role: 'user', content: buildCompatibilityPrompt(facts1, facts2) },
-      ]
-
       let fullText = ''
-      for await (const token of streamChat(messages)) {
+      for await (const token of streamReading(request, { signal: controller.signal })) {
+        if (
+          requestRef.current !== controller
+          || latestRequestKeyRef.current !== activeRequestKey
+          || latestPerson1Ref.current !== activePerson1
+          || latestPerson2Ref.current !== activePerson2
+        ) return
         fullText += token
         setResult(fullText)
       }
+      if (
+        requestRef.current !== controller
+        || latestRequestKeyRef.current !== activeRequestKey
+        || latestPerson1Ref.current !== activePerson1
+        || latestPerson2Ref.current !== activePerson2
+      ) return
     } catch (err) {
+      if (
+        controller.signal.aborted
+        || requestRef.current !== controller
+        || latestRequestKeyRef.current !== activeRequestKey
+        || latestPerson1Ref.current !== activePerson1
+        || latestPerson2Ref.current !== activePerson2
+      ) return
       setError(err instanceof Error ? err.message : 'The analysis failed. Please try again.')
     } finally {
-      setLoading(false)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        setLoading(false)
+      }
     }
-  }, [person1, person2, persona])
+  }, [person1, person2, publicAiEnabled, request, requestKey])
+
+  if (!publicAiEnabled) {
+    return (
+      <div
+        className="
+          animate-fade-in relative p-6 lg:p-8 max-w-6xl mx-auto
+          bg-gradient-to-br from-white/[0.04] to-transparent
+          backdrop-blur-xl border border-white/[0.08] rounded-2xl
+          shadow-[0_8px_32px_rgba(0,0,0,0.3)]
+        "
+      >
+        <h2
+          className="text-xl lg:text-2xl font-semibold text-gold mb-4"
+          style={{ fontFamily: 'var(--font-serif)' }}
+        >
+          Compatibility
+        </h2>
+        <div
+          role="status"
+          className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-sm text-text-secondary"
+        >
+          {PUBLIC_AI_UNAVAILABLE_MESSAGE}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="animate-fade-in space-y-8 max-w-6xl mx-auto">
@@ -239,8 +342,10 @@ export function MatchAnalysis() {
                 <button
                   key={p}
                   onClick={() => setPersona(p)}
+                  disabled={loading}
                   className={`
                     px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200
+                    disabled:cursor-not-allowed disabled:opacity-50
                     ${persona === p ? 'bg-gold/20 text-gold' : 'text-text-muted hover:text-text-secondary'}
                   `}
                 >
@@ -262,8 +367,18 @@ export function MatchAnalysis() {
 
         {/* Two-person input */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PersonInput label="Person A" value={person1} onChange={setPerson1} />
-          <PersonInput label="Person B" value={person2} onChange={setPerson2} />
+          <PersonInput
+            label="Person A"
+            value={person1}
+            onChange={setPerson1}
+            disabled={loading}
+          />
+          <PersonInput
+            label="Person B"
+            value={person2}
+            onChange={setPerson2}
+            disabled={loading}
+          />
         </div>
 
         {error && (

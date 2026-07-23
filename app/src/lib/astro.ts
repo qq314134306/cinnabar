@@ -37,6 +37,8 @@ export interface BirthInfo {
   birthplace?: string
   trueSolarEnabled?: boolean
   resolvedBirthTime?: ResolvedBirthTime
+  /** Approximate times may position a chart but must never be presented as an exact hour pillar. */
+  birthTimeReliable?: boolean
   isLeapMonth?: boolean
   fixLeap?: boolean
 }
