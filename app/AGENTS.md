@@ -135,6 +135,12 @@ linked to the input, submitting state is busy/disabled and rejects duplicates,
 and success is a status that invokes analytics plus the optional unlock
 callback exactly once.
 
+`src/components/ExitIntentModal.tsx` + `ExitIntentModal.test.ts`: best-effort
+once-per-session desktop exit-intent wrapper. It is a labeled modal dialog,
+moves focus inside, traps Tab, closes on Escape or the true backdrop, restores
+prior focus, and clears its delayed-success timer on unmount. Unavailable
+session storage must not break the dialog.
+
 `api/_supabase-admin.ts`: SERVER-ONLY Supabase service-role client. The
 underscore keeps it out of Vercel routing; it must never be imported from
 `src/`. The only place `SUPABASE_SECRET_KEY` is read. `src/lib/supabase.ts` is

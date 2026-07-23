@@ -304,7 +304,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   source-tagged email opt-in with input-linked announced errors, busy/disabled
   duplicate-submit protection, and an announced success/unlock state.
 - `app/src/components/SoulCard.tsx` + `app/src/lib/soul-card.ts` - shareable Soul Card (deterministic derivation from the chart) with locked teaser + share/email unlock.
-- `app/src/components/ExitIntentModal.tsx` - once-per-session exit-intent email capture.
+- `app/src/components/ExitIntentModal.tsx` + `ExitIntentModal.test.ts` -
+  best-effort once-per-session desktop email prompt with labeled modal
+  semantics, Escape/backdrop dismissal, contained Tab focus, prior-focus
+  restoration, and bounded delayed-success cleanup.
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.
 - `app/src/components/LocalChartSnapshot.tsx` - deterministic current-model-year
   chart summary shown regardless of the public-AI flag. It derives an English
