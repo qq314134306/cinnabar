@@ -119,8 +119,8 @@
   request and 18+ eligibility, reconstructs the chart/facts/prompt, and owns
   fixed DeepSeek model, token, and temperature policies. Browser streaming now
   handles split/multiline/tail SSE, UTF-8 boundaries, stable safe errors, and
-  aborts stale requests on retry/unmount. The hidden Life K-Line no longer has
-  a generic LLM route and uses a deterministic local calculation.
+  aborts stale requests on retry/unmount. Life Timeline no longer has a generic
+  LLM route and uses a deterministic local calculation.
 - Added the seventh migration,
   `20260723060000_public_ai_quota.sql`, with its rollback-only SQL behavior
   suite. Public AI remains disabled unless both `ENABLE_PUBLIC_AI_READINGS` and
@@ -161,8 +161,8 @@
   ordering and forbids audit mutation/force behavior.
 - Rewrote the four public READMEs (Simplified Chinese, Traditional Chinese,
   Japanese, and English) around the current Cinnabar product rather than stale
-  Ziwei-era claims. They advertise only the visible Your Chart, AI Reading,
-  Compatibility, and Share Card surfaces; describe DeepSeek behind the
+  Ziwei-era claims. They advertise the visible Your Chart, Life Timeline,
+  AI Reading, Compatibility, and Share Card surfaces; describe DeepSeek behind the
   server-only `/api/interpret` boundary; distinguish the Vite frontend dev/
   static output from a Vercel-compatible full API runtime; and keep both Future
   Report payment flags explicitly false with no live-payment claim. Language
@@ -492,8 +492,15 @@
 - Rebuilt AI readings on an English prompt system (base system prompt, Scholar /
   Old Sage persona toggle, free-reading and compatibility templates) grounded in
   a generated English CHART FACTS block.
-- Hid Yearly Fortune and Life K-Line from navigation (code retained, adapted to
-  the new LLM client).
+- Hid Yearly Fortune and Life K-Line from navigation while their original
+  mixed-language and LLM-bound surfaces were not product-ready.
+- Restored the deterministic path as the English Life Timeline: a first-class
+  desktop/mobile tab with local cycle generation, a year selector, scrollable
+  candle chart, translated cycle/transformation labels, and Career/Wealth/
+  Relationships/Well-being detail. The default range is current age minus five
+  through plus 25 years; the optional age 1–100 full model is explicitly
+  described as ten decadal cycles rather than a lifespan estimate. Yearly
+  Fortune remains hidden.
 - Pointed `package-lock.json` resolved URLs at registry.npmjs.org (previously
   registry.npmmirror.com, which some build environments block).
 - Added visible GitHub repository and MIT License links to the app shell (label
@@ -538,16 +545,20 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 52 Vitest files / 576 tests in
-three consecutive full-suite runs. It includes real PowerShell AST parsing for
-every workflow `pwsh` block, the exact 12-Function Hobby budget and auth-router
-contracts, the public-AI browser/server fail-closed gates, and the broader
-auth, payment, subscription, database-proof, and reading suites. `npm run
-lint`, `npm run build` with Vite 7.3.6, direct `tsc -b`, a moderate-threshold
-audit with zero findings, the secret-pattern scan, and `git diff --check`
-passed. The only build note is the known non-fatal chunk-over-500-KB warning.
-This remains local mock/contract/static evidence, not a hosted Actions run,
-database execution, deployment, or Supabase/PayPal/DeepSeek/provider proof.
+The current cumulative local baseline passed 54 Vitest files / 581 tests in
+the latest full-suite run. It includes the Life Timeline navigation, focused
+range, full ages 1-100 model, and lifespan-disclaimer contracts; real
+PowerShell AST parsing for every workflow `pwsh` block; the exact 12-Function
+Hobby budget and auth-router contracts; the public-AI browser/server
+fail-closed gates; and the broader auth, payment, subscription, database-proof,
+and reading suites. `npm run lint`, `npm run build` with Vite 7.3.6, direct
+`tsc -b`, a moderate-threshold audit with zero findings, the secret-pattern
+scan, and `git diff --check` passed. Desktop and 390-by-844 Chrome acceptance
+also covered both timeline ranges, all 100 full-model year options, intentional
+chart scrolling, and a clean current-chunk warning/error log. The only build
+note is the known non-fatal chunk-over-500-KB warning. This remains local
+mock/contract/static evidence, not a hosted Actions run, database execution,
+deployment, or Supabase/PayPal/DeepSeek/provider proof.
 
 The candidate-verification workflow contract has additionally passed its
 focused tests, and the workflow YAML was parsed locally. The database runner's focused

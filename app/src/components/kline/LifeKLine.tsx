@@ -17,7 +17,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   ReferenceLine,
   Label,
   LabelList,
@@ -25,6 +24,7 @@ import {
 import { useChartStore, useContentCacheStore } from '@/stores'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { ScoreRadar } from './ScoreRadar'
+import { translateGanZhi, translateStarLabel } from '@/lib/ziwei-glossary'
 import {
   generateLifetimeKLines,
   type LifetimeKLinePoint,
@@ -39,15 +39,19 @@ interface TooltipProps {
   payload?: Array<{ payload: LifetimeKLinePoint }>
 }
 
+function translateCycle(value: string): string {
+  return value === '童限' ? 'Early Years' : translateGanZhi(value)
+}
+
 function CustomTooltip({ active, payload }: TooltipProps) {
   if (!active || !payload?.length) return null
 
   const data = payload[0].payload
   const isUp = data.close >= data.open
-  const scoreLevel = data.score >= 80 ? '大吉' :
-                     data.score >= 60 ? '吉' :
-                     data.score >= 40 ? '平' :
-                     data.score >= 20 ? '凶' : '大凶'
+  const scoreLevel = data.score >= 80 ? 'Very high' :
+                     data.score >= 60 ? 'High' :
+                     data.score >= 40 ? 'Balanced' :
+                     data.score >= 20 ? 'Low' : 'Very low'
 
   return (
     <div className="bg-night/95 backdrop-blur-md p-5 rounded-xl shadow-2xl border border-white/10 z-50 w-[320px] md:w-[380px]">
@@ -55,11 +59,11 @@ function CustomTooltip({ active, payload }: TooltipProps) {
       <div className="flex justify-between items-start mb-3 border-b border-white/10 pb-3">
         <div>
           <p className="text-xl font-bold text-white" style={{ fontFamily: 'var(--font-serif)' }}>
-            {data.year} {data.ganZhi}年
-            <span className="text-base text-text-muted ml-2">({data.age}岁)</span>
+            {data.year} · {translateGanZhi(data.ganZhi)}
+            <span className="text-base text-text-muted ml-2">(Age {data.age})</span>
           </p>
           <p className="text-sm text-star-light font-medium mt-1">
-            大运：{data.daYun} ({data.daYunRange})
+            Cycle: {translateCycle(data.daYun)} · Ages {data.daYunRange}
           </p>
         </div>
         <div className={`text-sm font-bold px-3 py-1.5 rounded-lg ${
@@ -67,26 +71,26 @@ function CustomTooltip({ active, payload }: TooltipProps) {
           data.score >= 40 ? 'bg-amber-500/20 text-amber-400' :
           'bg-rose-500/20 text-rose-400'
         }`}>
-          {scoreLevel} {data.score}分
+          {scoreLevel} · {data.score}
         </div>
       </div>
 
       {/* ─── OHLC Grid ─── */}
       <div className="grid grid-cols-4 gap-2 text-xs mb-4 bg-white/[0.03] p-3 rounded-lg">
         <div className="text-center">
-          <span className="block text-text-muted mb-1">年初</span>
+          <span className="block text-text-muted mb-1">Open</span>
           <span className="font-mono text-white font-bold">{data.open}</span>
         </div>
         <div className="text-center">
-          <span className="block text-text-muted mb-1">年末</span>
+          <span className="block text-text-muted mb-1">Close</span>
           <span className={`font-mono font-bold ${isUp ? 'text-green-400' : 'text-rose-400'}`}>{data.close}</span>
         </div>
         <div className="text-center">
-          <span className="block text-text-muted mb-1">年内高</span>
+          <span className="block text-text-muted mb-1">High</span>
           <span className="font-mono text-gold font-bold">{data.high}</span>
         </div>
         <div className="text-center">
-          <span className="block text-text-muted mb-1">年内低</span>
+          <span className="block text-text-muted mb-1">Low</span>
           <span className="font-mono text-rose-400 font-bold">{data.low}</span>
         </div>
       </div>
@@ -95,9 +99,8 @@ function CustomTooltip({ active, payload }: TooltipProps) {
       <div className="text-sm text-text-secondary leading-relaxed max-h-[120px] overflow-y-auto"
            style={{ fontFamily: 'var(--font-brush)' }}>
         {data.reason || (
-          <span className="text-text-muted flex items-center gap-2">
-            <span className="inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            AI 解读生成中...
+          <span className="text-text-muted">
+            Locally modeled from the chart&apos;s palace and transformation weights.
           </span>
         )}
       </div>
@@ -107,7 +110,7 @@ function CustomTooltip({ active, payload }: TooltipProps) {
         <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-white/10">
           {data.yearlyMutagens.map((m, i) => (
             <span key={i} className="px-2 py-0.5 rounded text-xs bg-star/20 text-star-light">
-              {m}
+              {translateStarLabel(m)}
             </span>
           ))}
         </div>
@@ -206,13 +209,18 @@ function PeakLabel(props: PeakLabelProps) {
    主组件
    ============================================================ */
 
-export function LifeKLine() {
+interface LifeKLineProps {
+  onRequestChart?: () => void
+}
+
+export function LifeKLine({ onRequestChart }: LifeKLineProps) {
   const { chart, birthInfo } = useChartStore()
   const { klineCache, setKlineCache } = useContentCacheStore()
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState('')
   const [selectedPoint, setSelectedPoint] = useState<LifetimeKLinePoint | null>(null)
+  const [timelineRange, setTimelineRange] = useState<'focus' | 'full'>('focus')
 
   /* ------------------------------------------------------------
      生成 K 线数据（本地确定性算法）
@@ -222,15 +230,22 @@ export function LifeKLine() {
     if (!chart || !birthInfo) return
 
     setIsGenerating(true)
-    setProgress('正在生成...')
+    setProgress('Building timeline...')
 
     try {
       const lifetime = generateLifetimeKLines(chart, birthInfo.year)
       setKlineCache({ lifetime, isGenerating: false })
+      const currentAge = Math.max(
+        1,
+        Math.min(100, new Date().getFullYear() - birthInfo.year + 1),
+      )
+      setSelectedPoint(
+        lifetime.find((point) => point.age === currentAge) ?? lifetime[0] ?? null,
+      )
       setProgress('')
     } catch (error) {
-      console.error('K 线生成失败:', error)
-      setProgress('生成失败，请重试')
+      console.error('Life Timeline generation failed:', error)
+      setProgress('Could not build the timeline. Try again.')
     }
 
     setIsGenerating(false)
@@ -248,20 +263,45 @@ export function LifeKLine() {
     }))
   }, [klineCache])
 
+  const currentAge = birthInfo
+    ? Math.max(1, Math.min(100, new Date().getFullYear() - birthInfo.year + 1))
+    : 1
+  const visibleChartData = useMemo(() => {
+    if (timelineRange === 'full') return chartData
+    const firstAge = Math.max(1, currentAge - 5)
+    const lastAge = Math.min(100, currentAge + 25)
+    return chartData.filter((point) => (
+      point.age >= firstAge && point.age <= lastAge
+    ))
+  }, [chartData, currentAge, timelineRange])
+  const chartWidth = Math.max(880, visibleChartData.length * 24)
+
   // 大运变化点
   const daYunChanges = useMemo(() => {
-    if (!chartData.length) return []
-    return chartData.filter((d, i) => {
+    if (!visibleChartData.length) return []
+    return visibleChartData.filter((d, i) => {
       if (i === 0) return true
-      return d.daYun !== chartData[i - 1].daYun
+      return d.daYun !== visibleChartData[i - 1].daYun
     })
-  }, [chartData])
+  }, [visibleChartData])
 
   // 最高点
   const maxHigh = useMemo(() => {
-    if (!chartData.length) return 100
-    return Math.max(...chartData.map(d => d.high))
-  }, [chartData])
+    if (!visibleChartData.length) return 100
+    return Math.max(...visibleChartData.map(d => d.high))
+  }, [visibleChartData])
+
+  const activePoint = useMemo(() => {
+    if (
+      selectedPoint &&
+      visibleChartData.some((point) => point.age === selectedPoint.age)
+    ) {
+      return selectedPoint
+    }
+    return visibleChartData.find((point) => point.age === currentAge)
+      ?? visibleChartData[0]
+      ?? null
+  }, [currentAge, selectedPoint, visibleChartData])
 
   /* ------------------------------------------------------------
      图表点击
@@ -281,23 +321,27 @@ export function LifeKLine() {
   if (!chart) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <EmptyState />
+        <EmptyState onRequestChart={onRequestChart} />
       </div>
     )
   }
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="min-w-0 max-w-full animate-fade-in space-y-6">
       {/* ─── 标题区 ─── */}
       <div className="text-center">
         <h2
           className="text-2xl font-bold bg-gradient-to-r from-star-light via-gold to-star-light bg-clip-text text-transparent"
           style={{ fontFamily: 'var(--font-serif)' }}
         >
-          人生 K 线
+          Life Timeline
         </h2>
         <p className="text-text-muted text-sm mt-2">
-          {birthInfo?.year}年生 · 100 年运势起伏一目了然
+          Born {birthInfo?.year} · A focused view of modeled life cycles
+        </p>
+        <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-text-muted/70">
+          The model spans ages 1–100 only to cover ten decadal cycles. It does
+          not estimate lifespan or imply that someone will live to 100.
         </p>
       </div>
 
@@ -310,11 +354,11 @@ export function LifeKLine() {
             className="px-8 py-3 rounded-xl bg-gradient-to-r from-star to-gold text-night font-medium hover:shadow-[0_0_30px_rgba(124,58,237,0.4)] transition-all duration-300 disabled:opacity-50"
           >
             {isGenerating ? (
-              progress || '生成中...'
+              progress || 'Building...'
             ) : (
               <span className="inline-flex items-center gap-2">
                 <KLineIcon className="h-4 w-4" />
-                AI 生成人生 K 线
+                Build My Life Timeline
               </span>
             )}
           </button>
@@ -322,28 +366,70 @@ export function LifeKLine() {
       ) : (
         <>
           {/* ─── K 线图 ─── */}
-          <div className="relative p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-sm">
+          <div className="relative min-w-0 max-w-full p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-sm">
             {/* 顶部发光线 */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-star/50 to-transparent" />
 
             {/* 图表标题 */}
-            <div className="mb-4 flex justify-between items-center px-2">
+            <div className="mb-4 flex flex-col gap-3 px-2 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-serif)' }}>
-                人生流年大运 K 线图
+                Lifetime Cycle Timeline
               </h3>
-              <div className="flex gap-3 text-xs font-medium">
+              <div className="flex flex-wrap items-center gap-3 text-xs font-medium">
+                <label className="flex w-full flex-col items-stretch gap-1.5 text-text-muted sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+                  <span>Range</span>
+                  <select
+                    aria-label="Timeline range"
+                    value={timelineRange}
+                    onChange={(event) => {
+                      setTimelineRange(
+                        event.target.value === 'full' ? 'full' : 'focus',
+                      )
+                      setSelectedPoint(null)
+                    }}
+                    className="w-full rounded-lg border border-white/10 bg-night px-2 py-1.5 text-text-secondary outline-none focus:border-gold/40 sm:w-auto"
+                  >
+                    <option value="focus">Around now (−5 / +25 years)</option>
+                    <option value="full">Full model (ages 1–100)</option>
+                  </select>
+                </label>
+                <label className="flex w-full flex-col items-stretch gap-1.5 text-text-muted sm:w-auto sm:flex-row sm:items-center sm:gap-2">
+                  <span>Inspect year</span>
+                  <select
+                    aria-label="Choose a year"
+                    value={activePoint?.age ?? ''}
+                    onChange={(event) => {
+                      const age = Number(event.target.value)
+                      setSelectedPoint(
+                        visibleChartData.find((point) => point.age === age) ?? null,
+                      )
+                    }}
+                    className="w-full rounded-lg border border-white/10 bg-night px-2 py-1.5 text-text-secondary outline-none focus:border-gold/40 sm:w-auto"
+                  >
+                    {visibleChartData.map((point) => (
+                      <option key={point.age} value={point.age}>
+                        {point.year} · Age {point.age}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <span className="flex items-center text-green-400 bg-green-500/10 px-2 py-1 rounded">
-                  <div className="w-2 h-2 bg-green-500 mr-2 rounded-full" /> 吉运
+                  <span className="w-2 h-2 bg-green-500 mr-2 rounded-full" /> Rising
                 </span>
                 <span className="flex items-center text-rose-400 bg-rose-500/10 px-2 py-1 rounded">
-                  <div className="w-2 h-2 bg-rose-500 mr-2 rounded-full" /> 凶运
+                  <span className="w-2 h-2 bg-rose-500 mr-2 rounded-full" /> Falling
                 </span>
               </div>
             </div>
 
-            <ResponsiveContainer width="100%" height={500}>
+            <p className="mb-2 px-2 text-xs text-text-muted/70">
+              Select a year above or tap a candle to inspect its score profile.
+            </p>
+            <div className="-mx-2 max-w-full overflow-x-auto px-2 pb-2">
               <ComposedChart
-                data={chartData}
+                width={chartWidth}
+                height={500}
+                data={visibleChartData}
                 margin={{ top: 30, right: 10, left: 0, bottom: 20 }}
                 onClick={handleChartClick}
               >
@@ -360,7 +446,7 @@ export function LifeKLine() {
                   axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                   tickLine={false}
                   label={{
-                    value: '年龄',
+                    value: 'Age',
                     position: 'insideBottomRight',
                     offset: -5,
                     fontSize: 10,
@@ -375,7 +461,7 @@ export function LifeKLine() {
                   tickLine={false}
                   ticks={[0, 25, 50, 75, 100]}
                   label={{
-                    value: '运势分',
+                    value: 'Cycle score',
                     angle: -90,
                     position: 'insideLeft',
                     fontSize: 10,
@@ -398,7 +484,7 @@ export function LifeKLine() {
                     strokeWidth={1}
                   >
                     <Label
-                      value={point.daYun}
+                      value={translateCycle(point.daYun)}
                       position="top"
                       fill="#a78bfa"
                       fontSize={9}
@@ -421,71 +507,73 @@ export function LifeKLine() {
                   />
                 </Bar>
               </ComposedChart>
-            </ResponsiveContainer>
+            </div>
 
             {/* 生成状态 */}
             {klineCache.isGenerating && (
               <div className="absolute bottom-4 right-4 flex items-center gap-2 text-xs text-text-muted bg-night/80 px-3 py-1.5 rounded-lg">
                 <span className="inline-block w-3 h-3 border-2 border-star border-t-transparent rounded-full animate-spin" />
-                AI 正在生成运势解读...
+                Calculating timeline...
               </div>
             )}
           </div>
 
           {/* ─── 选中年份详情 ─── */}
-          {selectedPoint && (
+          {activePoint && (
             <div className="grid md:grid-cols-2 gap-6">
               {/* 雷达图 */}
               <ScoreRadar
                 score={{
-                  total: selectedPoint.score,
-                  trend: selectedPoint.close >= selectedPoint.open ? 'up' : 'down',
-                  dimensions: selectedPoint.dimensions,
+                  total: activePoint.score,
+                  trend: activePoint.close >= activePoint.open ? 'up' : 'down',
+                  dimensions: activePoint.dimensions,
                 }}
-                period={`${selectedPoint.year}年 (${selectedPoint.age}岁)`}
+                period={`${activePoint.year} (Age ${activePoint.age})`}
               />
 
               {/* 详细信息卡片 */}
               <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-sm">
                 <h3 className="text-sm text-text-muted font-medium mb-4">
-                  📌 {selectedPoint.year}年 {selectedPoint.ganZhi} · {selectedPoint.age}岁
+                  {activePoint.year} · {translateGanZhi(activePoint.ganZhi)} · Age {activePoint.age}
                 </h3>
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-muted">所属大运</span>
-                    <span className="text-star-light font-medium">{selectedPoint.daYun} ({selectedPoint.daYunRange})</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-text-muted">综合评分</span>
-                    <span className={`font-bold ${
-                      selectedPoint.score >= 70 ? 'text-gold' :
-                      selectedPoint.score >= 50 ? 'text-green-400' :
-                      selectedPoint.score >= 30 ? 'text-amber-400' : 'text-rose-400'
-                    }`}>
-                      {selectedPoint.score} 分
+                    <span className="text-text-muted">Major cycle</span>
+                    <span className="text-star-light font-medium">
+                      {translateCycle(activePoint.daYun)} · Ages {activePoint.daYunRange}
                     </span>
                   </div>
 
-                  {selectedPoint.yearlyMutagens && selectedPoint.yearlyMutagens.length > 0 && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-muted">Overall score</span>
+                    <span className={`font-bold ${
+                      activePoint.score >= 70 ? 'text-gold' :
+                      activePoint.score >= 50 ? 'text-green-400' :
+                      activePoint.score >= 30 ? 'text-amber-400' : 'text-rose-400'
+                    }`}>
+                      {activePoint.score} / 100
+                    </span>
+                  </div>
+
+                  {activePoint.yearlyMutagens && activePoint.yearlyMutagens.length > 0 && (
                     <div className="pt-3 border-t border-white/10">
-                      <span className="text-text-muted text-sm block mb-2">流年四化</span>
+                      <span className="text-text-muted text-sm block mb-2">Annual transformations</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {selectedPoint.yearlyMutagens.map((m, i) => (
+                        {activePoint.yearlyMutagens.map((m, i) => (
                           <span key={i} className="px-2 py-0.5 rounded text-xs bg-star/20 text-star-light">
-                            {m}
+                            {translateStarLabel(m)}
                           </span>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {selectedPoint.reason && (
+                  {activePoint.reason && (
                     <div className="pt-3 border-t border-white/10">
-                      <span className="text-text-muted text-sm block mb-2">运势解读</span>
+                      <span className="text-text-muted text-sm block mb-2">Modeled context</span>
                       <p className="text-text-secondary text-sm leading-relaxed" style={{ fontFamily: 'var(--font-brush)' }}>
-                        {selectedPoint.reason}
+                        {activePoint.reason}
                       </p>
                     </div>
                   )}
@@ -503,13 +591,22 @@ export function LifeKLine() {
    空状态组件
    ============================================================ */
 
-function EmptyState() {
+function EmptyState({ onRequestChart }: LifeKLineProps) {
   return (
     <div className="text-center p-8 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
       <KLineIcon className="mx-auto mb-4 h-12 w-12 text-gold/30" />
       <p className="text-text-muted mb-4">
-        请先在「命盘解读」中输入您的生辰信息
+        Create your birth chart before opening Life Timeline.
       </p>
+      {onRequestChart && (
+        <button
+          type="button"
+          onClick={onRequestChart}
+          className="rounded-lg bg-cinnabar/20 px-4 py-2 text-sm text-cinnabar-light transition-colors hover:bg-cinnabar/30"
+        >
+          Go to Your Chart
+        </button>
+      )}
     </div>
   )
 }

@@ -29,9 +29,9 @@ Primary runtime flow:
 3. True solar time correction can adjust the effective birth time.
 4. iztro generates the chart (zh-CN keys internally).
 5. App state stores the chart and user selections.
-6. UI renders chart, match (Compatibility), share, and AI reading views through
-   the English glossary layer. Fortune and K-line views exist but are hidden
-   from navigation.
+6. UI renders chart, deterministic Life Timeline, match (Compatibility), share,
+   and AI reading views through the English glossary layer. Yearly Fortune
+   remains hidden because it depends on the disabled public-AI path.
 7. AI reading clients send only an allowlisted `reading.v1`
    `natal`/`compatibility`/`yearly` product request to `/api/interpret`. The
    server validates 18+ eligibility, rebuilds the chart and prompt, claims the
@@ -291,7 +291,12 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   `app/src/stores/auth.test.ts` - bounded paid-generation, request-keyed stream,
   and recoverable auth-hydration regression coverage.
 - `app/src/lib/fortune-score.ts` - local chart scoring, including the
-  deterministic Life K-Line path; it no longer exposes an LLM message route.
+  deterministic Life Timeline path; it no longer exposes an LLM message route.
+- `app/src/components/kline/LifeKLine.tsx` + `ScoreRadar.tsx` - visible English
+  Life Timeline UI with a current-age-focused default range, an optional age
+  1–100 full model, horizontal mobile inspection, an explicit year selector,
+  translated cycle labels, and four-dimension detail. The full range covers ten
+  decadal cycles and is explicitly not presented as a lifespan estimate.
 - `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via Intl).
 - `app/src/lib/birthplace-data.json` - local Chinese city/region coordinate dataset.
 - `app/src/lib/world-cities.json` - curated global city dataset (name, country, longitude, IANA timezone, aliases).

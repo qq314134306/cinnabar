@@ -3,12 +3,13 @@
    Eastern Astrology, in English.
    ============================================================ */
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
 import { ChartDisplay } from '@/components/chart'
 import { AIInterpretation } from '@/components/AIInterpretation'
 import { MatchAnalysis } from '@/components/match'
+import { KLineIcon } from '@/components/icons/KLineIcon'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ShareCard } from '@/components/share'
 import { ExitIntentModal } from '@/components/ExitIntentModal'
@@ -16,10 +17,26 @@ import { AuthControl } from '@/components/AuthControl'
 import { useChartStore, useAuthStore } from '@/stores'
 import { trackPageView } from '@/lib/analytics'
 
-type TabType = 'chart' | 'match' | 'share'
+const LifeKLine = lazy(async () => {
+  const module = await import('@/components/kline/LifeKLine')
+  return { default: module.LifeKLine }
+})
 
-const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
+type TabType = 'chart' | 'timeline' | 'match' | 'share'
+
+const TABS: Array<{
+  key: TabType
+  label: string
+  mobileLabel?: string
+  icon: ReactNode
+}> = [
   { key: 'chart', label: 'Your Chart', icon: '☰' },
+  {
+    key: 'timeline',
+    label: 'Life Timeline',
+    mobileLabel: 'Timeline',
+    icon: <KLineIcon className="h-4 w-4" />,
+  },
   { key: 'match', label: 'Compatibility', icon: '⚭' },
   { key: 'share', label: 'Share Card', icon: '◈' },
 ]
@@ -27,6 +44,7 @@ const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
 /** Virtual SPA routes reported to GA4 on each tab change. */
 const TAB_ROUTES: Record<TabType, { path: string; title: string }> = {
   chart: { path: '/', title: 'Cinnabar — Your Chart' },
+  timeline: { path: '/life-timeline', title: 'Cinnabar — Life Timeline' },
   match: { path: '/compatibility', title: 'Cinnabar — Compatibility' },
   share: { path: '/share-card', title: 'Cinnabar — Share Card' },
 }
@@ -179,7 +197,7 @@ export default function App() {
               `}
             >
               <span className="inline-flex h-5 w-5 items-center justify-center text-base">{tab.icon}</span>
-              <span className="text-xs">{tab.label}</span>
+              <span className="text-xs">{tab.mobileLabel ?? tab.label}</span>
               {activeTab === tab.key && (
                 <span className="absolute -top-1 w-1 h-1 rounded-full bg-gold shadow-[0_0_6px_rgba(212,175,55,0.6)]" />
               )}
@@ -189,8 +207,8 @@ export default function App() {
       </nav>
 
       {/* Main content */}
-      <main className="flex-1 px-4 lg:px-12 py-8 pb-24 md:pb-8">
-        <div className="max-w-[1600px] mx-auto">
+      <main className="min-w-0 flex-1 px-4 lg:px-12 py-8 pb-24 md:pb-8">
+        <div className="mx-auto min-w-0 max-w-[1600px]">
           {/* Your Chart tab */}
           {activeTab === 'chart' && (
             !chart ? (
@@ -225,6 +243,13 @@ export default function App() {
                 </div>
               </div>
             )
+          )}
+
+          {/* Life Timeline tab */}
+          {activeTab === 'timeline' && (
+            <Suspense fallback={<TimelineLoading />}>
+              <LifeKLine onRequestChart={() => setActiveTab('chart')} />
+            </Suspense>
           )}
 
           {/* Compatibility tab */}
@@ -309,6 +334,20 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </button>
+    </div>
+  )
+}
+
+function TimelineLoading() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center">
+      <div
+        role="status"
+        className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-sm text-text-muted"
+      >
+        <span className="h-4 w-4 animate-spin rounded-full border-2 border-star border-t-transparent" />
+        Loading Life Timeline…
+      </div>
     </div>
   )
 }

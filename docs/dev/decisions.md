@@ -686,3 +686,15 @@ into platform disconnect termination. This avoids the Edge runtime's
 25-second first-response constraint while retaining existing
 application-level deadlines. The authenticated project has Fluid Compute
 enabled, but a real Preview remains the runtime proof.
+
+## D025 - Life Timeline Is a Focused Model, Not a Lifespan Prediction
+
+The deterministic Life K-Line calculator is now exposed as Life Timeline. Its
+default view covers the current age minus five through plus twenty-five years,
+so the primary surface stays useful for present decisions. Users may opt into
+the complete ages 1-100 model to inspect all ten decadal cycles.
+
+The upper bound exists only to make the cycle model complete. Product copy must
+state that it neither predicts lifespan nor implies that a person will live to
+100. The timeline remains a local deterministic feature and must not acquire a
+generic LLM request or a fourth public-AI operation.

@@ -101,8 +101,8 @@ proofs pass. Future Report payments remain last and disabled.
 `src/main.tsx`: React entry point and app mounting.
 
 `src/App.tsx`: Top-level application composition (Cinnabar shell: Your Chart,
-Compatibility, Share Card; Yearly Fortune and Life K-Line remain in the codebase
-but are hidden from navigation).
+Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
+codebase but is hidden from navigation).
 
 `api/interpret.ts` + `api/_public-reading.ts`: SERVER-OWNED, default-off public
 AI boundary. It accepts only exact `reading.v1` `natal`, `compatibility`, or
@@ -270,9 +270,12 @@ stream. Keep controller + request-key + chart guards on tokens, cache writes,
 errors, and completion analytics; never restore cache from an effect after a
 retry has cleared it.
 
-`src/lib/fortune-score.ts` + `src/components/kline/LifeKLine.tsx`: hidden
-Life K-Line uses the deterministic local calculator. It must not regain a
-generic LLM/messages path or invent a `lifetime` public-AI operation.
+`src/lib/fortune-score.ts` + `src/components/kline/LifeKLine.tsx`: visible Life
+Timeline uses the deterministic local calculator. Its default view stays
+focused on the current age minus five through plus twenty-five, while the full
+ages 1-100 model is explicitly optional and must never be described as a
+lifespan estimate. It must not regain a generic LLM/messages path or invent a
+`lifetime` public-AI operation.
 
 `src/lib/paypal.ts`: PayPal Smart Payment Buttons adapter. It sends only the
 tier, a stable checkout-attempt UUID, and an allowlisted birth/persona request

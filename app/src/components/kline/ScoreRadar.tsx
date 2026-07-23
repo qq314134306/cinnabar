@@ -27,10 +27,10 @@ export function ScoreRadar({ score, period }: ScoreRadarProps) {
     backgroundColor: 'transparent',
     radar: {
       indicator: [
-        { name: '事业', max: 100 },
-        { name: '财运', max: 100 },
-        { name: '感情', max: 100 },
-        { name: '健康', max: 100 },
+        { name: 'Career', max: 100 },
+        { name: 'Wealth', max: 100 },
+        { name: 'Relationships', max: 100 },
+        { name: 'Well-being', max: 100 },
       ],
       shape: 'polygon',
       splitNumber: 4,
@@ -89,10 +89,10 @@ export function ScoreRadar({ score, period }: ScoreRadarProps) {
 
   // 维度得分条
   const dimensions = [
-    { key: 'career', label: '事业', value: score.dimensions.career, color: 'from-amber-500 to-orange-500' },
-    { key: 'wealth', label: '财运', value: score.dimensions.wealth, color: 'from-gold to-amber-400' },
-    { key: 'relationship', label: '感情', value: score.dimensions.relationship, color: 'from-pink-500 to-rose-500' },
-    { key: 'health', label: '健康', value: score.dimensions.health, color: 'from-emerald-500 to-green-500' },
+    { key: 'career', label: 'Career', value: score.dimensions.career, color: 'from-amber-500 to-orange-500' },
+    { key: 'wealth', label: 'Wealth', value: score.dimensions.wealth, color: 'from-gold to-amber-400' },
+    { key: 'relationship', label: 'Relationships', value: score.dimensions.relationship, color: 'from-pink-500 to-rose-500' },
+    { key: 'health', label: 'Well-being', value: score.dimensions.health, color: 'from-emerald-500 to-green-500' },
   ]
 
   return (
@@ -107,7 +107,7 @@ export function ScoreRadar({ score, period }: ScoreRadarProps) {
       <div className="flex items-center justify-between mb-4">
         <h3 className="flex items-center gap-2 text-sm text-text-muted font-medium">
           <RadarIcon className="h-4 w-4 text-gold/70" />
-          {period} 运势分析
+          {period} score profile
         </h3>
         <div className="flex items-center gap-2">
           <span
@@ -141,7 +141,7 @@ export function ScoreRadar({ score, period }: ScoreRadarProps) {
       <div className="space-y-3 mt-4">
         {dimensions.map(dim => (
           <div key={dim.key} className="flex items-center gap-3">
-            <span className="text-xs text-text-muted w-8">{dim.label}</span>
+            <span className="w-20 text-xs text-text-muted">{dim.label}</span>
             <div className="flex-1 h-2 bg-white/[0.05] rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full bg-gradient-to-r ${dim.color} transition-all duration-500`}
