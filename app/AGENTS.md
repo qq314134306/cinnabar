@@ -102,7 +102,9 @@ proofs pass. Future Report payments remain last and disabled.
 
 `src/App.tsx`: Top-level application composition (Cinnabar shell: Your Chart,
 Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
-codebase but is hidden from navigation).
+codebase but is hidden from navigation). Desktop and mobile navigation have
+distinct accessible labels, expose the active surface with
+`aria-current="page"`, and keep decorative tab icons out of accessible names.
 
 `api/interpret.ts` + `api/_public-reading.ts`: SERVER-OWNED, default-off public
 AI boundary. It accepts only exact `reading.v1` `natal`, `compatibility`, or
@@ -367,6 +369,12 @@ entries default to Asia/Shanghai).
 year, month, and day controls retain explicit accessible names, invalid
 month/day combinations are clamped, and a generation failure must leave the
 form retryable with a visible alert rather than only a console message.
+
+`src/components/AuthControl.tsx` + `AuthControl.test.ts`: header authentication
+state and recovery. When cookie authority is unknown, session retry remains
+visible, but its long provider-error text is visually compact below the large
+desktop breakpoint while remaining an announced alert. Tests exercise rendered
+states rather than source-text matching.
 
 `src/lib/birthplace-data.json`: Local Chinese coordinate dataset used for
 birthplace matching (pinyin keys generated at load via pinyin-pro).

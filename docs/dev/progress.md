@@ -65,6 +65,16 @@
 - Corrected the app shell's header, footer, and GPLv3 links to the confirmed
   canonical `qq314134306/cinnabar` repository and added a component contract
   test so the visible attribution cannot drift back to the historical upstream.
+- Made desktop and mobile primary navigation semantically observable: each nav
+  has a distinct label, the active destination exposes `aria-current="page"`,
+  and decorative icons no longer pollute button names. During unknown session
+  authority, the retry action remains visible at every viewport while the long
+  provider-error detail becomes visually compact below the large desktop
+  breakpoint and remains an announced alert. AuthControl coverage now renders
+  retry, callback-error, and failed-sign-out states instead of inspecting
+  source text. A 390-by-844 Chrome check confirmed the compact header, visible
+  retry action, semantic active-state transition to Timeline, zero page-level
+  horizontal overflow, and an empty current-build warning/error log.
 - Added same-origin cross-tab authentication freshness without copying
   credentials or identity into browser storage. A versioned
   `BroadcastChannel` carries only a fixed "session may have changed" event;

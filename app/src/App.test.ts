@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 
 import { createElement } from 'react'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 
@@ -67,9 +73,34 @@ describe('App navigation', () => {
   it('exposes Life Timeline as a first-class lazy-loaded route', async () => {
     render(createElement(App))
 
-    fireEvent.click(screen.getByRole('button', { name: /Life Timeline/ }))
+    const primaryNav = screen.getByRole('navigation', { name: 'Primary' })
+    const mobileNav = screen.getByRole('navigation', { name: 'Mobile' })
+    expect(
+      within(primaryNav).getByRole('button', { name: 'Your Chart' })
+        .getAttribute('aria-current'),
+    ).toBe('page')
+    expect(
+      within(mobileNav).getByRole('button', { name: 'Your Chart' })
+        .getAttribute('aria-current'),
+    ).toBe('page')
+
+    fireEvent.click(
+      within(primaryNav).getByRole('button', { name: 'Life Timeline' }),
+    )
 
     expect(await screen.findByText('Life Timeline Content')).toBeTruthy()
+    expect(
+      within(primaryNav).getByRole('button', { name: 'Life Timeline' })
+        .getAttribute('aria-current'),
+    ).toBe('page')
+    expect(
+      within(mobileNav).getByRole('button', { name: 'Timeline' })
+        .getAttribute('aria-current'),
+    ).toBe('page')
+    expect(
+      within(primaryNav).getByRole('button', { name: 'Your Chart' })
+        .hasAttribute('aria-current'),
+    ).toBe(false)
     expect(mocks.trackPageView).toHaveBeenLastCalledWith(
       '/life-timeline',
       'Cinnabar — Life Timeline',

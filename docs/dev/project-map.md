@@ -89,6 +89,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 
 ## Important Files
 
+- `app/src/App.tsx` + `App.test.ts` - top-level visible-surface navigation.
+  Desktop and mobile navs have distinct names, report the active surface with
+  `aria-current="page"`, and keep decorative icons out of accessible names.
 - `app/tsconfig.json` + `app/tsconfig.api.json` - root build reference and the
   strict, no-emit API compilation boundary. API tests are excluded, but all
   `app/api/**/*.ts` production files remain in the build graph.
@@ -200,7 +203,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   retry UI. Cross-tab messages carry only a fixed freshness hint. Availability
   uncertainty preserves existing identity and paid cache; only explicit
   signed-out state or `401` clears them. An unknown legacy-migration phase
-  remains terminal because refresh-token rotation may have begun.
+  remains terminal because refresh-token rotation may have begun. The unknown-
+  authority retry remains visible on mobile while its long provider-error text
+  is visually compact and still announced.
 - `app/api/_auth-login.ts` +
   `app/api/_auth-route-{login-preflight,login-email,login-email-verify,login-oauth,callback}.ts` -
   server-owned PKCE start/callback boundary. A one-use pre-auth double-submit

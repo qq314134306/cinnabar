@@ -120,11 +120,15 @@ export default function App() {
             </div>
 
             {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-1">
+            <nav
+              aria-label="Primary"
+              className="hidden md:flex items-center gap-1"
+            >
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
+                  aria-current={activeTab === tab.key ? 'page' : undefined}
                   className={`
                     group relative px-4 py-2 rounded-lg
                     text-sm font-medium transition-all duration-200
@@ -144,10 +148,13 @@ export default function App() {
                     `}
                   />
                   <span className="relative flex items-center gap-2">
-                    <span className={`
+                    <span
+                      aria-hidden="true"
+                      className={`
                       inline-flex h-4 w-4 items-center justify-center text-xs transition-all duration-200
                       ${activeTab === tab.key ? 'text-gold' : 'opacity-50 group-hover:opacity-70'}
-                    `}>
+                    `}
+                    >
                       {tab.icon}
                     </span>
                     {tab.label}
@@ -175,6 +182,7 @@ export default function App() {
 
       {/* Mobile bottom nav */}
       <nav
+        aria-label="Mobile"
         className="
           md:hidden fixed bottom-0 left-0 right-0 z-40
           px-4 py-3
@@ -187,6 +195,7 @@ export default function App() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
+              aria-current={activeTab === tab.key ? 'page' : undefined}
               className={`
                 flex flex-col items-center gap-1 px-4 py-1.5 rounded-lg
                 transition-all duration-200
@@ -196,10 +205,18 @@ export default function App() {
                 }
               `}
             >
-              <span className="inline-flex h-5 w-5 items-center justify-center text-base">{tab.icon}</span>
+              <span
+                aria-hidden="true"
+                className="inline-flex h-5 w-5 items-center justify-center text-base"
+              >
+                {tab.icon}
+              </span>
               <span className="text-xs">{tab.mobileLabel ?? tab.label}</span>
               {activeTab === tab.key && (
-                <span className="absolute -top-1 w-1 h-1 rounded-full bg-gold shadow-[0_0_6px_rgba(212,175,55,0.6)]" />
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-1 w-1 h-1 rounded-full bg-gold shadow-[0_0_6px_rgba(212,175,55,0.6)]"
+                />
               )}
             </button>
           ))}
@@ -318,7 +335,7 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
         bg-white/[0.02] border border-white/[0.06]
       "
     >
-      <div className="text-4xl mb-4 opacity-30">☆</div>
+      <div aria-hidden="true" className="text-4xl mb-4 opacity-30">☆</div>
       <p className="text-text-muted mb-4">{message}</p>
       <button
         onClick={action}
@@ -330,7 +347,13 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
         "
       >
         {actionLabel}
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          aria-hidden="true"
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </button>
@@ -345,7 +368,10 @@ function TimelineLoading() {
         role="status"
         className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-sm text-text-muted"
       >
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-star border-t-transparent" />
+        <span
+          aria-hidden="true"
+          className="h-4 w-4 animate-spin rounded-full border-2 border-star border-t-transparent"
+        />
         Loading Life Timeline…
       </div>
     </div>

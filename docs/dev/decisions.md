@@ -729,3 +729,15 @@ explicitly a reflective model rather than scientific evidence or professional
 advice. Public AI remains a separate optional narrative layer below that
 snapshot. Enabling or disabling it must neither hide nor be described as
 changing the underlying natal chart.
+
+## D028 - Navigation Stays Clear During Optional-Account Failure
+
+The four primary product surfaces are independent of authentication. Desktop
+and mobile navigation therefore expose their active destination with semantic
+`aria-current="page"` state and use distinct navigation labels, while
+decorative icons do not alter control names.
+
+When session authority is temporarily unknown, the retry action remains visible
+at every viewport. The longer provider-error detail stays an announced alert
+but becomes visually compact below the large desktop breakpoint so an optional
+account outage cannot crowd the mobile product navigation.

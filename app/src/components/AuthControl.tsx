@@ -54,7 +54,10 @@ export function AuthControl() {
         >
           Retry session
         </button>
-        <span role="alert" className="max-w-52 text-xs text-misfortune">
+        <span
+          role="alert"
+          className="sr-only max-w-52 text-xs text-misfortune lg:not-sr-only"
+        >
           {authError}
         </span>
       </div>
