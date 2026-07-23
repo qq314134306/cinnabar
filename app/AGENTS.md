@@ -399,7 +399,9 @@ offers a symmetric, deterministic local four-dimension snapshot without an
 account, API, payment, cache, or analytics. The optional AI narrative remains
 uncached; its controller, exact request key, and both input identities own
 every streamed commit. Keep both paths free of analytics unless product and
-privacy requirements explicitly change.
+privacy requirements explicitly change. Person A and Person B controls must
+retain unique element IDs, person-specific accessible names, independent radio
+groups, and an announced recoverable local-error state.
 
 `src/components/share/ShareCard.tsx` + `ShareCard.test.ts`: deterministic
 chart-summary card and local PNG export. The quote renderer uses an

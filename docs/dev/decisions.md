@@ -711,7 +711,10 @@ analytics.
 The UI labels this as a reflective model rather than scientific evidence,
 relationship advice, or an outcome prediction. When public AI is enabled, the
 existing compatibility stream remains an optional narrative layer with its
-controller/request-key/input-identity ownership unchanged.
+controller/request-key/input-identity ownership unchanged. The two birth forms
+must remain distinguishable to assistive technology: their date/hour IDs and
+accessible names are person-specific, their gender radios are independent
+groups, and local comparison errors use an announced retryable state.
 
 ## D027 - Your Chart Works Locally Before AI
 

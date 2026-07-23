@@ -167,6 +167,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   deterministic local Compatibility snapshot across communication, shared
   direction, emotional rhythm, and resilience. It is symmetric, needs no
   account/API/payment, and is explicitly reflective rather than scientific.
+  Person A/B date, hour, and gender controls use unique IDs and
+  person-specific accessible names; local failures are announced and retryable.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership; changes, retries, and unmount reject stale tokens
   and errors.

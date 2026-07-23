@@ -90,7 +90,10 @@
   explicitly labels it a reflective model rather than scientific evidence or
   relationship advice. The existing guarded stream remains an optional “Add AI
   Reading” layer. Desktop and 390-by-844 Chrome acceptance passed with no new
-  current-build warning/error log.
+  current-build warning/error log. Person A/B year, month, day, hour, and
+  gender controls now have unique element IDs, person-specific accessible
+  names, and independent radio groups; a local comparison failure is announced
+  as a retryable alert.
 - Made Your Chart useful when public AI is disabled. A completed natal chart
   now includes a deterministic current-model-year snapshot with an English
   identity, overall score, and Career, Wealth, Relationships, and Well-being
@@ -580,7 +583,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 58 Vitest files / 595 tests in
+The current cumulative local baseline passed 58 Vitest files / 597 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the

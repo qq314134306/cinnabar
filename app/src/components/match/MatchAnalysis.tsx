@@ -86,6 +86,7 @@ interface PersonInputProps {
 }
 
 function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
+  const inputIdPrefix = label.toLowerCase().replace(/\s+/g, '-')
   const update = (field: keyof BirthInfo, val: number | Gender) => {
     const next = { ...value, [field]: val }
     if (field === 'year' || field === 'month') {
@@ -113,21 +114,27 @@ function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
       <div className="space-y-3">
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <Select
+            id={`${inputIdPrefix}-year`}
             label="Year"
+            aria-label={`${label} year of birth`}
             options={YEAR_OPTIONS}
             value={value.year}
             onChange={(e) => update('year', Number(e.target.value))}
             disabled={disabled}
           />
           <Select
+            id={`${inputIdPrefix}-month`}
             label="Month"
+            aria-label={`${label} month of birth`}
             options={MONTH_OPTIONS}
             value={value.month}
             onChange={(e) => update('month', Number(e.target.value))}
             disabled={disabled}
           />
           <Select
+            id={`${inputIdPrefix}-day`}
             label="Day"
+            aria-label={`${label} day of birth`}
             options={dayOptions}
             value={value.day}
             onChange={(e) => update('day', Number(e.target.value))}
@@ -135,13 +142,16 @@ function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
           />
         </div>
         <Select
+          id={`${inputIdPrefix}-hour`}
           label="Birth Hour"
+          aria-label={`${label} birth hour`}
           options={HOUR_OPTIONS}
           value={value.hour}
           onChange={(e) => update('hour', Number(e.target.value))}
           disabled={disabled}
         />
-        <div className="flex gap-2">
+        <fieldset className="flex gap-2">
+          <legend className="sr-only">{label} gender</legend>
           {GENDER_OPTIONS.map((opt) => (
             <label
               key={opt.value}
@@ -156,6 +166,8 @@ function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
             >
               <input
                 type="radio"
+                name={`${inputIdPrefix}-gender`}
+                aria-label={`${label} ${opt.label}`}
                 value={opt.value}
                 checked={value.gender === opt.value}
                 onChange={() => update('gender', opt.value as Gender)}
@@ -165,7 +177,7 @@ function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
               {opt.label}
             </label>
           ))}
-        </div>
+        </fieldset>
       </div>
     </div>
   )
@@ -404,7 +416,10 @@ export function MatchAnalysis() {
         )}
 
         {error && (
-          <div className="mt-4 p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm border border-misfortune/20">
+          <div
+            role="alert"
+            className="mt-4 p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm border border-misfortune/20"
+          >
             {error}
           </div>
         )}

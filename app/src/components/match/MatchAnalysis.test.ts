@@ -5,6 +5,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSettingsStore } from '@/stores'
 import { buildCompatibilityReadingRequest } from '@/lib/reading-contract'
+import * as compatibilityScore from '@/lib/compatibility-score'
 import { MatchAnalysis } from './MatchAnalysis'
 
 const mocks = vi.hoisted(() => ({
@@ -51,10 +52,35 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
   vi.unstubAllEnvs()
 })
 
 describe('MatchAnalysis public AI gate', () => {
+  it('uniquely names both people and every birth input', () => {
+    render(createElement(MatchAnalysis))
+
+    for (const person of ['Person A', 'Person B']) {
+      expect(screen.getByRole('combobox', {
+        name: `${person} year of birth`,
+      })).toBeTruthy()
+      expect(screen.getByRole('combobox', {
+        name: `${person} month of birth`,
+      })).toBeTruthy()
+      expect(screen.getByRole('combobox', {
+        name: `${person} day of birth`,
+      })).toBeTruthy()
+      expect(screen.getByRole('combobox', {
+        name: `${person} birth hour`,
+      })).toBeTruthy()
+      expect(screen.getByRole('radio', { name: `${person} Male` })).toBeTruthy()
+      expect(screen.getByRole('radio', { name: `${person} Female` })).toBeTruthy()
+    }
+
+    const ids = screen.getAllByRole('combobox').map((element) => element.id)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
   it('shows a clear unavailable state and exposes no request action for an invalid value', () => {
     vi.stubEnv('VITE_ENABLE_PUBLIC_AI_READINGS', 'TRUE')
 
@@ -80,6 +106,20 @@ describe('MatchAnalysis public AI gate', () => {
     expect(screen.getAllByRole('progressbar')).toHaveLength(4)
     expect(screen.getByText(/not scientific evidence/)).toBeTruthy()
     expect(mocks.streamReading).not.toHaveBeenCalled()
+  })
+
+  it('announces a recoverable local comparison failure', () => {
+    vi.spyOn(compatibilityScore, 'compareBirthCharts')
+      .mockImplementationOnce(() => {
+        throw new Error('Check both birth dates and try again.')
+      })
+    render(createElement(MatchAnalysis))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Compare Locally' }))
+
+    expect(screen.getByRole('alert').textContent).toContain(
+      'Check both birth dates and try again.',
+    )
   })
 })
 
