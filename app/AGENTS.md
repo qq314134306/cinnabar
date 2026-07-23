@@ -129,6 +129,12 @@ EmailCapture and the Soul Card unlock). The only place `MAKE_WEBHOOK_URL` is
 read; it forwards `{email, source, created_at}` to Make with body-size and
 per-IP rate limits. Set `MAKE_WEBHOOK_URL` in the Vercel project env.
 
+`src/components/EmailCapture.tsx` + `EmailCapture.test.ts`: reusable,
+source-tagged email opt-in. Invalid and request-error states are announced and
+linked to the input, submitting state is busy/disabled and rejects duplicates,
+and success is a status that invokes analytics plus the optional unlock
+callback exactly once.
+
 `api/_supabase-admin.ts`: SERVER-ONLY Supabase service-role client. The
 underscore keeps it out of Vercel routing; it must never be imported from
 `src/`. The only place `SUPABASE_SECRET_KEY` is read. `src/lib/supabase.ts` is

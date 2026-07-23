@@ -4,7 +4,7 @@
    (self-discovery / entertainment only; no divination wording).
    ============================================================ */
 
-import { useState, type FormEvent } from 'react'
+import { useId, useState, type FormEvent } from 'react'
 import { isValidEmail, subscribeEmail } from '@/lib/subscribe'
 import { analytics } from '@/lib/analytics'
 
@@ -34,6 +34,7 @@ export function EmailCapture({
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [message, setMessage] = useState<string | null>(null)
+  const messageId = useId()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -61,15 +62,22 @@ export function EmailCapture({
 
   if (status === 'success') {
     return (
-      <div className={`text-center text-sm text-gold ${className}`}>
-        <span className="mr-1">✓</span>
+      <div
+        role="status"
+        className={`text-center text-sm text-gold ${className}`}
+      >
+        <span aria-hidden="true" className="mr-1">✓</span>
         {message}
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`w-full ${className}`}>
+    <form
+      onSubmit={handleSubmit}
+      aria-busy={status === 'submitting'}
+      className={`w-full ${className}`}
+    >
       {title && (
         <p className="text-sm font-medium text-text-secondary mb-1">{title}</p>
       )}
@@ -90,6 +98,8 @@ export function EmailCapture({
           }}
           placeholder={placeholder}
           aria-label="Email address"
+          aria-invalid={status === 'error' ? 'true' : undefined}
+          aria-describedby={status === 'error' && message ? messageId : undefined}
           className="
             flex-1 min-w-0 px-4 py-2.5 rounded-lg text-sm
             bg-white/[0.04] border border-white/[0.1]
@@ -111,7 +121,10 @@ export function EmailCapture({
         >
           {status === 'submitting' ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="w-3.5 h-3.5 border-2 border-night border-t-transparent rounded-full animate-spin" />
+              <span
+                aria-hidden="true"
+                className="w-3.5 h-3.5 border-2 border-night border-t-transparent rounded-full animate-spin"
+              />
               Sending
             </span>
           ) : (
@@ -121,7 +134,13 @@ export function EmailCapture({
       </div>
 
       {status === 'error' && message && (
-        <p className="mt-2 text-xs text-misfortune">{message}</p>
+        <p
+          id={messageId}
+          role="alert"
+          className="mt-2 text-xs text-misfortune"
+        >
+          {message}
+        </p>
       )}
 
       <p className="mt-2 text-[11px] text-text-muted/70">

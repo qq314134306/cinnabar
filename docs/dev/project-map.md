@@ -300,7 +300,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/subscribe.ts` - client POST helper for `/api/subscribe`;
   normalizes email, understands the stable nested error shape, and forwards an
   optional abort signal.
-- `app/src/components/EmailCapture.tsx` - reusable, source-tagged email opt-in.
+- `app/src/components/EmailCapture.tsx` + `EmailCapture.test.ts` - reusable,
+  source-tagged email opt-in with input-linked announced errors, busy/disabled
+  duplicate-submit protection, and an announced success/unlock state.
 - `app/src/components/SoulCard.tsx` + `app/src/lib/soul-card.ts` - shareable Soul Card (deterministic derivation from the chart) with locked teaser + share/email unlock.
 - `app/src/components/ExitIntentModal.tsx` - once-per-session exit-intent email capture.
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.

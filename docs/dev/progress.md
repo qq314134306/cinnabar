@@ -131,6 +131,13 @@
   concise alert; a retry clears the alert and can commit the chart normally.
   Component tests cover the accessible fields, failure state, and successful
   retry.
+- Added rendered-state coverage for the reusable email opt-in. Invalid input
+  and request failures are announced and linked to the email field; editing
+  clears stale errors. Pending requests mark the form busy, disable the action,
+  and reject duplicate submissions. Success is announced and invokes analytics
+  plus an optional Soul Card unlock callback exactly once. These are local
+  component contracts and do not claim that the external Make webhook has been
+  verified.
 - Hardened the public email subscription boundary. `/api/subscribe` is now an
   exact same-origin JSON POST with a 2 KiB streamed byte cap, exact
   `{email, source}` schema, normalized bounded email, fixed source allowlist,
@@ -593,7 +600,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 58 Vitest files / 597 tests in
+The current cumulative local baseline passed 59 Vitest files / 601 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the
