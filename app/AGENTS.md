@@ -297,6 +297,13 @@ account-gated PayPal checkout, server purchase recovery, no-recapture report
 retry, and the purchased report view rendered below the free reading in
 `AIInterpretation.tsx`.
 
+`src/components/LocalChartSnapshot.tsx`: deterministic, current-model-year
+chart summary rendered whenever a natal chart exists and public AI is off. It
+derives its English identity locally and exposes overall, Career, Wealth,
+Relationships, and Well-being scores without an account, API, payment, cache,
+or analytics. Keep this base result available when public AI is unavailable;
+AI is an optional narrative layer, not the feature's sole output.
+
 `api/future-report-order.ts`, `future-report-capture.ts`,
 `future-report-access.ts`, `future-report-generate.ts`: Authenticated Future
 Report transaction boundary. The server owns prices and facts, creates/captures

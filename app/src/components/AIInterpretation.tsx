@@ -20,6 +20,7 @@ import { Button } from '@/components/ui'
 import { FutureReportPaywall } from '@/components/FutureReportPaywall'
 import { SoulCard } from '@/components/SoulCard'
 import { EmailCapture } from '@/components/EmailCapture'
+import { LocalChartSnapshot } from '@/components/LocalChartSnapshot'
 import { analytics } from '@/lib/analytics'
 
 /* ------------------------------------------------------------
@@ -259,25 +260,28 @@ export function AIInterpretation() {
 
   if (!publicAiEnabled) {
     return (
-      <div
-        className="
-          relative p-6 lg:p-8
-          bg-gradient-to-br from-white/[0.04] to-transparent
-          backdrop-blur-xl border border-white/[0.08] rounded-2xl
-          shadow-[0_8px_32px_rgba(0,0,0,0.3)]
-        "
-      >
-        <h2
-          className="text-xl lg:text-2xl font-semibold text-gold mb-4"
-          style={{ fontFamily: 'var(--font-serif)' }}
-        >
-          Your Cinnabar Reading
-        </h2>
+      <div className="space-y-4">
+        <LocalChartSnapshot />
         <div
-          role="status"
-          className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-sm text-text-secondary"
+          className="
+            relative rounded-2xl border border-white/[0.08]
+            bg-gradient-to-br from-white/[0.04] to-transparent p-6
+            shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl lg:p-8
+          "
         >
-          {PUBLIC_AI_UNAVAILABLE_MESSAGE}
+          <h2
+            className="mb-4 text-xl font-semibold text-gold lg:text-2xl"
+            style={{ fontFamily: 'var(--font-serif)' }}
+          >
+            Optional AI Narrative
+          </h2>
+          <div
+            role="status"
+            className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-sm text-text-secondary"
+          >
+            {PUBLIC_AI_UNAVAILABLE_MESSAGE} Your local snapshot above remains
+            available without an account, API, or payment.
+          </div>
         </div>
       </div>
     )

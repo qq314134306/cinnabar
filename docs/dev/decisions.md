@@ -712,3 +712,16 @@ The UI labels this as a reflective model rather than scientific evidence,
 relationship advice, or an outcome prediction. When public AI is enabled, the
 existing compatibility stream remains an optional narrative layer with its
 controller/request-key/input-identity ownership unchanged.
+
+## D027 - Your Chart Works Locally Before AI
+
+Your Chart is the primary product surface, so a disabled public-AI flag must
+not reduce a completed chart to an availability message. After chart
+generation, the default-off experience now derives a deterministic
+current-model-year snapshot in the browser: an English chart identity, overall
+score, and Career, Wealth, Relationships, and Well-being dimensions.
+
+The snapshot requires no account, API, payment, cache, or analytics and is
+explicitly a reflective model rather than scientific evidence or professional
+advice. Public AI remains an optional narrative layer. Enabling or disabling it
+must not be described as changing the underlying natal chart.

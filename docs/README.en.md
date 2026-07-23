@@ -18,12 +18,16 @@
 ## What is available
 
 - **Your Chart** — casts a 12-palace Zi Wei Dou Shu chart with `iztro`, local
-  birthplace matching, and true solar time correction.
+  birthplace matching, and true solar time correction. Once cast, it also
+  shows a deterministic current-model-year snapshot with an overall score and
+  Career, Wealth, Relationships, and Well-being dimensions. This snapshot
+  needs no AI request, account, API, or payment.
 - **Life Timeline** — builds a local deterministic cycle view, focused by
   default on five years before through 25 years after the current age. The
   optional age 1–100 model range covers ten decadal cycles; it does not estimate
   lifespan and requires no AI request, account, or payment.
-- **AI Reading** — sends only a versioned `reading.v1` birth/persona request to
+- **AI Reading** — is an optional narrative layer over the local snapshot. When
+  enabled, it sends only a versioned `reading.v1` birth/persona request to
   server-side `/api/interpret`. The server rebuilds the chart and prompt,
   enforces 18+ eligibility and persistent daily quotas, then streams DeepSeek.
   Browser requests contain no chat messages, prompts, chart facts, resolved

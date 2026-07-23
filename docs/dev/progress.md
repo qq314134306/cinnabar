@@ -91,6 +91,15 @@
   relationship advice. The existing guarded stream remains an optional “Add AI
   Reading” layer. Desktop and 390-by-844 Chrome acceptance passed with no new
   current-build warning/error log.
+- Made Your Chart useful when public AI is disabled. A completed natal chart
+  now includes a deterministic current-model-year snapshot with an English
+  identity, overall score, and Career, Wealth, Relationships, and Well-being
+  dimensions. It needs no account, API, payment, cache, or analytics and is
+  labeled as reflective rather than scientific or professional advice. The
+  unavailable AI state is now a separate optional-narrative notice. Desktop
+  and 390-by-844 Chrome acceptance passed with four accessible progress bars,
+  no page-level horizontal overflow, and no current-build browser warnings or
+  errors.
 - Verified the Share Card path against its real downloaded PNG rather than the
   browser preview alone. The export worked, but Cormorant italic text measured
   incorrectly in html2canvas and overlapped words. The quote area now uses a
@@ -561,10 +570,11 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 56 Vitest files / 587 tests in
+The current cumulative local baseline passed 57 Vitest files / 589 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
-local Compatibility model plus its default-off-AI interaction contract; real
+local Compatibility model plus its default-off-AI interaction contract; the
+deterministic local Your Chart snapshot and default-off-AI presentation; real
 PowerShell AST parsing for every workflow `pwsh` block; the exact 12-Function
 Hobby budget and auth-router contracts; the public-AI browser/server
 fail-closed gates; and the broader auth, payment, subscription, database-proof,

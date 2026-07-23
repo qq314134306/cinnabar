@@ -41,6 +41,14 @@ vi.mock('@/components/EmailCapture', () => ({
   EmailCapture: () => null,
 }))
 
+vi.mock('@/components/LocalChartSnapshot', () => ({
+  LocalChartSnapshot: () => createElement(
+    'div',
+    null,
+    'LOCAL CHART SNAPSHOT',
+  ),
+}))
+
 const BIRTH_INFO: BirthInfo = {
   year: 1990,
   month: 5,
@@ -125,6 +133,7 @@ describe('AIInterpretation public AI gate', () => {
     expect(screen.getByRole('status').textContent).toContain(
       'AI readings are temporarily unavailable.',
     )
+    expect(screen.getByText('LOCAL CHART SNAPSHOT')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Get My Free Reading' })).toBeNull()
     expect(screen.queryByText('CACHED READING')).toBeNull()
     expect(mocks.streamReading).not.toHaveBeenCalled()

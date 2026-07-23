@@ -293,6 +293,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/SoulCard.tsx` + `app/src/lib/soul-card.ts` - shareable Soul Card (deterministic derivation from the chart) with locked teaser + share/email unlock.
 - `app/src/components/ExitIntentModal.tsx` - once-per-session exit-intent email capture.
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.
+- `app/src/components/LocalChartSnapshot.tsx` - deterministic current-model-year
+  chart summary shown when public AI is off. It derives an English chart
+  identity plus overall, Career, Wealth, Relationships, and Well-being scores
+  locally, with no account, API, payment, cache, or analytics.
 - `app/src/components/AIInterpretation.tsx` - request-keyed natal-reading cache
   and guarded streaming UI. Retry and chart/persona changes abort the old
   controller and reject late tokens, cache writes, errors, and analytics.
