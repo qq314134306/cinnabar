@@ -83,6 +83,14 @@
   and completion checks current ownership. All request-defining controls are
   disabled during a stream, and Compatibility intentionally remains uncached
   and without analytics.
+- Made Compatibility functional when public AI is disabled. “Compare Locally”
+  now creates a symmetric, bounded four-dimension snapshot from both generated
+  charts, including English identities, element context, strongest signal, and
+  growth edge. It uses no account, API, payment, cache, or analytics; the UI
+  explicitly labels it a reflective model rather than scientific evidence or
+  relationship advice. The existing guarded stream remains an optional “Add AI
+  Reading” layer. Desktop and 390-by-844 Chrome acceptance passed with no new
+  current-build warning/error log.
 - Hardened the public email subscription boundary. `/api/subscribe` is now an
   exact same-origin JSON POST with a 2 KiB streamed byte cap, exact
   `{email, source}` schema, normalized bounded email, fixed source allowlist,
@@ -545,9 +553,10 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 54 Vitest files / 581 tests in
+The current cumulative local baseline passed 55 Vitest files / 585 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
-range, full ages 1-100 model, and lifespan-disclaimer contracts; real
+range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
+local Compatibility model plus its default-off-AI interaction contract; real
 PowerShell AST parsing for every workflow `pwsh` block; the exact 12-Function
 Hobby budget and auth-router contracts; the public-AI browser/server
 fail-closed gates; and the broader auth, payment, subscription, database-proof,

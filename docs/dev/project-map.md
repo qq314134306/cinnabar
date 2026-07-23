@@ -159,9 +159,14 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   allowlist, redirect denial, request/body deadlines, and stable no-store
   errors. It is the only reader of
   `MAKE_WEBHOOK_URL`; its in-memory limiter is not a distributed quota.
-- `app/src/components/match/MatchAnalysis.tsx` + `MatchAnalysis.test.ts` -
-  uncached Compatibility streaming UI with controller/request-key/input-identity
-  ownership. Changes, retries, and unmount reject stale tokens and errors.
+- `app/src/lib/compatibility-score.ts` +
+  `app/src/components/match/MatchAnalysis.tsx` + their tests - always-available
+  deterministic local Compatibility snapshot across communication, shared
+  direction, emotional rhythm, and resilience. It is symmetric, needs no
+  account/API/payment, and is explicitly reflective rather than scientific.
+  The optional uncached AI narrative retains controller/request-key/
+  input-identity ownership; changes, retries, and unmount reject stale tokens
+  and errors.
 - `app/src/lib/supabase.ts` - lazy browser Supabase client for `legacy` rollback
   only (public publishable key; never constructed for a new `dual`/`opaque`
   login).

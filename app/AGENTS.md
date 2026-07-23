@@ -381,10 +381,13 @@ configuration, redirect denial, and active request/webhook deadlines. Its
 per-IP, overflow, and isolate-global windows form only a warm-isolate abuse
 brake; never describe them as a persistent quota.
 
-`src/components/match/MatchAnalysis.tsx` + `MatchAnalysis.test.ts`: Uncached
-Compatibility reading whose controller, exact request key, and both input
-identities own every streamed commit. Keep it free of analytics unless product
-and privacy requirements explicitly change.
+`src/lib/compatibility-score.ts` +
+`src/components/match/MatchAnalysis.tsx` + their tests: Compatibility always
+offers a symmetric, deterministic local four-dimension snapshot without an
+account, API, payment, cache, or analytics. The optional AI narrative remains
+uncached; its controller, exact request key, and both input identities own
+every streamed commit. Keep both paths free of analytics unless product and
+privacy requirements explicitly change.
 
 `tests/api-typecheck.test.ts`: Contract coverage that keeps
 `tsconfig.api.json` in the root build graph, keeps strict API type checking
@@ -488,8 +491,9 @@ ciphertext makes concurrency tests flaky and invalid.
 - Cross-tab auth change: run `npm run test -- src/stores/auth.test.ts
   src/components/AuthControl.test.ts`, then lint and the complete root build.
 - Compatibility change: run
-  `npm run test -- src/components/match/MatchAnalysis.test.ts`, then lint and
-  the complete root build.
+  `npm run test -- src/lib/compatibility-score.test.ts
+  src/components/match/MatchAnalysis.test.ts`, then lint and the complete root
+  build.
 - Subscription change: run `npm run test -- tests/subscribe-api.test.ts`, lint,
   and the complete root build. A mocked webhook and warm-isolate limiter remain
   local contract evidence, not deployed delivery or distributed-rate proof.

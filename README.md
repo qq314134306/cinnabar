@@ -25,7 +25,8 @@ Cinnabar 是一款面向英语读者的紫微斗数 Web 应用。它基于 `iztr
   覆盖十个十年周期，不预测寿命，也不依赖 AI、账号或付费。
 - **AI Reading（AI 解读）**：在命盘下方生成结构化解读，可选择 Scholar 或
   Old Sage 表达风格。
-- **Compatibility（合盘）**：比较两人的命盘，生成关系与互动分析。
+- **Compatibility（合盘）**：无需账号或 API 即可生成四维本地合盘摘要；公共 AI
+  启用时可再添加可选的叙事解读。
 - **Share Card（分享卡片）**：把命盘摘要生成为适合保存和分享的卡片。
 
 部署 Supabase 后可启用免密码账号。已登录用户可以只读查看 credits

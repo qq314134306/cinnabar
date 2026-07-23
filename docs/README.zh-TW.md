@@ -29,7 +29,8 @@ Cinnabar 是以 React、TypeScript 與 Vite 建構的紫微斗數應用。目前
   `reading.v1` 出生資料／persona 請求。命盤、提示詞、18+ 檢查與每日配額由
   伺服器重建及執行；瀏覽器不提交 messages、prompt、命盤 facts、校正時間、
   座標或時區。DeepSeek 金鑰不會傳到瀏覽器。
-- **Compatibility**：比較兩人的命盤與互動關係。
+- **Compatibility**：不需要帳號或 API，即可從兩人的命盤建立四維本機相容性
+  摘要；只有在公開 AI 啟用時，才可選擇加入敘事解讀。
 - **Share Card**：從已產生的命盤建立可分享卡片。
 
 ## 本機開發

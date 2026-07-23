@@ -698,3 +698,17 @@ The upper bound exists only to make the cycle model complete. Product copy must
 state that it neither predicts lifespan nor implies that a person will live to
 100. The timeline remains a local deterministic feature and must not acquire a
 generic LLM request or a fourth public-AI operation.
+
+## D026 - Compatibility Works Locally Before AI
+
+Compatibility is a visible primary navigation surface, so the default-off
+public-AI gate must not turn it into a dead end. The base product now generates
+a deterministic local snapshot from both entered charts for communication,
+shared direction, emotional rhythm, and resilience. The calculation is
+symmetric, bounded, uncached, and requires no account, API, payment, or
+analytics.
+
+The UI labels this as a reflective model rather than scientific evidence,
+relationship advice, or an outcome prediction. When public AI is enabled, the
+existing compatibility stream remains an optional narrative layer with its
+controller/request-key/input-identity ownership unchanged.

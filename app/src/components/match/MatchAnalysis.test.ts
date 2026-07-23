@@ -63,7 +63,22 @@ describe('MatchAnalysis public AI gate', () => {
     expect(screen.getByRole('status').textContent).toContain(
       'AI readings are temporarily unavailable.',
     )
-    expect(screen.queryByRole('button', { name: 'Read Our Compatibility' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Add AI Reading' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Compare Locally' })).toBeTruthy()
+    expect(mocks.streamReading).not.toHaveBeenCalled()
+  })
+
+  it('builds the local comparison while public AI is disabled', () => {
+    vi.stubEnv('VITE_ENABLE_PUBLIC_AI_READINGS', '')
+
+    render(createElement(MatchAnalysis))
+    fireEvent.click(screen.getByRole('button', { name: 'Compare Locally' }))
+
+    expect(screen.getByText(
+      `Local compatibility snapshot · ${new Date().getFullYear()}`,
+    )).toBeTruthy()
+    expect(screen.getAllByRole('progressbar')).toHaveLength(4)
+    expect(screen.getByText(/not scientific evidence/)).toBeTruthy()
     expect(mocks.streamReading).not.toHaveBeenCalled()
   })
 })
@@ -73,7 +88,7 @@ describe('MatchAnalysis request ownership', () => {
     mocks.streamReading.mockReturnValue(immediateStream('N', 'E', 'W'))
     render(createElement(MatchAnalysis))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Read Our Compatibility' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add AI Reading' }))
     await flushAsyncWork()
 
     expect(screen.getByText('NEW')).toBeTruthy()
@@ -103,7 +118,7 @@ describe('MatchAnalysis request ownership', () => {
     })
     render(createElement(MatchAnalysis))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Read Our Compatibility' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add AI Reading' }))
     await flushAsyncWork()
     expect(
       (screen.getByRole('button', { name: 'The Old Sage' }) as HTMLButtonElement).disabled,
@@ -144,7 +159,7 @@ describe('MatchAnalysis request ownership', () => {
     })
     render(createElement(MatchAnalysis))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Read Our Compatibility' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add AI Reading' }))
     await flushAsyncWork()
     const select = screen.getAllByRole('combobox')[selectIndex] as HTMLSelectElement
     expect(select.disabled).toBe(true)
@@ -175,7 +190,7 @@ describe('MatchAnalysis request ownership', () => {
     })
     render(createElement(MatchAnalysis))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Read Our Compatibility' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add AI Reading' }))
     await flushAsyncWork()
     const personAYear = screen.getAllByRole('combobox')[0] as HTMLSelectElement
 
@@ -204,7 +219,7 @@ describe('MatchAnalysis request ownership', () => {
     })
     const view = render(createElement(MatchAnalysis))
 
-    fireEvent.click(screen.getByRole('button', { name: 'Read Our Compatibility' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add AI Reading' }))
     await flushAsyncWork()
     view.unmount()
     expect(signal?.aborted).toBe(true)
@@ -223,7 +238,7 @@ describe('MatchAnalysis request ownership', () => {
       })())
       .mockReturnValueOnce(immediateStream('NEW'))
     render(createElement(MatchAnalysis))
-    const analyze = screen.getByRole('button', { name: 'Read Our Compatibility' })
+    const analyze = screen.getByRole('button', { name: 'Add AI Reading' })
 
     fireEvent.click(analyze)
     await flushAsyncWork()

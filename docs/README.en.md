@@ -29,7 +29,9 @@
   Browser requests contain no chat messages, prompts, chart facts, resolved
   time, coordinates, or timezone. `DEEPSEEK_API_KEY` stays on the server; there
   is no in-app API-key or model configuration.
-- **Compatibility** — compares two charts and produces a relationship reading.
+- **Compatibility** — produces a four-dimension deterministic local comparison
+  without an account or API. When public AI is enabled, users may optionally
+  add a narrative reading.
 - **Share Card** — creates a shareable Soul Card from the calculated chart.
 
 ## Local development
