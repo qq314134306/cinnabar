@@ -255,4 +255,40 @@ describe('PayPal server payment boundary', () => {
     })
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
+
+  it('hard-times out a PayPal fetch even when the fetch implementation ignores abort', async () => {
+    vi.useFakeTimers()
+    try {
+      const fetchMock = vi.fn(() => (
+        new Promise<Response>(() => undefined)
+      ))
+      const client = new PayPalServerClient(
+        {
+          clientId: 'client-id',
+          clientSecret: 'client-secret',
+          merchantId: 'MERCHANT-1',
+          environment: 'sandbox',
+        },
+        fetchMock as typeof fetch,
+        25,
+      )
+
+      const outcome = client.createOrder({
+        purchaseId: 'purchase-1',
+        amountMinor: 990,
+        currency: 'USD',
+      }).catch((error: unknown) => error)
+      await vi.advanceTimersByTimeAsync(25)
+
+      await expect(outcome).resolves.toMatchObject({
+        code: 'PAYPAL_REQUEST_TIMEOUT',
+        status: 504,
+      })
+      const [, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+      expect(init.signal).toBeInstanceOf(AbortSignal)
+      expect(init.signal?.aborted).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })

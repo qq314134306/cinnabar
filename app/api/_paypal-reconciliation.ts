@@ -1,6 +1,6 @@
 /**
- * [INPUT]: Recent local Future Report purchases and authoritative PayPal order reads
- * [OUTPUT]: Stable reconciliation counters plus monotonic database repairs
+ * [INPUT]: Recent local Future Report purchases, authoritative PayPal reads, and a wall-clock budget
+ * [OUTPUT]: Stable counters plus monotonic repairs with cursor-safe deadline exits
  * [POS]: Server-only bounded reconciliation worker for the Vercel Cron endpoint
  * [PROTOCOL]: Update this header when changed, then check AGENTS.md/CLAUDE.md
  */
@@ -17,8 +17,9 @@ import type {
 } from './_paypal-webhook'
 
 const DEFAULT_LOOKBACK_DAYS = 31
-const DEFAULT_PAGE_SIZE = 25
+const DEFAULT_PAGE_SIZE = 10
 const DEFAULT_MAX_PAGES = 4
+const DEFAULT_MAX_DURATION_MS = 210_000
 
 type ReconciliationPayPalClient = Pick<
   PayPalServerClient,
@@ -35,6 +36,7 @@ export interface PayPalReconciliationCounts {
   hasMore: boolean
   rateLimited: number
   backoff: number
+  deadlineReached: number
 }
 
 interface ReconciliationOptions {
@@ -42,6 +44,8 @@ interface ReconciliationOptions {
   lookbackDays?: number
   pageSize?: number
   maxPages?: number
+  maxDurationMs?: number
+  clock?: () => number
 }
 
 export async function reconcileRecentPayPalPurchases(
@@ -53,6 +57,9 @@ export async function reconcileRecentPayPalPurchases(
   const lookbackDays = options.lookbackDays ?? DEFAULT_LOOKBACK_DAYS
   const pageSize = options.pageSize ?? DEFAULT_PAGE_SIZE
   const maxPages = options.maxPages ?? DEFAULT_MAX_PAGES
+  const maxDurationMs = options.maxDurationMs ?? DEFAULT_MAX_DURATION_MS
+  const clock = options.clock ?? Date.now
+  const deadlineAt = clock() + Math.max(0, maxDurationMs)
   const since = new Date(now.getTime() - lookbackDays * 86_400_000).toISOString()
   const verifiedAt = now.toISOString()
   const counts: PayPalReconciliationCounts = {
@@ -65,6 +72,14 @@ export async function reconcileRecentPayPalPurchases(
     hasMore: false,
     rateLimited: 0,
     backoff: 0,
+    deadlineReached: 0,
+  }
+
+  const stopAtDeadline = (): boolean => {
+    if (clock() < deadlineAt) return false
+    counts.hasMore = true
+    counts.deadlineReached = 1
+    return true
   }
 
   let cursor = await store.getReconciliationCursor()
@@ -77,6 +92,7 @@ export async function reconcileRecentPayPalPurchases(
   }
 
   for (let page = 0; page < maxPages; page += 1) {
+    if (stopAtDeadline()) return counts
     const result = await store.listRecentPurchases(since, cursor, pageSize)
     counts.pages += 1
     counts.hasMore = result.hasMore
@@ -87,6 +103,7 @@ export async function reconcileRecentPayPalPurchases(
     }
 
     for (const purchase of result.purchases) {
+      if (stopAtDeadline()) return counts
       counts.scanned += 1
       if (!purchase.paypal_order_id) {
         counts.deferred += 1

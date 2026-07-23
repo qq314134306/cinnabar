@@ -216,7 +216,11 @@ and becomes an irreversible tombstone even if it arrives before the local
 completion write. Missing local linkage or lagging PayPal state fails retryably
 instead of permanently consuming the event. Reconciliation persists a keyset
 cursor so bounded runs rotate across the full recent backlog and persists
-PayPal 429 backoff before resuming the same unverified purchase.
+PayPal 429 backoff before resuming the same unverified purchase. Every PayPal
+OAuth and business request has a 15-second hard timeout. Reconciliation starts
+at most 40 purchase reads per default run, stops launching new work at its
+210-second wall-clock budget, and advances the cursor only after a purchase is
+fully handled so a deadline exit cannot skip an unverified record.
 
 When those blockers are resolved, deployments also require
 `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_MERCHANT_ID`,

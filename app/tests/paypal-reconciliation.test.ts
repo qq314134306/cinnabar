@@ -82,6 +82,7 @@ describe('PayPal reconciliation', () => {
       hasMore: false,
       rateLimited: 0,
       backoff: 0,
+      deadlineReached: 0,
     })
     expect(store.listRecentPurchases).toHaveBeenNthCalledWith(
       1,
@@ -112,7 +113,7 @@ describe('PayPal reconciliation', () => {
     )
   })
 
-  it('persists a keyset cursor so a backlog larger than 100 continues next run', async () => {
+  it('persists a keyset cursor so a backlog continues in bounded 40-item runs', async () => {
     const backlog = Array.from({ length: 125 }, (_, index) => purchase(
       `20000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
       `ORDER${index + 1}`,
@@ -164,19 +165,23 @@ describe('PayPal reconciliation', () => {
 
     const firstRun = await reconcileRecentPayPalPurchases(client, store, {
       now: new Date('2026-07-23T12:00:00Z'),
-      pageSize: 25,
-      maxPages: 4,
     })
-    expect(firstRun.scanned).toBe(100)
+    expect(firstRun.scanned).toBe(40)
     expect(firstRun.hasMore).toBe(true)
-    expect(cursor.purchaseId).toBe(backlog[99].id)
+    expect(cursor.purchaseId).toBe(backlog[39].id)
 
     const secondRun = await reconcileRecentPayPalPurchases(client, store, {
       now: new Date('2026-07-23T12:05:00Z'),
-      pageSize: 25,
-      maxPages: 4,
     })
-    expect(secondRun.scanned).toBe(25)
+    expect(secondRun.scanned).toBe(40)
+    const thirdRun = await reconcileRecentPayPalPurchases(client, store, {
+      now: new Date('2026-07-23T12:10:00Z'),
+    })
+    expect(thirdRun.scanned).toBe(40)
+    const fourthRun = await reconcileRecentPayPalPurchases(client, store, {
+      now: new Date('2026-07-23T12:15:00Z'),
+    })
+    expect(fourthRun.scanned).toBe(5)
     expect(client.retrieveOrderPaymentState).toHaveBeenCalledTimes(125)
     expect(cursor.purchaseId).toBeNull()
     expect(store.completeReconciliationCycle).toHaveBeenCalledTimes(1)
@@ -242,6 +247,64 @@ describe('PayPal reconciliation', () => {
     expect(client.retrieveOrderPaymentState).toHaveBeenCalledTimes(1)
   })
 
+  it('stops at the wall-clock budget without advancing past an unprocessed purchase', async () => {
+    const first = purchase('20000000-0000-4000-8000-000000000001', 'ORDER1')
+    const second = purchase('20000000-0000-4000-8000-000000000002', 'ORDER2')
+    let elapsedMs = 0
+    const store = {
+      claimEvent: vi.fn(),
+      finishEvent: vi.fn(),
+      findPurchase: vi.fn(),
+      applyState: vi.fn().mockResolvedValue('unchanged'),
+      listRecentPurchases: vi.fn().mockResolvedValue({
+        purchases: [first, second],
+        hasMore: false,
+      }),
+      getReconciliationCursor: vi.fn().mockResolvedValue({
+        createdAt: null,
+        purchaseId: null,
+        nextRetryAt: null,
+      }),
+      advanceReconciliationCursor: vi.fn().mockResolvedValue(undefined),
+      completeReconciliationCycle: vi.fn(),
+      deferReconciliation: vi.fn(),
+    }
+    const client = {
+      retrieveOrderPaymentState: vi.fn(async (
+        orderId: string,
+        expected: { purchaseId: string },
+      ) => {
+        elapsedMs = 50
+        return {
+          captureId: `CAPTURE-${orderId}`,
+          orderId,
+          purchaseId: expected.purchaseId,
+          status: 'completed' as const,
+        }
+      }),
+    }
+
+    const counts = await reconcileRecentPayPalPurchases(client, store, {
+      now: new Date('2026-07-23T12:00:00Z'),
+      maxDurationMs: 50,
+      clock: () => elapsedMs,
+    })
+
+    expect(counts).toMatchObject({
+      scanned: 1,
+      unchanged: 1,
+      hasMore: true,
+      deadlineReached: 1,
+    })
+    expect(client.retrieveOrderPaymentState).toHaveBeenCalledTimes(1)
+    expect(store.advanceReconciliationCursor).toHaveBeenCalledOnce()
+    expect(store.advanceReconciliationCursor).toHaveBeenCalledWith(
+      first.created_at,
+      first.id,
+    )
+    expect(store.completeReconciliationCycle).not.toHaveBeenCalled()
+  })
+
   it('requires the independent CRON_SECRET and returns only stable aggregate counts', async () => {
     const counts = {
       scanned: 2,
@@ -253,6 +316,7 @@ describe('PayPal reconciliation', () => {
       hasMore: false,
       rateLimited: 0,
       backoff: 0,
+      deadlineReached: 0,
     }
     const reconcile = vi.fn().mockResolvedValue(counts)
     const handler = createPayPalReconciliationHandler({

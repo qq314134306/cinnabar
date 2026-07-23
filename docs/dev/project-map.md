@@ -139,7 +139,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   dispute tombstone enforced by the monotonic payment-state RPC.
 - `app/api/cron/paypal-reconciliation.ts` + `_paypal-reconciliation.ts` -
   `CRON_SECRET`-protected recent-purchase verification with a persistent keyset
-  cursor, PayPal 429 backoff, and aggregate-only output.
+  cursor, PayPal 429 backoff, aggregate-only output, a default 40-purchase
+  ceiling, and a 210-second cursor-safe wall-clock exit. All PayPal OAuth and
+  business API reads use a 15-second hard timeout even if an injected fetch
+  implementation ignores abort.
 - `app/src/lib/analytics.ts` - guarded gtag.js wrapper: manual SPA page_views + named GA4 custom events.
 - `app/vercel.json` + `app/api/auth.ts` +
   `app/tests/vercel-function-budget.test.ts` - preserves every public

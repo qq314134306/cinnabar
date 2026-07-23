@@ -1,6 +1,6 @@
 /**
- * [INPUT]: PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_ENV and trusted purchase data
- * [OUTPUT]: Server-side PayPal Orders, webhook verification, capture, and dispute helpers
+ * [INPUT]: PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_ENV, trusted purchase data, and bounded fetches
+ * [OUTPUT]: Timeout-bounded PayPal Orders, webhook verification, capture, and dispute helpers
  * [POS]: Server-only payment boundary for Future Report checkout and PayPal webhooks
  * [PROTOCOL]: Update this header when changed, then check AGENTS.md/CLAUDE.md
  */
@@ -91,6 +91,7 @@ export interface PayPalConfiguration {
 }
 
 type FetchLike = typeof fetch
+const DEFAULT_PAYPAL_REQUEST_TIMEOUT_MS = 15_000
 
 export class PayPalApiError extends Error {
   readonly status: number
@@ -162,19 +163,70 @@ export class PayPalServerClient {
   private readonly configuration: PayPalConfiguration
   private readonly fetchImpl: FetchLike
   private readonly baseUrl: string
+  private readonly requestTimeoutMs: number
   private accessToken: string | null = null
   private accessTokenExpiresAt = 0
 
   constructor(
     configuration: PayPalConfiguration,
     fetchImpl: FetchLike = fetch,
+    requestTimeoutMs = DEFAULT_PAYPAL_REQUEST_TIMEOUT_MS,
   ) {
+    if (!Number.isFinite(requestTimeoutMs) || requestTimeoutMs <= 0) {
+      throw new Error('PayPal request timeout must be a positive number.')
+    }
     this.configuration = configuration
     this.fetchImpl = fetchImpl
+    this.requestTimeoutMs = requestTimeoutMs
     this.baseUrl =
       configuration.environment === 'sandbox'
         ? 'https://api-m.sandbox.paypal.com'
         : 'https://api-m.paypal.com'
+  }
+
+  private async fetchWithTimeout(
+    input: string,
+    init: RequestInit,
+  ): Promise<Response> {
+    const controller = new AbortController()
+    const upstreamSignal = init.signal
+    const forwardAbort = () => controller.abort(upstreamSignal?.reason)
+    if (upstreamSignal?.aborted) {
+      forwardAbort()
+    } else {
+      upstreamSignal?.addEventListener('abort', forwardAbort, { once: true })
+    }
+
+    let timedOut = false
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+    const timeoutError = new PayPalApiError(
+      'PayPal request timed out.',
+      504,
+      'PAYPAL_REQUEST_TIMEOUT',
+    )
+    const timeout = new Promise<never>((_resolve, reject) => {
+      timeoutId = setTimeout(() => {
+        timedOut = true
+        controller.abort(timeoutError)
+        reject(timeoutError)
+      }, this.requestTimeoutMs)
+    })
+
+    try {
+      return await Promise.race([
+        Promise.resolve(this.fetchImpl(input, {
+          ...init,
+          signal: controller.signal,
+        })),
+        timeout,
+      ])
+    } catch (error) {
+      if (timedOut) throw timeoutError
+      throw error
+    } finally {
+      if (timeoutId !== undefined) clearTimeout(timeoutId)
+      upstreamSignal?.removeEventListener('abort', forwardAbort)
+    }
   }
 
   private async getAccessToken(): Promise<string> {
@@ -183,7 +235,7 @@ export class PayPalServerClient {
     }
 
     const basic = btoa(`${this.configuration.clientId}:${this.configuration.clientSecret}`)
-    const response = await this.fetchImpl(`${this.baseUrl}/v1/oauth2/token`, {
+    const response = await this.fetchWithTimeout(`${this.baseUrl}/v1/oauth2/token`, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${basic}`,
@@ -211,7 +263,7 @@ export class PayPalServerClient {
 
   private async authorizedFetch(path: string, init: RequestInit): Promise<Response> {
     const accessToken = await this.getAccessToken()
-    return this.fetchImpl(`${this.baseUrl}${path}`, {
+    return this.fetchWithTimeout(`${this.baseUrl}${path}`, {
       ...init,
       headers: {
         Accept: 'application/json',

@@ -227,6 +227,10 @@ Supabase credentials; documenting them does not authorize enabling the payment
 feature flags. Reconciliation cursor/backoff state is persisted by
 `20260723020000_paypal_webhook_reconciliation.sql`; do not schedule the cron
 before that migration is applied.
+The worker uses 15-second hard-bounded PayPal requests, starts no more than 40
+purchase reads per default run, and stops launching new work at 210 seconds
+while preserving its last completed keyset cursor. `deadlineReached: 1` is an
+expected resumable outcome, not permission to discard or skip the next record.
 
 `app/vercel.json` currently ships
 `Content-Security-Policy-Report-Only` plus the non-CSP security headers. Keep it

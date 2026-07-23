@@ -636,12 +636,15 @@ hosted run or artifact exists yet.
   validation. The migration's exceptions view covers local drift only; its SQL
   behavior suite was added but could not run here because PostgreSQL tooling is
   unavailable.
-- All PayPal-provider-facing routes now use Node rather than Edge, but
-  `_paypal.ts` still lacks a per-fetch abort deadline and reconciliation can
-  process up to 100 purchases serially. The disabled payment flags make this a
-  pre-enable blocker rather than a default-off Preview blocker. Before the
-  final PayPal sandbox validation, add bounded OAuth/business fetch deadlines,
-  a total reconciliation deadline, and safe cursor exit with a smaller batch.
+- All PayPal-provider-facing routes now use Node rather than Edge. PayPal OAuth
+  and business fetches have a 15-second hard deadline that also settles when an
+  injected fetch ignores abort. Reconciliation now starts at most 40 purchase
+  reads by default, stops launching new work after 210 seconds, reports the
+  deadline exit, and advances its durable keyset cursor only after completed
+  handling. This closes the local timeout/batch pre-enable blocker; real sandbox
+  credentials, applied migrations, signed webhook delivery, and an observed
+  end-to-end PayPal recovery/reconciliation run are still required before either
+  payment flag may be enabled.
 - The database suites require a disposable Supabase-shaped PostgreSQL instance.
   The release-proof runner now automates the ordered migration transaction, SQL
   suites, and two-connection concurrency check. GitHub Actions is configured to

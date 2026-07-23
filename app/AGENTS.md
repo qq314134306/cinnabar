@@ -326,8 +326,10 @@ temporarily missing purchases or lagging authoritative state remain retryable.
 `api/cron/paypal-reconciliation.ts` + `_paypal-reconciliation.ts`: Private,
 bounded recent-purchase reconciliation for Vercel Cron. It uses an independent
 `CRON_SECRET`, a database-persisted keyset cursor and 429 backoff, re-fetches
-PayPal order state, and returns fixed aggregate counters without account or
-processor identifiers.
+PayPal order state through 15-second hard-bounded requests, and returns fixed
+aggregate counters without account or processor identifiers. A run launches at
+most 40 purchase reads by default, stops starting work after 210 seconds, and
+leaves the cursor on the last completed purchase so the next run resumes safely.
 
 `src/lib/analytics.ts`: Guarded gtag.js wrapper. The local application bundle
 initializes GA4 and dynamically loads gtag.js with automatic page_view disabled,
