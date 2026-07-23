@@ -132,4 +132,46 @@ describe('AuthModal email OTP flow', () => {
     expect(screen.queryByLabelText('6-digit verification code')).toBeNull()
     expect(mocks.verifyEmailOtp).not.toHaveBeenCalled()
   })
+
+  it('contains keyboard focus and restores it after Escape closes the dialog', () => {
+    const origin = document.createElement('button')
+    origin.textContent = 'Open sign in'
+    document.body.appendChild(origin)
+    origin.focus()
+    const onClose = vi.fn()
+    const view = render(createElement(AuthModal, { onClose }))
+
+    const dialog = screen.getByRole('dialog', { name: 'Sign in to Cinnabar' })
+    expect(dialog.getAttribute('aria-modal')).toBe('true')
+    const close = screen.getByRole('button', { name: 'Close sign in' })
+    const submit = screen.getByRole('button', {
+      name: 'Email me a sign-in link',
+    })
+    expect(document.activeElement).toBe(close)
+
+    submit.focus()
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(document.activeElement).toBe(close)
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(onClose).toHaveBeenCalledOnce()
+    view.unmount()
+    expect(document.activeElement).toBe(origin)
+  })
+
+  it('closes on the true backdrop but not on dialog content', () => {
+    const onClose = vi.fn()
+    const view = render(createElement(AuthModal, { onClose }))
+    const dialog = screen.getByRole('dialog')
+
+    fireEvent.mouseDown(dialog)
+    expect(onClose).not.toHaveBeenCalled()
+
+    const backdrop = view.container.firstElementChild
+    if (!(backdrop instanceof HTMLElement)) {
+      throw new Error('Expected the sign-in backdrop')
+    }
+    fireEvent.mouseDown(backdrop)
+    expect(onClose).toHaveBeenCalledOnce()
+  })
 })

@@ -741,3 +741,16 @@ When session authority is temporarily unknown, the retry action remains visible
 at every viewport. The longer provider-error detail stays an announced alert
 but becomes visually compact below the large desktop breakpoint so an optional
 account outage cannot crowd the mobile product navigation.
+
+## D029 - Modal Entry Points Own and Restore Focus
+
+The sign-in and desktop exit-intent overlays are labeled modal dialogs rather
+than generic visual containers. On open they move focus to an explicit close
+action; Tab and Shift+Tab stay within enabled dialog controls; Escape and only
+the true backdrop request dismissal. When the parent unmounts the dialog, focus
+returns to the control that preceded it.
+
+Visual icons are excluded from accessible names. A delayed exit-intent success
+close is cleared on unmount, and unavailable session storage degrades only its
+once-per-session hint. These UI guarantees do not alter authentication,
+subscription, OTP consumption, or external-provider authority.

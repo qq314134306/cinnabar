@@ -236,8 +236,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `docs/dev/credits-api.openapi.yaml` - OpenAPI 3.1 contract for the public
   catalog and authenticated read-only account endpoints.
 - `app/src/components/AuthModal.tsx` + `AuthControl.tsx` - email-link/Google
-  sign-in modal and header sign-in/out control; `useAuthStore` in `src/stores`
-  selects legacy browser auth or the server login BFF by `AUTH_MODE`.
+  sign-in dialog and header sign-in/out control; `useAuthStore` in `src/stores`
+  selects legacy browser auth or the server login BFF by `AUTH_MODE`. The
+  dialog has state-dependent labeling, contained Tab focus, Escape/backdrop
+  dismissal, prior-focus restoration, and input-linked email errors.
 - `app/src/components/CreditWallet.tsx` + `app/src/lib/credits.ts` - signed-in
   balance and recent safe credit activity via authenticated
   `/api/credits/account`; its portal dialog isolates the app background and read

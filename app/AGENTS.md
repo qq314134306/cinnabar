@@ -388,6 +388,12 @@ visible, but its long provider-error text is visually compact below the large
 desktop breakpoint while remaining an announced alert. Tests exercise rendered
 states rather than source-text matching.
 
+`src/components/AuthModal.tsx` + `AuthModal.test.ts`: passwordless email/OTP
+and OAuth entry dialog. It has a state-dependent accessible name/description,
+moves focus inside, traps Tab, closes on Escape or the true backdrop, and
+restores prior focus when its parent unmounts it. Email errors remain announced
+and input-linked; OTP attempt-consumption behavior is unchanged.
+
 `src/lib/birthplace-data.json`: Local Chinese coordinate dataset used for
 birthplace matching (pinyin keys generated at load via pinyin-pro).
 

@@ -145,6 +145,13 @@
   storage denial degrades the once-only behavior without breaking the dialog.
   Five component tests cover the trigger, session flag, focus loop, dismissal,
   focus restoration, and delayed-success close.
+- Made the passwordless/OAuth sign-in overlay a labeled keyboard dialog without
+  changing authentication authority or OTP attempt consumption. Its accessible
+  name and description follow the sign-in, verification-code, and inbox
+  states; focus enters the close action, Tab remains inside, Escape and the
+  true backdrop request dismissal, and parent unmount restores prior focus.
+  Email errors are now linked to the address field. Existing OTP tests plus
+  focused dialog tests cover the preserved and new behavior.
 - Hardened the public email subscription boundary. `/api/subscribe` is now an
   exact same-origin JSON POST with a 2 KiB streamed byte cap, exact
   `{email, source}` schema, normalized bounded email, fixed source allowlist,
@@ -607,7 +614,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 60 Vitest files / 606 tests in
+The current cumulative local baseline passed 60 Vitest files / 608 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the
