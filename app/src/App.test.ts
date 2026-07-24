@@ -38,7 +38,7 @@ vi.mock('@/stores', () => {
 vi.mock('@/components/BirthForm', () => ({
   BirthForm: () => createElement('div', null, 'Birth Form'),
 }))
-vi.mock('@/components/chart', () => ({
+vi.mock('@/components/chart/ChartDisplay', () => ({
   ChartDisplay: () => createElement('div', null, 'Chart Display'),
 }))
 vi.mock('@/components/AIInterpretation', () => ({

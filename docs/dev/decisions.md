@@ -757,12 +757,15 @@ subscription, OTP consumption, or external-provider authority.
 
 ## D030 - Secondary Product Surfaces Do Not Tax the Landing Page
 
-The landing and base chart are the shortest path to product value, so
-`BirthForm` and `ChartDisplay` stay synchronous. Optional AI narrative, Life
-Timeline, Compatibility, and the populated Share Card are lazy boundaries with
-announced loading states. Their Markdown, image-export, matching, and payment
-dependencies must not return to the initial application chunk merely because
-their navigation controls are visible.
+The landing form is the shortest path to product value, so `BirthForm` stays
+synchronous while engine-independent date and shichen controls remain small.
+The iztro engine and `ChartDisplay` load only after submission, with the
+existing busy form and an announced chart-rendering fallback covering that
+transition. Optional AI narrative, Life Timeline, Compatibility, and the
+populated Share Card are further lazy boundaries with announced loading
+states. Their chart-calculation, palace-rendering, Markdown, image-export,
+matching, and payment dependencies must not return to the initial application
+chunk merely because their navigation controls are visible.
 
 The empty Share Card state remains synchronous so a user without a chart gets
 an immediate recovery action. Tab changes update the semantic active state,
@@ -771,7 +774,9 @@ not create browser-history routes or alter authentication and provider
 authority.
 
 The 2026-07-23 production build reduced the initial main script from
-1,416.78 kB / 421.89 kB gzip to 981.91 kB / 299.97 kB gzip, a reduction of
-434.87 kB raw (30.7%) and 121.92 kB gzip (28.9%). The remaining chunk-over-
-500-KB warning is tracked separately and is not evidence that these optional
-surfaces were eagerly restored.
+1,416.78 kB / 421.89 kB gzip to 485.86 kB / 140.04 kB gzip, a reduction of
+930.92 kB raw (65.7%) and 281.85 kB gzip (66.8%). Browser resource inventory
+must show no `astro-*` request before submission and an `astro-*` plus
+`ChartDisplay-*` request afterward. The remaining chunk-over-500-KB warning is
+the already-lazy Life Timeline and is not evidence that these boundaries were
+eagerly restored.

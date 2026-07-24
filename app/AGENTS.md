@@ -105,11 +105,13 @@ Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
 codebase but is hidden from navigation). Desktop and mobile navigation have
 distinct accessible labels, expose the active surface with
 `aria-current="page"`, keep decorative tab icons out of accessible names, and
-update the document title plus analytics virtual route together. BirthForm and
-the base chart remain in the initial application path. Optional AI narrative,
-Life Timeline, Compatibility, and populated Share Card surfaces are lazy
-boundaries with announced loading states; do not make the landing page pay for
-their calculation, image-export, Markdown, or payment dependencies eagerly.
+update the document title plus analytics virtual route together. BirthForm
+remains in the initial application path. The iztro engine and ChartDisplay load
+only after chart submission; optional AI narrative, Life Timeline,
+Compatibility, and populated Share Card surfaces are additional lazy
+boundaries with announced loading states. Do not make the landing page pay for
+chart calculation, palace rendering, image-export, Markdown, or payment
+dependencies eagerly.
 
 `api/interpret.ts` + `api/_public-reading.ts`: SERVER-OWNED, default-off public
 AI boundary. It accepts only exact `reading.v1` `natal`, `compatibility`, or
@@ -264,6 +266,10 @@ Credit writes remain server-only.
 
 `src/lib/`: Business helpers for date handling, astrology support, true solar
 time, birthplace data, LLM wiring, and scoring.
+
+`src/lib/shichen.ts`: Engine-independent traditional two-hour labels and form
+options. Keep it free of iztro runtime imports so BirthForm can render before
+the chart engine is requested.
 
 `src/lib/ziwei-glossary.ts`: Chinese→English translation dictionaries for stars,
 palaces, transformations, brightness, stems/branches, shichen, and Na Yin.

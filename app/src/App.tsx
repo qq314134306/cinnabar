@@ -6,7 +6,6 @@
 import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
-import { ChartDisplay } from '@/components/chart'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ExitIntentModal } from '@/components/ExitIntentModal'
@@ -17,6 +16,11 @@ import { trackPageView } from '@/lib/analytics'
 const AIInterpretation = lazy(async () => {
   const module = await import('@/components/AIInterpretation')
   return { default: module.AIInterpretation }
+})
+
+const ChartDisplay = lazy(async () => {
+  const module = await import('@/components/chart/ChartDisplay')
+  return { default: module.ChartDisplay }
 })
 
 const LifeKLine = lazy(async () => {
@@ -248,7 +252,11 @@ export default function App() {
             ) : (
               <div className="animate-fade-in space-y-8">
                 <div className="w-full">
-                  <ChartDisplay />
+                  <Suspense
+                    fallback={<SurfaceLoading label="Rendering your chart…" />}
+                  >
+                    <ChartDisplay />
+                  </Suspense>
                 </div>
 
                 <div className="w-full max-w-6xl mx-auto">

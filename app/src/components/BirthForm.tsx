@@ -4,8 +4,9 @@
 
 import { useEffect, useState } from 'react'
 import { Button, Input, Select } from '@/components/ui'
-import { generateChart, getShichenOptions, type BirthInfo, type Gender } from '@/lib/astro'
+import type { BirthInfo, Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
+import { getShichenOptions } from '@/lib/shichen'
 import { findBirthplaceAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
 import { useChartStore } from '@/stores'
 import { analytics } from '@/lib/analytics'
@@ -106,6 +107,7 @@ export function BirthForm() {
         resolvedBirthTime,
         birthTimeReliable: birthTimeReliability === 'recorded',
       }
+      const { generateChart } = await import('@/lib/astro')
       const chart = generateChart(birthInfo)
 
       setBirthInfo(birthInfo)

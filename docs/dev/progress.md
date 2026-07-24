@@ -39,17 +39,19 @@
 
 ## Recently Completed
 
-- Split secondary product surfaces out of the landing bundle without changing
-  their behavior. Optional AI narrative, Life Timeline, Compatibility, and the
-  populated Share Card now load only when rendered and expose announced
-  loading states; BirthForm, the base chart, and the no-chart Share Card
-  recovery remain immediate. Navigation now updates the document title with
-  the existing analytics virtual route. The production main script fell from
-  1,416.78 kB / 421.89 kB gzip to 981.91 kB / 299.97 kB gzip (30.7% raw and
-  28.9% gzip smaller). Chrome production-preview acceptance cast the default
-  chart, observed the local snapshot and optional-AI state, then opened
-  Compatibility and the populated Share Card with correct titles and no
-  warning/error log.
+- Removed chart and secondary-surface work from the landing bundle without
+  changing product behavior. BirthForm now renders its twelve shichen options
+  from an engine-independent helper, then loads iztro and ChartDisplay only
+  after submission. Optional AI narrative, Life Timeline, Compatibility, and
+  the populated Share Card remain separate lazy boundaries with announced
+  loading states; the no-chart Share Card recovery stays immediate. Navigation
+  updates the document title with the existing analytics virtual route. The
+  production main script fell from 1,416.78 kB / 421.89 kB gzip to
+  485.86 kB / 140.04 kB gzip (65.7% raw and 66.8% gzip smaller). Browser
+  resource inventory confirmed no `astro-*` request before submission and
+  `astro-*` plus `ChartDisplay-*` requests afterward; the default chart, local
+  snapshot, optional-AI state, Compatibility, and populated Share Card all
+  rendered with correct titles and no warning/error log.
 - Added a matching browser-side public-AI kill switch. Only exact
   `VITE_ENABLE_PUBLIC_AI_READINGS=true` shows the three reading entrypoints;
   missing, false, or malformed values show a clear unavailable state, hide
@@ -625,7 +627,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 60 Vitest files / 609 tests in
+The current cumulative local baseline passed 61 Vitest files / 611 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the

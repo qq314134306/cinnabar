@@ -92,10 +92,13 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/App.tsx` + `App.test.ts` - top-level visible-surface navigation.
   Desktop and mobile navs have distinct names, report the active surface with
   `aria-current="page"`, keep decorative icons out of accessible names, and
-  synchronize each virtual route with the document title. BirthForm and the
-  base chart are synchronous; optional AI narrative, Life Timeline,
-  Compatibility, and the populated Share Card are separate lazy chunks with
-  announced loading fallbacks.
+  synchronize each virtual route with the document title. BirthForm is
+  synchronous; the iztro engine and ChartDisplay load after submission.
+  Optional AI narrative, Life Timeline, Compatibility, and the populated Share
+  Card are further lazy chunks with announced loading fallbacks.
+- `app/src/lib/shichen.ts` - engine-independent traditional two-hour labels and
+  select options. BirthForm imports this instead of loading iztro merely to
+  render its hour control.
 - `app/tsconfig.json` + `app/tsconfig.api.json` - root build reference and the
   strict, no-emit API compilation boundary. API tests are excluded, but all
   `app/api/**/*.ts` production files remain in the build graph.

@@ -5,7 +5,8 @@
  * [PROTOCOL]: Update this header when changed, then check AGENTS.md/CLAUDE.md
  */
 
-import { hourToShichen, type BirthInfo, type FunctionalAstrolabe } from './astro'
+import type { BirthInfo, FunctionalAstrolabe } from './astro'
+import { hourToShichen } from './shichen'
 import {
   describeStarLabel,
   PALACE_PINYIN,
