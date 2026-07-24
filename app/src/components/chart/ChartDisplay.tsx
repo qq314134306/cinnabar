@@ -19,6 +19,13 @@ import {
   getPalaceExplanation,
 } from '@/lib/chart-explanations'
 import {
+  collectNatalTransformations,
+  NATAL_TRANSFORMATION_ORDER,
+  type NatalTransformation,
+  type NatalTransformationCode,
+  type NatalTransformationPalaceInput,
+} from '@/lib/chart-transformations'
+import {
   getSanFangSiZheng,
   type PalaceRelationRole,
 } from '@/lib/palace-relations'
@@ -269,6 +276,106 @@ function PalaceCard({
         <span>{translateStarLabel(boshi12)}</span>
       </div>
     </button>
+  )
+}
+
+/* ------------------------------------------------------------
+   Natal Four Transformations navigation
+   ------------------------------------------------------------ */
+
+interface FourTransformationsPanelProps {
+  transformations: NatalTransformation[]
+  selectedTransformation: NatalTransformationCode | null
+  onSelectTransformation: (transformation: NatalTransformation) => void
+}
+
+function FourTransformationsPanel({
+  transformations,
+  selectedTransformation,
+  onSelectTransformation,
+}: FourTransformationsPanelProps) {
+  const transformationStyles: Record<NatalTransformationCode, string> = {
+    '禄': 'border-fortune/25 bg-fortune/[0.06] text-fortune',
+    '权': 'border-gold/25 bg-gold/[0.06] text-gold',
+    '科': 'border-star/25 bg-star/[0.06] text-star-light',
+    '忌': 'border-misfortune/25 bg-misfortune/[0.06] text-misfortune',
+  }
+
+  return (
+    <section
+      aria-labelledby="natal-four-transformations-heading"
+      className="mt-3 rounded-xl border border-white/[0.07] bg-black/10 p-3 lg:p-4"
+    >
+      <div className="max-w-3xl">
+        <h3
+          id="natal-four-transformations-heading"
+          className="text-sm font-semibold text-text"
+        >
+          Natal Four Transformations
+        </h3>
+        <p className="mt-1 text-xs leading-relaxed text-text-muted">
+          A local index of which natal stars carry Lu, Quan, Ke, and Ji.
+          Choose one to open its palace and four-palace context. These labels
+          organize the chart; none is a standalone verdict.
+        </p>
+      </div>
+
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {NATAL_TRANSFORMATION_ORDER.map((code) => {
+          const info = translateMutagen(code)
+          const entry = transformations.find((item) => item.code === code)
+
+          if (!info || !entry) {
+            return (
+              <div
+                key={code}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3"
+              >
+                <p className="text-xs font-medium text-text-muted">
+                  {info?.code ?? code}
+                </p>
+                <p className="mt-1 text-xs text-text-muted">
+                  Not available in this chart
+                </p>
+              </div>
+            )
+          }
+
+          const palaceLabel = translatePalaceName(entry.palaceName)
+          const isSelected = selectedTransformation === code
+
+          return (
+            <button
+              key={code}
+              type="button"
+              aria-label={`Open ${info.code} transformation in ${palaceLabel}`}
+              aria-pressed={isSelected}
+              aria-controls={isSelected
+                ? 'selected-palace-explanation'
+                : undefined}
+              onClick={() => onSelectTransformation(entry)}
+              className={`
+                rounded-lg border p-3 text-left transition-colors
+                hover:bg-white/[0.08]
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
+                ${transformationStyles[code]}
+                ${isSelected ? 'ring-2 ring-star' : ''}
+              `}
+            >
+              <span className="block text-xs font-semibold">
+                {info.code}
+              </span>
+              <span className="mt-1 block text-sm font-medium text-text">
+                {translateStarLabel(entry.starName)}
+              </span>
+              <span className="mt-0.5 block text-xs text-text-secondary">
+                {palaceLabel}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </section>
   )
 }
 
@@ -622,6 +729,8 @@ const MONTH_NAMES = [
 export function ChartDisplay() {
   const { chart, birthInfo } = useChartStore()
   const [selectedPalace, setSelectedPalace] = useState<string | null>(null)
+  const [selectedTransformation, setSelectedTransformation] =
+    useState<NatalTransformationCode | null>(null)
 
   if (!chart || !birthInfo) return null
   if (birthInfo.birthTimeUnknown === true) {
@@ -646,6 +755,9 @@ export function ChartDisplay() {
   }
 
   const palaceData = parsePalaces(chart)
+  const transformations = collectNatalTransformations(
+    chart.palaces as unknown as NatalTransformationPalaceInput[],
+  )
   const selectedPalaceData = palaceData.find(
     (palace) => palace.name === selectedPalace,
   ) ?? null
@@ -677,9 +789,12 @@ export function ChartDisplay() {
         {...palace}
         isSelected={selectedPalace === palace.name}
         relation={relationByBranch.get(palace.branch)}
-        onClick={() => setSelectedPalace((current) => (
-          current === palace.name ? null : palace.name
-        ))}
+        onClick={() => {
+          setSelectedTransformation(null)
+          setSelectedPalace((current) => (
+            current === palace.name ? null : palace.name
+          ))
+        }}
       />
     )
   }
@@ -715,11 +830,23 @@ export function ChartDisplay() {
         {grid[3].map((p, c) => renderPalace(p, `3-${c}`))}
       </div>
 
+      <FourTransformationsPanel
+        transformations={transformations}
+        selectedTransformation={selectedTransformation}
+        onSelectTransformation={(transformation) => {
+          setSelectedTransformation(transformation.code)
+          setSelectedPalace(transformation.palaceName)
+        }}
+      />
+
       {selectedPalaceData && (
         <PalaceExplanationPanel
           palace={selectedPalaceData}
           relatedPalaces={relatedPalaces}
-          onClose={() => setSelectedPalace(null)}
+          onClose={() => {
+            setSelectedTransformation(null)
+            setSelectedPalace(null)
+          }}
         />
       )}
 

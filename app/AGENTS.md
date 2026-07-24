@@ -42,7 +42,7 @@ Targeted examples:
 ```powershell
 npm run test -- true-solar-time
 npm run test -- birth-time-sensitivity BirthForm
-npm run test -- ChartDisplay chart-explanations palace-relations
+npm run test -- ChartDisplay chart-explanations palace-relations chart-transformations chart-facts
 npm run test -- retrieve
 npm run test -- llm
 npm run test -- public-reading
@@ -313,6 +313,7 @@ palaces, transformations, brightness, stems/branches, shichen, and Na Yin.
 Follows the Cinnabar glossary; covered by `ziwei-glossary.test.ts`.
 
 `src/lib/chart-explanations.ts` + `src/lib/palace-relations.ts` +
+`src/lib/chart-transformations.ts` +
 `src/components/chart/ChartDisplay.tsx`: local, English reflective guidance for
 the twelve canonical palaces and fourteen major stars. Internal lookup keys stay
 zh-CN. Every palace card is a semantic toggle button; selection owns the single
@@ -322,6 +323,14 @@ and two trine palaces, and summarizes those four palaces without inventing a
 strength score. Unknown engine labels receive no invented interpretation, and
 an empty major-star palace is explained explicitly. Keep the copy non-
 deterministic and free of medical, financial, relationship, or career promises.
+The natal Four Transformations index must use the same pure extraction helper
+as `chart-facts.ts`, cover both major and minor stars, retain canonical
+Lu/Quan/Ke/Ji ordering, and navigate only to the engine-owned palace. It may
+organize labels and relationships but must not invent a missing transformation,
+interpret one label as a standalone outcome, or create another score. When
+multiple transformations share one palace, only the exact selected
+transformation is pressed even though the palace relationship context is
+shared.
 
 `src/lib/birth-time-sensitivity.ts` +
 `src/components/chart/BirthTimeSensitivity.tsx`: provider-independent
@@ -358,7 +367,9 @@ AI, or payment dependency belongs in this flow.
 
 `src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI
 prompts, including `buildYearlyChartFacts` (year-by-year Liu Nian facts via
-`chart.horoscope()`) for the paid Future Report.
+`chart.horoscope()`) for the paid Future Report. Natal transformation facts
+reuse `src/lib/chart-transformations.ts` so UI navigation and prompt grounding
+cannot disagree about star or palace ownership.
 
 `src/lib/ai-prompts.ts`: Base system prompt, Scholar/Old Sage personas, and the
 free-reading / compatibility / paid Future Report prompt templates.

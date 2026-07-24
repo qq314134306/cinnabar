@@ -29,7 +29,7 @@ const CHART = {
       name: '命宫',
       heavenlyStem: '辛',
       earthlyBranch: '巳',
-      majorStars: [{ name: '天梁' }],
+      majorStars: [{ name: '天梁', mutagen: '科' }],
       minorStars: [],
       adjectiveStars: [],
       decadal: { range: [5, 14] },
@@ -65,7 +65,7 @@ const CHART = {
       name: '迁移',
       heavenlyStem: '甲',
       earthlyBranch: '亥',
-      majorStars: [{ name: '天机' }],
+      majorStars: [{ name: '天机', mutagen: '忌' }],
       minorStars: [],
       adjectiveStars: [],
       decadal: { range: [35, 44] },
@@ -77,7 +77,7 @@ const CHART = {
       name: '福德',
       heavenlyStem: '乙',
       earthlyBranch: '丑',
-      majorStars: [{ name: '武曲' }],
+      majorStars: [{ name: '武曲', mutagen: '禄' }],
       minorStars: [],
       adjectiveStars: [],
       decadal: { range: [45, 54] },
@@ -178,6 +178,69 @@ describe('ChartDisplay palace explanations', () => {
       name: 'Close palace explanation',
     }))
     expect(container.querySelectorAll('[data-palace-relation]')).toHaveLength(0)
+  })
+
+  it('indexes all four natal transformations and opens their owner palace', () => {
+    const sharedOwnerChart = {
+      ...CHART,
+      palaces: CHART.palaces.map((palace, index) => {
+        if (index === 3) {
+          return {
+            ...palace,
+            majorStars: [
+              ...palace.majorStars,
+              ...CHART.palaces[4].majorStars,
+            ],
+          }
+        }
+        if (index === 4) {
+          return { ...palace, majorStars: [] }
+        }
+        return palace
+      }),
+    } as FunctionalAstrolabe
+    useChartStore.setState({
+      birthInfo: BIRTH_INFO,
+      chart: sharedOwnerChart,
+    })
+
+    render(createElement(ChartDisplay))
+
+    expect(screen.getByRole('heading', {
+      name: 'Natal Four Transformations',
+    })).toBeTruthy()
+    expect(screen.getByText(
+      /none is a standalone verdict/,
+    )).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Open Lu transformation in Travel Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Open Quan transformation in Career Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Open Ke transformation in Life Palace',
+    })).toBeTruthy()
+
+    const obstacleButton = screen.getByRole('button', {
+      name: 'Open Ji transformation in Travel Palace',
+    })
+    expect(obstacleButton.getAttribute('aria-pressed')).toBe('false')
+    fireEvent.click(obstacleButton)
+
+    expect(obstacleButton.getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByRole('button', {
+      name: 'Open Lu transformation in Travel Palace',
+    }).getAttribute('aria-pressed')).toBe('false')
+    expect(obstacleButton.getAttribute('aria-controls')).toBe(
+      'selected-palace-explanation',
+    )
+    expect(screen.getByRole('heading', {
+      name: 'About the Travel Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Explain Travel Palace',
+    }).getAttribute('data-palace-relation')).toBe('focus')
   })
 
   it('replaces the selected guide and explains an empty major-star space', () => {

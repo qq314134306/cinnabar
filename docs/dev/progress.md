@@ -39,6 +39,27 @@
 
 ## Recently Completed
 
+- Added a provider-independent natal Four Transformations navigation layer,
+  using [qingnang.cc's public Zi Wei Dou Shu overview](https://www.qingnang.cc/wiki/ziwei/jichu/ziwei-doushu)
+  and its treatment of Four Transformations as a core chart structure as a
+  product benchmark without copying its code, brand, design, or interpretive
+  claims. One shared extractor now supplies both the visible
+  Lu/Quan/Ke/Ji index and the chart-facts prompt grounding, scanning major and
+  minor stars in canonical order while retaining the engine-owned star,
+  palace, branch, brightness, and star kind. Clicking an available
+  transformation opens its existing palace explanation and San Fang Si Zheng
+  context; missing or unknown values remain unavailable rather than inferred.
+  The view creates no score or standalone good/bad verdict. Its selection state
+  also distinguishes two transformations that share one palace, so only the
+  exact item chosen is pressed while the palace relationship stays shared.
+  The complete app passes 73 test files / 710 tests, lint, and the strict
+  production build. ChartDisplay remains lazy at 34.38 kB raw / 10.99 kB gzip,
+  with every JavaScript chunk below 500 kB. A real production preview confirmed
+  all four default-chart entries, exactly one selected transformation, one
+  focus, one opposite, two trines, the linked palace explanation, no
+  document-level horizontal overflow at desktop or 390-by-844 mobile, and no
+  browser warning/error logs. This acceptance does not choose the final visual
+  direction.
 - Added a provider-independent San Fang Si Zheng reading layer to the natal
   chart, using qingnang.cc's public emphasis on whole-chart reading as a product
   benchmark without copying its code, design, or interpretive claims. Selecting

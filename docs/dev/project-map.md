@@ -143,12 +143,16 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/components/chart/ChartDisplay.tsx` +
   `app/src/lib/chart-explanations.ts` +
-  `app/src/lib/palace-relations.ts` - lazy local chart viewer and its
+  `app/src/lib/palace-relations.ts` +
+  `app/src/lib/chart-transformations.ts` - lazy local chart viewer and its
   presentation-only reflective guide. Palace cards are accessible toggle
   buttons; one selected palace exposes English palace and major-star context,
   derives the focus/opposite/two-trine San Fang Si Zheng group from fixed
   earthly-branch positions, and highlights plus summarizes the complete
-  four-palace structure without AI, accounts, or remote data.
+  four-palace structure without AI, accounts, or remote data. Its natal Four
+  Transformations index extracts major/minor star ownership in canonical
+  Lu/Quan/Ke/Ji order and opens the owning palace plus the same relationship
+  view without generating a separate score.
 - `app/src/components/chart/BirthTimeSensitivity.tsx` +
   `app/src/lib/birth-time-sensitivity.ts` - three-window local comparison for
   explicitly approximate birth times. It shifts wall-clock time across real
@@ -167,7 +171,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   remain locked. Only an explicit candidate action atomically
   replaces the chart, preserves approximate status, and clears chart-derived
   caches.
-- `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
+- `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts. Its
+  natal Four Transformations line reuses the chart's pure transformation index
+  so local navigation and prompt grounding share one ownership source.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates (free reading, compatibility, paid Future Report).
 - `app/src/lib/paypal.ts` - PayPal Smart Payment Buttons adapter; passes tier +
   stable attempt ID and allowlisted birth/persona fields to authenticated

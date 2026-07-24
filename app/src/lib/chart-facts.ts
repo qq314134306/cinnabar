@@ -6,6 +6,7 @@
  */
 
 import type { BirthInfo, FunctionalAstrolabe } from './astro'
+import { collectNatalTransformations } from './chart-transformations'
 import { hourToShichen } from './shichen'
 import {
   describeStarLabel,
@@ -53,23 +54,10 @@ function findBodyPalace(palaces: MinimalPalace[]): MinimalPalace | undefined {
 
 /** Finds which star carries each of the four transformations, across every palace. */
 function findTransformations(palaces: MinimalPalace[]): string {
-  const found: Partial<Record<string, { star: string; palace: string }>> = {}
-
-  for (const palace of palaces) {
-    for (const star of [...palace.majorStars, ...palace.minorStars]) {
-      if (star.mutagen && SIHUA_EN[star.mutagen] && !found[star.mutagen]) {
-        found[star.mutagen] = { star: star.name, palace: palace.name }
-      }
-    }
-  }
-
-  const order = ['禄', '权', '科', '忌']
-  return order
-    .filter((m) => found[m])
-    .map((m) => {
-      const entry = found[m]!
-      const { code } = SIHUA_EN[m]
-      return `${code} on ${describeStarLabel(entry.star)} (in the ${translatePalaceName(entry.palace)})`
+  return collectNatalTransformations(palaces)
+    .map((entry) => {
+      const { code } = SIHUA_EN[entry.code]
+      return `${code} on ${describeStarLabel(entry.starName)} (in the ${translatePalaceName(entry.palaceName)})`
     })
     .join(', ')
 }

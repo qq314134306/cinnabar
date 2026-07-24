@@ -33,7 +33,10 @@
   claim to identify an exact or correct birth time. Once
   cast, selecting any palace locally highlights its focus, opposite, and two
   trine palaces, then summarizes the four-palace San Fang Si Zheng structure
-  and major stars without claiming a deterministic outcome. The chart also
+  and major stars without claiming a deterministic outcome. A natal Four
+  Transformations index also maps Lu, Quan, Ke, and Ji to their engine-owned
+  stars and palaces; choosing one opens that palace and its four-palace
+  context without treating a label as a standalone verdict. The chart also
   shows a deterministic current-model-year snapshot with
   an overall score and Career, Wealth, Relationships, and Well-being
   dimensions. These local features need no AI request, account, API, or

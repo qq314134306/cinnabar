@@ -30,6 +30,11 @@ describe('buildZiWeiChartFacts', () => {
     expect(facts).toContain('System: Zi Wei Dou Shu')
     expect(facts).toContain('Life Palace')
     expect(facts).toContain('Birth Hour: Ox Hour')
+    const transformations = facts.split('\n').find((line) => (
+      line.startsWith('Four Transformations (Si Hua):')
+    ))
+    expect(transformations).toBeDefined()
+    expect(transformations).toMatch(/Lu on .*Quan on .*Ke on .*Ji on/)
     expect(CJK.test(facts)).toBe(false)
   })
 

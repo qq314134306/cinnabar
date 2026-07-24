@@ -1114,3 +1114,23 @@ bad configurations, or claim that the four-palace group determines an outcome.
 Unknown branch values produce no invented relationship. The helper stays pure
 and provider-independent, while all zh-CN engine labels continue to translate
 only at presentation time.
+
+## D047 - Natal Four Transformations Are One Shared Structural Index
+
+The browser-visible Lu, Quan, Ke, and Ji navigation and the natal Four
+Transformations line used for prompt grounding share one provider-independent
+extractor. It scans both major and minor stars, accepts only iztro's four known
+natal transformation codes, retains canonical Lu/Quan/Ke/Ji order, and records
+the first engine-owned star, palace, branch, star kind, and brightness for each
+code. An unknown or absent code remains unavailable rather than being inferred.
+
+The UI renders all four canonical slots and lets an available slot select its
+owning palace, which then opens the existing palace explanation and San Fang Si
+Zheng view. The transformation label is structural navigation only: it does
+not create a new score, treat Lu or Ji as a standalone good/bad verdict, borrow
+a transformation into an empty palace, or add AI/account/network work. Keeping
+the facts builder on the same extractor prevents local navigation and server-
+grounded narrative from silently disagreeing about star or palace ownership.
+If multiple transformations share one palace, the palace context remains
+shared but pressed state belongs only to the exact transformation the user
+selected.
