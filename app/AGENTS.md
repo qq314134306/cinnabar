@@ -322,7 +322,11 @@ zh-CN. Every palace card is a semantic toggle button; selection owns the single
 explanation panel below the chart. The same selection derives San Fang Si Zheng
 only from the twelve earthly-branch positions, highlights the focus, opposite,
 and two trine palaces, and summarizes those four palaces without inventing a
-strength score. Unknown engine labels receive no invented interpretation, and
+strength score. It separately derives the immediately previous and next
+earthly-branch palaces as flanking context inside the explanation panel; these
+two palaces do not join the four-palace chart highlight and receive no inferred
+supportive/difficult classification. Unknown engine labels receive no invented
+interpretation, and
 an empty major-star palace is explained explicitly. Keep the copy non-
 deterministic and free of medical, financial, relationship, or career promises.
 The natal Four Transformations index must use the same pure extraction helper

@@ -39,6 +39,27 @@
 
 ## Recently Completed
 
+- Added a provider-independent flanking-palace context to every selected natal
+  palace, using
+  [qingnang.cc's public San Fang Si Zheng and flanking-palace article](https://www.qingnang.cc/wiki/ziwei/jichu/sanfang-sizheng)
+  as a structural benchmark without copying its code, brand, design, or
+  interpretive claims. One pure helper now resolves the immediately previous
+  and next earthly branches with wraparound, while the selected-palace guide
+  summarizes both engine-owned neighbors in a separate section. The existing
+  San Fang Si Zheng chart highlight remains exactly one focus, one opposite,
+  and two trines; flanks receive no chart highlight, score, supportive/difficult
+  label, or outcome claim. Unknown branches and partial engine data remain
+  unavailable rather than inferred. Pure tests cover all twelve branches,
+  wraparound, uniqueness, reciprocity, and unknown values; rendered tests cover
+  both neighboring summaries alongside the unchanged four-palace state. The
+  complete app passes 75 test files / 722 tests, lint, and the strict
+  production build. ChartDisplay remains lazy at 43.71 kB raw / 13.06 kB gzip,
+  with every JavaScript chunk below 500 kB. A real 1920-pixel-wide Chrome
+  preview confirmed the default Life Palace's Siblings/Parents flanks, four
+  unchanged San Fang Si Zheng summaries, no document-level horizontal
+  overflow, and no browser warning/error logs. The active Chrome viewport
+  override did not apply the requested 390-by-844 dimensions, so a fresh
+  mobile-browser acceptance claim is deliberately withheld.
 - Added a provider-independent Major Limit & Year Lens to the natal chart,
   using [qingnang.cc's public Zi Wei Dou Shu overview](https://www.qingnang.cc/wiki/ziwei/jichu/ziwei-doushu)
   and its stated natal/Major Limit/annual layering as a product benchmark

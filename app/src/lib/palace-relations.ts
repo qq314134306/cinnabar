@@ -18,6 +18,13 @@ export interface PalaceRelation {
   role: PalaceRelationRole
 }
 
+export type FlankingPalaceSide = 'previous' | 'next'
+
+export interface FlankingPalace {
+  branch: string
+  side: FlankingPalaceSide
+}
+
 export function getSanFangSiZheng(
   focusBranch: string,
 ): PalaceRelation[] {
@@ -35,5 +42,26 @@ export function getSanFangSiZheng(
     { branch: branchAt(4), role: 'trine' },
     { branch: branchAt(6), role: 'opposite' },
     { branch: branchAt(8), role: 'trine' },
+  ]
+}
+
+export function getFlankingPalaces(
+  focusBranch: string,
+): FlankingPalace[] {
+  const focusIndex = EARTHLY_BRANCHES.indexOf(
+    focusBranch as (typeof EARTHLY_BRANCHES)[number],
+  )
+  if (focusIndex < 0) return []
+
+  const branchAt = (offset: number): string => (
+    EARTHLY_BRANCHES[
+      (focusIndex + offset + EARTHLY_BRANCHES.length)
+      % EARTHLY_BRANCHES.length
+    ]
+  )
+
+  return [
+    { branch: branchAt(-1), side: 'previous' },
+    { branch: branchAt(1), side: 'next' },
   ]
 }

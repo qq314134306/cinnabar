@@ -1153,3 +1153,19 @@ from the previous timing context. A resolved Life Palace or transformation may
 open its natal palace and San Fang Si Zheng view, but unavailable indexes or
 star hosts remain explicit. The lens adds no score, AI request, persistence,
 good/bad label, event prediction, or outcome claim.
+
+## D049 - Flanking Palaces Stay Separate From San Fang Si Zheng
+
+Cinnabar derives the two flanking palaces from the fixed twelve-branch ring:
+the immediately previous branch and the immediately next branch around the
+selected focus. This presentation follows the structural definition described
+in [qingnang.cc's public San Fang Si Zheng and flanking-palace article](https://www.qingnang.cc/wiki/ziwei/jichu/sanfang-sizheng)
+as a product benchmark without copying its code, brand, design, or
+interpretive claims.
+
+The selected-palace guide summarizes both flanks in their own adjacent-context
+section. They do not join the focus/opposite/two-trine chart highlight, change
+its four-card invariant, or receive an automatic supportive, difficult,
+strength, score, event, or outcome label. Both engine-owned neighboring
+palaces must resolve before the section is shown; an unknown branch or partial
+engine result remains explicitly unavailable instead of being inferred.

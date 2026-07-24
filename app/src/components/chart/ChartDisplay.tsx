@@ -26,7 +26,9 @@ import {
   type NatalTransformationPalaceInput,
 } from '@/lib/chart-transformations'
 import {
+  getFlankingPalaces,
   getSanFangSiZheng,
+  type FlankingPalaceSide,
   type PalaceRelationRole,
 } from '@/lib/palace-relations'
 import { TimingLens } from './TimingLens'
@@ -390,12 +392,17 @@ interface PalaceExplanationPanelProps {
     palace: PalaceData
     role: PalaceRelationRole
   }>
+  flankingPalaces: Array<{
+    palace: PalaceData
+    side: FlankingPalaceSide
+  }>
   onClose: () => void
 }
 
 function PalaceExplanationPanel({
   palace,
   relatedPalaces,
+  flankingPalaces,
   onClose,
 }: PalaceExplanationPanelProps) {
   const palaceExplanation = getPalaceExplanation(palace.name)
@@ -524,6 +531,62 @@ function PalaceExplanationPanel({
           <p className="mt-1 text-xs leading-relaxed text-text-secondary">
             A four-palace relationship is unavailable for this engine label.
             Cinnabar will not invent one.
+          </p>
+        )}
+      </section>
+
+      <section
+        aria-labelledby="flanking-palaces-heading"
+        className="mt-4 border-t border-white/[0.08] pt-4"
+      >
+        <h4
+          id="flanking-palaces-heading"
+          className="text-xs font-medium uppercase tracking-wider text-text-muted"
+        >
+          Flanking Palaces · Adjacent context
+        </h4>
+        {flankingPalaces.length === 2 ? (
+          <>
+            <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+              The two neighboring palaces sit immediately beside the focus
+              palace. This shows structural context only; it does not classify
+              the pair as supportive or difficult.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {flankingPalaces.map(({ palace: flankingPalace, side }) => (
+                <article
+                  key={flankingPalace.branch}
+                  data-flanking-summary={side}
+                  className="rounded-lg border border-white/[0.06] bg-black/10 p-3"
+                >
+                  <p className="text-[9px] uppercase tracking-wider text-text-muted">
+                    {side === 'previous' ? 'Previous neighbor' : 'Next neighbor'}
+                  </p>
+                  <h5 className="mt-1 text-sm font-medium text-gold">
+                    {translatePalaceName(flankingPalace.name)}
+                  </h5>
+                  <p className="mt-0.5 text-[10px] text-text-muted">
+                    {translateBranch(flankingPalace.branch)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {flankingPalace.majorStars.length > 0 ? (
+                      flankingPalace.majorStars.map((star) => (
+                        <StarTag key={star.name} star={star} />
+                      ))
+                    ) : (
+                      <span className="text-xs text-text-muted">
+                        No major star
+                      </span>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+            Both neighboring palaces are required for this structural view.
+            Cinnabar will not fill missing engine data.
           </p>
         )}
       </section>
@@ -772,6 +835,13 @@ export function ChartDisplay() {
     const palace = palaceData.find((item) => item.branch === relation.branch)
     return palace ? [{ palace, role: relation.role }] : []
   })
+  const selectedFlanks = selectedPalaceData
+    ? getFlankingPalaces(selectedPalaceData.branch)
+    : []
+  const flankingPalaces = selectedFlanks.flatMap((flank) => {
+    const palace = palaceData.find((item) => item.branch === flank.branch)
+    return palace ? [{ palace, side: flank.side }] : []
+  })
   const grid: (PalaceData | null)[][] = Array(4).fill(null).map(() => Array(4).fill(null))
 
   palaceData.forEach((p) => {
@@ -857,6 +927,7 @@ export function ChartDisplay() {
         <PalaceExplanationPanel
           palace={selectedPalaceData}
           relatedPalaces={relatedPalaces}
+          flankingPalaces={flankingPalaces}
           onClose={() => {
             setSelectedTransformation(null)
             setSelectedPalace(null)

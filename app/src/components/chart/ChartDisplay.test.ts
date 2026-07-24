@@ -99,6 +99,18 @@ const CHART = {
       changsheng12: '养',
       isBodyPalace: false,
     },
+    {
+      name: '子女',
+      heavenlyStem: '戊',
+      earthlyBranch: '辰',
+      majorStars: [],
+      minorStars: [],
+      adjectiveStars: [],
+      decadal: { range: [55, 64] },
+      boshi12: '奏书',
+      changsheng12: '沐浴',
+      isBodyPalace: false,
+    },
   ],
 } as unknown as FunctionalAstrolabe
 
@@ -187,6 +199,19 @@ describe('ChartDisplay palace explanations', () => {
       name: 'Explain Wealth Palace',
     }).getAttribute('data-palace-relation')).toBeNull()
     expect(container.querySelectorAll('[data-relation-summary]')).toHaveLength(4)
+    expect(screen.getByRole('heading', {
+      name: 'Flanking Palaces · Adjacent context',
+    })).toBeTruthy()
+    expect(screen.getByText(
+      /This shows structural context only; it does not classify/,
+    )).toBeTruthy()
+    expect(container.querySelectorAll('[data-flanking-summary]')).toHaveLength(2)
+    expect(container.querySelector(
+      '[data-flanking-summary="previous"]',
+    )?.textContent).toContain('Children Palace')
+    expect(container.querySelector(
+      '[data-flanking-summary="next"]',
+    )?.textContent).toContain('Wealth Palace')
 
     fireEvent.click(screen.getByRole('button', {
       name: 'Close palace explanation',

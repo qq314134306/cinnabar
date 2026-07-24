@@ -151,7 +151,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   buttons; one selected palace exposes English palace and major-star context,
   derives the focus/opposite/two-trine San Fang Si Zheng group from fixed
   earthly-branch positions, and highlights plus summarizes the complete
-  four-palace structure without AI, accounts, or remote data. Its natal Four
+  four-palace structure without AI, accounts, or remote data. The same
+  explanation separately resolves the immediately previous and next branches
+  as flanking-palace context, without adding them to the four-palace highlight
+  or inferring that they help or hinder the focus. Its natal Four
   Transformations index extracts major/minor star ownership in canonical
   Lu/Quan/Ke/Ji order and opens the owning palace plus the same relationship
   view without generating a separate score. Its timing lens uses the engine's
