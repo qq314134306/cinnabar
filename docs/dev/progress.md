@@ -39,6 +39,13 @@
 
 ## Recently Completed
 
+- Contained Soul Card share failures. Image generation is now imperatively
+  single-flight, always removes its temporary anchor, and replaces the
+  raw-detail browser alert with an action-linked announced retry state.
+  Clipboard success is announced with bounded timer cleanup; clipboard failure
+  exposes the canonical address for manual copying and keeps retry available.
+  Four new rendered tests cover 2x PNG output, duplicate suppression,
+  download-activation failure/recovery, and clipboard failure-to-success.
 - Made Share Card quote editing reversible and export-bounded. The textarea now
   owns a separate draft, Cancel restores the previously committed quote, and
   Done trims and saves. An explicit accessible name, live count, and redundant
@@ -669,7 +676,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 62 Vitest files / 618 tests in
+The current cumulative local baseline passed 63 Vitest files / 622 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the

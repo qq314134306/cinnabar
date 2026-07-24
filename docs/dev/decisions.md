@@ -847,3 +847,20 @@ Custom copy is limited to 240 characters in both the textarea contract and the
 state update path. The editor exposes the boundary with a live character count
 and an explicit accessible name. This matches the existing optional-AI quote
 ceiling and protects the fixed-height exported card from unbounded user text.
+
+## D036 - Soul Card Sharing Fails Locally and Recoverably
+
+Soul Card teaser unlock remains optimistic on a share-action click; downstream
+browser capability does not relock content or create server verification. That
+product behavior does not permit silent or blocking failures.
+
+PNG export is guarded imperatively so no more than one capture runs per mounted
+card. Any font, canvas, encoding, or download failure restores the action and
+shows fixed announced retry copy without raw exception details or
+`window.alert`. The temporary download anchor is removed in the shared cleanup
+path even when activation throws.
+
+Clipboard success is an announced, temporary state whose timer is replaced on
+retry and cleared on unmount. Clipboard absence or rejection shows an announced
+failure with the canonical site address as a manual fallback, while leaving
+the Copy action available for retry.

@@ -149,6 +149,14 @@ linked to the input, submitting state is busy/disabled and rejects duplicates,
 and success is a status that invokes analytics plus the optional unlock
 callback exactly once.
 
+`src/components/SoulCard.tsx` + `SoulCard.test.ts` +
+`src/lib/soul-card.ts`: deterministic chart-derived card with optimistic
+share/email teaser unlock. Local PNG export is single-flight, always removes
+its temporary anchor, and exposes fixed announced retry copy without raw
+exceptions or browser alerts. Clipboard success is announced; clipboard
+failure provides the canonical site address for manual copying. Clear the
+temporary copied state timer on replacement and unmount.
+
 `src/components/ExitIntentModal.tsx` + `ExitIntentModal.test.ts`: best-effort
 once-per-session desktop exit-intent wrapper. It is a labeled modal dialog,
 moves focus inside, traps Tab, closes on Escape or the true backdrop, restores
@@ -574,6 +582,10 @@ ciphertext makes concurrency tests flaky and invalid.
 - Share Card change: run
   `npm run test -- src/components/share/ShareCard.test.ts`, inspect one real
   exported PNG, then lint and the complete root build.
+- Soul Card change: run
+  `npm run test -- src/components/SoulCard.test.ts`; inspect one real exported
+  PNG when capture styling or content changes, then lint and the complete root
+  build.
 - Subscription change: run `npm run test -- tests/subscribe-api.test.ts`, lint,
   and the complete root build. A mocked webhook and warm-isolate limiter remain
   local contract evidence, not deployed delivery or distributed-rate proof.

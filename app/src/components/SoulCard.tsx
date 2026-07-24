@@ -21,21 +21,32 @@ const FONT_BODY = "'Inter', system-ui, sans-serif"
 const SITE_URL = 'https://cinnabarastrology.com'
 const SHARE_TEXT =
   'I just unlocked my Cinnabar Soul Card ✨ Eastern Astrology, in English — discover yours:'
+const SHARE_COPY = `${SHARE_TEXT} ${SITE_URL}`
 
 type SharePlatform = 'download' | 'pinterest' | 'x' | 'copy_link'
+type CopyState = 'idle' | 'copied' | 'error'
 
 export function SoulCard() {
   const { chart } = useChartStore()
   const cardRef = useRef<HTMLDivElement>(null)
+  const downloadInFlightRef = useRef(false)
+  const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [name, setName] = useState('')
   const [qrDataUrl, setQrDataUrl] = useState('')
   const [generating, setGenerating] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
   const [unlocked, setUnlocked] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [copyState, setCopyState] = useState<CopyState>('idle')
 
   // Fire soul_card_view once when the card mounts.
   useEffect(() => {
     analytics.soulCardView()
+  }, [])
+
+  useEffect(() => () => {
+    if (copyResetTimerRef.current !== null) {
+      clearTimeout(copyResetTimerRef.current)
+    }
   }, [])
 
   // Build the QR (points at the homepage) once.
@@ -56,8 +67,12 @@ export function SoulCard() {
   const data: SoulCardData | null = chart ? deriveSoulCard(chart) : null
 
   const handleDownload = useCallback(async () => {
-    if (!cardRef.current) return
+    if (!cardRef.current || downloadInFlightRef.current) return
+
+    downloadInFlightRef.current = true
+    setDownloadError(null)
     setGenerating(true)
+    let link: HTMLAnchorElement | null = null
     try {
       await document.fonts.ready
       const canvas = await html2canvas(cardRef.current, {
@@ -66,17 +81,42 @@ export function SoulCard() {
         useCORS: true,
         allowTaint: true,
       })
-      const link = document.createElement('a')
+      link = document.createElement('a')
       link.download = 'cinnabar-soul-card.png'
       link.href = canvas.toDataURL('image/png')
       document.body.appendChild(link)
       link.click()
-      document.body.removeChild(link)
     } catch (err) {
       console.error('Soul Card image generation failed:', err)
-      alert(`Image generation failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      setDownloadError("We couldn't save this image. Please try again.")
     } finally {
+      link?.remove()
+      downloadInFlightRef.current = false
       setGenerating(false)
+    }
+  }, [])
+
+  const copyShareLink = useCallback(async () => {
+    if (copyResetTimerRef.current !== null) {
+      clearTimeout(copyResetTimerRef.current)
+      copyResetTimerRef.current = null
+    }
+    setCopyState('idle')
+
+    try {
+      const clipboard = navigator.clipboard
+      if (!clipboard?.writeText) {
+        throw new Error('Clipboard API unavailable')
+      }
+      await clipboard.writeText(SHARE_COPY)
+      setCopyState('copied')
+      copyResetTimerRef.current = setTimeout(() => {
+        setCopyState('idle')
+        copyResetTimerRef.current = null
+      }, 2000)
+    } catch (err) {
+      console.error('Soul Card link copy failed:', err)
+      setCopyState('error')
     }
   }, [])
 
@@ -103,18 +143,10 @@ export function SoulCard() {
           'noopener,noreferrer'
         )
       } else if (platform === 'copy_link') {
-        void navigator.clipboard
-          ?.writeText(`${SHARE_TEXT} ${SITE_URL}`)
-          .then(() => {
-            setCopied(true)
-            setTimeout(() => setCopied(false), 2000)
-          })
-          .catch(() => {
-            /* clipboard may be unavailable; unlock still applies */
-          })
+        void copyShareLink()
       }
     },
-    [handleDownload]
+    [copyShareLink, handleDownload]
   )
 
   if (!chart || !data) return null
@@ -289,7 +321,13 @@ export function SoulCard() {
       {/* Share row */}
       <div className="max-w-md mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <Button size="sm" variant="gold" disabled={generating} onClick={() => share('download')}>
+          <Button
+            size="sm"
+            variant="gold"
+            disabled={generating}
+            aria-describedby={downloadError ? 'soul-card-download-error' : undefined}
+            onClick={() => share('download')}
+          >
             {generating ? 'Saving…' : '⬇ Image'}
           </Button>
           <Button size="sm" variant="secondary" onClick={() => share('pinterest')}>
@@ -298,10 +336,42 @@ export function SoulCard() {
           <Button size="sm" variant="secondary" onClick={() => share('x')}>
             Post on X
           </Button>
-          <Button size="sm" variant="secondary" onClick={() => share('copy_link')}>
-            {copied ? '✓ Copied' : 'Copy link'}
+          <Button
+            size="sm"
+            variant="secondary"
+            aria-describedby={copyState !== 'idle' ? 'soul-card-copy-feedback' : undefined}
+            onClick={() => share('copy_link')}
+          >
+            {copyState === 'copied' ? '✓ Copied' : 'Copy link'}
           </Button>
         </div>
+        {downloadError && (
+          <p
+            id="soul-card-download-error"
+            role="alert"
+            className="mt-3 text-sm text-rose-300"
+          >
+            {downloadError}
+          </p>
+        )}
+        {copyState === 'copied' && (
+          <p
+            id="soul-card-copy-feedback"
+            role="status"
+            className="mt-3 text-sm text-text-secondary"
+          >
+            Share link copied.
+          </p>
+        )}
+        {copyState === 'error' && (
+          <p
+            id="soul-card-copy-feedback"
+            role="alert"
+            className="mt-3 text-sm text-rose-300"
+          >
+            We couldn't copy the link. Copy this address manually: {SITE_URL}
+          </p>
+        )}
 
         {/* Or unlock via email */}
         <div className="mt-4 pt-4 border-t border-white/[0.06]">

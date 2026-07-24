@@ -319,7 +319,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/EmailCapture.tsx` + `EmailCapture.test.ts` - reusable,
   source-tagged email opt-in with input-linked announced errors, busy/disabled
   duplicate-submit protection, and an announced success/unlock state.
-- `app/src/components/SoulCard.tsx` + `app/src/lib/soul-card.ts` - shareable Soul Card (deterministic derivation from the chart) with locked teaser + share/email unlock.
+- `app/src/components/SoulCard.tsx` + `SoulCard.test.ts` +
+  `app/src/lib/soul-card.ts` - shareable, deterministic chart-derived Soul
+  Card with optimistic share/email teaser unlock. Image export is single-flight
+  and retryable with unconditional temporary-anchor cleanup; copy success is
+  announced and copy failure exposes the canonical address for manual use.
 - `app/src/components/ExitIntentModal.tsx` + `ExitIntentModal.test.ts` -
   best-effort once-per-session desktop email prompt with labeled modal
   semantics, Escape/backdrop dismissal, contained Tab focus, prior-focus
