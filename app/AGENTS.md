@@ -307,7 +307,10 @@ Timeline uses the deterministic local calculator. Its default view stays
 focused on the current age minus five through plus twenty-five, while the full
 ages 1-100 model is explicitly optional and must never be described as a
 lifespan estimate. It must not regain a generic LLM/messages path or invent a
-`lifetime` public-AI operation.
+`lifetime` public-AI operation. LifeKLine owns the Recharts timeline shell;
+`ScoreRadar.tsx` and its ECharts runtime load only after a timeline has been
+built and an active year exists. Keep that nested lazy boundary locally
+contained with the compact `LazySurface` panel variant.
 
 `src/lib/paypal.ts`: PayPal Smart Payment Buttons adapter. It sends only the
 tier, a stable checkout-attempt UUID, and an allowlisted birth/persona request

@@ -9,7 +9,7 @@
    - 深色玻璃态 Tooltip
    ============================================================ */
 
-import { useState, useMemo, useCallback } from 'react'
+import { lazy, useState, useMemo, useCallback } from 'react'
 import {
   ComposedChart,
   Bar,
@@ -22,13 +22,18 @@ import {
   LabelList,
 } from 'recharts'
 import { useChartStore, useContentCacheStore } from '@/stores'
+import { LazySurface } from '@/components/LazySurface'
 import { KLineIcon } from '@/components/icons/KLineIcon'
-import { ScoreRadar } from './ScoreRadar'
 import { translateGanZhi, translateStarLabel } from '@/lib/ziwei-glossary'
 import {
   generateLifetimeKLines,
   type LifetimeKLinePoint,
 } from '@/lib/fortune-score'
+
+const ScoreRadar = lazy(async () => {
+  const module = await import('./ScoreRadar')
+  return { default: module.ScoreRadar }
+})
 
 /* ============================================================
    自定义 Tooltip (深色玻璃态)
@@ -522,14 +527,20 @@ export function LifeKLine({ onRequestChart }: LifeKLineProps) {
           {activePoint && (
             <div className="grid md:grid-cols-2 gap-6">
               {/* 雷达图 */}
-              <ScoreRadar
-                score={{
-                  total: activePoint.score,
-                  trend: activePoint.close >= activePoint.open ? 'up' : 'down',
-                  dimensions: activePoint.dimensions,
-                }}
-                period={`${activePoint.year} (Age ${activePoint.age})`}
-              />
+              <LazySurface
+                label="score profile"
+                loadingLabel="Loading score profile…"
+                variant="panel"
+              >
+                <ScoreRadar
+                  score={{
+                    total: activePoint.score,
+                    trend: activePoint.close >= activePoint.open ? 'up' : 'down',
+                    dimensions: activePoint.dimensions,
+                  }}
+                  period={`${activePoint.year} (Age ${activePoint.age})`}
+                />
+              </LazySurface>
 
               {/* 详细信息卡片 */}
               <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-sm">

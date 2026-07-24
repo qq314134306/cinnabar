@@ -10,12 +10,14 @@ interface LazySurfaceProps {
   label: string
   loadingLabel: string
   onReload?: () => void
+  variant?: 'surface' | 'panel'
 }
 
 interface LazySurfaceBoundaryProps {
   children?: ReactNode
   label: string
   onReload?: () => void
+  variant: 'surface' | 'panel'
 }
 
 interface LazySurfaceBoundaryState {
@@ -43,10 +45,12 @@ class LazySurfaceBoundary extends Component<
   render() {
     if (!this.state.failed) return this.props.children
 
-    const { label, onReload = reloadPage } = this.props
+    const { label, onReload = reloadPage, variant } = this.props
 
     return (
-      <div className="flex min-h-[40vh] items-center justify-center">
+      <div className={`flex items-center justify-center ${
+        variant === 'panel' ? 'min-h-[260px]' : 'min-h-[40vh]'
+      }`}>
         <div
           role="alert"
           className="max-w-md rounded-2xl border border-cinnabar/25 bg-cinnabar/[0.08] p-6 text-center"
@@ -76,19 +80,34 @@ export function LazySurface({
   label,
   loadingLabel,
   onReload,
+  variant = 'surface',
 }: LazySurfaceProps) {
   return (
-    <LazySurfaceBoundary label={label} onReload={onReload}>
-      <Suspense fallback={<SurfaceLoading label={loadingLabel} />}>
+    <LazySurfaceBoundary
+      label={label}
+      onReload={onReload}
+      variant={variant}
+    >
+      <Suspense
+        fallback={<SurfaceLoading label={loadingLabel} variant={variant} />}
+      >
         {children}
       </Suspense>
     </LazySurfaceBoundary>
   )
 }
 
-function SurfaceLoading({ label }: { label: string }) {
+function SurfaceLoading({
+  label,
+  variant,
+}: {
+  label: string
+  variant: 'surface' | 'panel'
+}) {
   return (
-    <div className="flex min-h-[40vh] items-center justify-center">
+    <div className={`flex items-center justify-center ${
+      variant === 'panel' ? 'min-h-[260px]' : 'min-h-[40vh]'
+    }`}>
       <div
         role="status"
         className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-sm text-text-muted"

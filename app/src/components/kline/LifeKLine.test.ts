@@ -126,7 +126,7 @@ describe('Life Timeline', () => {
     expect(onRequestChart).toHaveBeenCalledOnce()
   })
 
-  it('builds the deterministic timeline and lets the user inspect any year', () => {
+  it('builds the deterministic timeline and lets the user inspect any year', async () => {
     render(createElement(LifeKLine))
 
     fireEvent.click(screen.getByRole('button', {
@@ -139,7 +139,7 @@ describe('Life Timeline', () => {
     )
     expect(screen.getByRole('combobox', { name: 'Choose a year' })).toBeTruthy()
     expect(screen.queryByRole('option', { name: /Age 100/ })).toBeNull()
-    expect(screen.getByTestId('score-radar').textContent).toBe(
+    expect((await screen.findByTestId('score-radar')).textContent).toBe(
       `${BIRTH_YEAR} (Age 1)`,
     )
 

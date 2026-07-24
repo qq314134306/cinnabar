@@ -777,9 +777,9 @@ The 2026-07-23 production build reduced the initial main script from
 1,416.78 kB / 421.89 kB gzip to 485.86 kB / 140.04 kB gzip, a reduction of
 930.92 kB raw (65.7%) and 281.85 kB gzip (66.8%). Browser resource inventory
 must show no `astro-*` request before submission and an `astro-*` plus
-`ChartDisplay-*` request afterward. The remaining chunk-over-500-KB warning is
-the already-lazy Life Timeline and is not evidence that these boundaries were
-eagerly restored.
+`ChartDisplay-*` request afterward. The later nested ScoreRadar split brought
+every generated JavaScript chunk below 500 kB; a regression above that boundary
+requires an explicit dependency and loading-path review.
 
 ## D031 - Lazy Surface Failures Stay Local
 
@@ -794,3 +794,18 @@ component. React caches a rejected `lazy()` import promise, while a reload can
 obtain the current asset manifest after a deployment or recover from a network
 interruption. The boundary logs the technical failure to the browser console
 but exposes only stable user-facing copy.
+
+## D032 - Life Timeline Loads Its Radar Only After Build
+
+Opening Life Timeline must reveal its title, scope disclaimer, empty state, and
+build action without downloading ECharts. `LifeKLine` owns the Recharts
+timeline shell and deterministic calculation. `ScoreRadar` owns the ECharts
+runtime and loads through a compact, locally contained lazy panel only after an
+active timeline point exists.
+
+This boundary does not change the 1–100 cycle model, focused range, selected
+year, scores, or chart state. The 2026-07-23 production build reduced the
+LifeKLine entry chunk from 842.58 kB / 272.38 kB gzip to
+351.80 kB / 105.52 kB gzip. The deferred ScoreRadar chunk is
+489.92 kB / 167.10 kB gzip, leaving every generated JavaScript chunk below
+Vite's 500 kB warning threshold.

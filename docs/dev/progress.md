@@ -39,6 +39,14 @@
 
 ## Recently Completed
 
+- Split Life Timeline's radar visualization from its entry path. Opening the
+  feature now loads the Recharts timeline shell, scope disclaimer, empty state,
+  and build action without ECharts; ScoreRadar loads through a compact,
+  failure-contained panel only after a timeline has an active year. The
+  LifeKLine chunk fell from 842.58 kB / 272.38 kB gzip to
+  351.80 kB / 105.52 kB gzip, while the deferred ScoreRadar is
+  489.92 kB / 167.10 kB gzip. Every generated JavaScript chunk is now below
+  500 kB, so the production build emits no large-chunk warning.
 - Added local failure containment to every lazy product region. ChartDisplay,
   optional AI narrative, Life Timeline, Compatibility, and the populated Share
   Card now share an announced pending state plus an error boundary that keeps
@@ -46,8 +54,8 @@
   exposes stable recovery copy and an explicit page reload, which is required
   because React caches rejected lazy-import promises. Focused rendered tests
   cover both the loading status and contained failure/reload action. The
-  production main script remains below the warning threshold at
-  487.06 kB / 140.44 kB gzip.
+  production main script remains below the warning threshold; after the nested
+  timeline split it is 487.20 kB / 140.51 kB gzip.
 - Removed chart and secondary-surface work from the landing bundle without
   changing product behavior. BirthForm now renders its twelve shichen options
   from an engine-independent helper, then loads iztro and ChartDisplay only
@@ -624,8 +632,9 @@ npm run build
 npm run test -- sync-zwknows
 ```
 
-Known build note: Vite may report a large chunk warning. That warning was already
-known and is not by itself a failure.
+Earlier builds reported a non-fatal large-chunk warning. The current split
+build keeps every generated JavaScript chunk below 500 kB and emits no such
+warning.
 
 Full local verification on 2026-07-23 passed `npm run lint`, all 43 Vitest
 files / 363 tests in three consecutive full-suite runs, `npm run build`
@@ -648,8 +657,8 @@ and reading suites. `npm run lint`, `npm run build` with Vite 7.3.6, direct
 `tsc -b`, a moderate-threshold audit with zero findings, the secret-pattern
 scan, and `git diff --check` passed. Desktop and 390-by-844 Chrome acceptance
 also covered both timeline ranges, all 100 full-model year options, intentional
-chart scrolling, and a clean current-chunk warning/error log. The only build
-note is the known non-fatal chunk-over-500-KB warning. This remains local
+chart scrolling, and a clean current-chunk warning/error log. The current build
+emits no chunk-over-500-KB warning. This remains local
 mock/contract/static evidence, not a hosted Actions run, database execution,
 deployment, or Supabase/PayPal/DeepSeek/provider proof.
 

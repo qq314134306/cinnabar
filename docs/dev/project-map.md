@@ -338,8 +338,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/kline/LifeKLine.tsx` + `ScoreRadar.tsx` - visible English
   Life Timeline UI with a current-age-focused default range, an optional age
   1–100 full model, horizontal mobile inspection, an explicit year selector,
-  translated cycle labels, and four-dimension detail. The full range covers ten
-  decadal cycles and is explicitly not presented as a lifespan estimate.
+  translated cycle labels, and four-dimension detail. LifeKLine loads the
+  Recharts timeline shell; ScoreRadar and ECharts are a nested lazy panel that
+  is requested only after the user builds a timeline. The full range covers
+  ten decadal cycles and is explicitly not presented as a lifespan estimate.
 - `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via Intl).
 - `app/src/lib/birthplace-data.json` - local Chinese city/region coordinate dataset.
 - `app/src/lib/world-cities.json` - curated global city dataset (name, country, longitude, IANA timezone, aliases).
