@@ -99,6 +99,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/shichen.ts` - engine-independent traditional two-hour labels and
   select options. BirthForm imports this instead of loading iztro merely to
   render its hour control.
+- `app/src/components/LazySurface.tsx` + `LazySurface.test.ts` - shared
+  `Suspense` loading status and local error boundary for every lazy product
+  region. A rejected import cannot blank the shell; recovery explicitly reloads
+  the page to obtain a fresh asset manifest and module promise.
 - `app/tsconfig.json` + `app/tsconfig.api.json` - root build reference and the
   strict, no-emit API compilation boundary. API tests are excluded, but all
   `app/api/**/*.ts` production files remain in the build graph.

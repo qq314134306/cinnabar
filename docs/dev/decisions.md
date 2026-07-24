@@ -780,3 +780,17 @@ must show no `astro-*` request before submission and an `astro-*` plus
 `ChartDisplay-*` request afterward. The remaining chunk-over-500-KB warning is
 the already-lazy Life Timeline and is not evidence that these boundaries were
 eagerly restored.
+
+## D031 - Lazy Surface Failures Stay Local
+
+Each lazy product region owns a local error boundary in addition to its
+`Suspense` loading state. A failed ChartDisplay, optional AI narrative, Life
+Timeline, Compatibility, or populated Share Card import or render must replace
+only that region with an announced recovery panel; the app shell, navigation,
+authentication state, and unrelated surfaces remain mounted.
+
+Recovery performs an explicit page reload rather than remounting the same lazy
+component. React caches a rejected `lazy()` import promise, while a reload can
+obtain the current asset manifest after a deployment or recover from a network
+interruption. The boundary logs the technical failure to the browser console
+but exposes only stable user-facing copy.

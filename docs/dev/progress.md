@@ -39,6 +39,15 @@
 
 ## Recently Completed
 
+- Added local failure containment to every lazy product region. ChartDisplay,
+  optional AI narrative, Life Timeline, Compatibility, and the populated Share
+  Card now share an announced pending state plus an error boundary that keeps
+  the app shell and unrelated features mounted. A failed module or render
+  exposes stable recovery copy and an explicit page reload, which is required
+  because React caches rejected lazy-import promises. Focused rendered tests
+  cover both the loading status and contained failure/reload action. The
+  production main script remains below the warning threshold at
+  487.06 kB / 140.44 kB gzip.
 - Removed chart and secondary-surface work from the landing bundle without
   changing product behavior. BirthForm now renders its twelve shichen options
   from an engine-independent helper, then loads iztro and ChartDisplay only
@@ -627,7 +636,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 61 Vitest files / 611 tests in
+The current cumulative local baseline passed 62 Vitest files / 613 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the

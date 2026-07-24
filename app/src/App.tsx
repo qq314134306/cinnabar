@@ -3,9 +3,10 @@
    Eastern Astrology, in English.
    ============================================================ */
 
-import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
+import { lazy, useEffect, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
+import { LazySurface } from '@/components/LazySurface'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ExitIntentModal } from '@/components/ExitIntentModal'
@@ -252,19 +253,21 @@ export default function App() {
             ) : (
               <div className="animate-fade-in space-y-8">
                 <div className="w-full">
-                  <Suspense
-                    fallback={<SurfaceLoading label="Rendering your chart…" />}
+                  <LazySurface
+                    label="your chart"
+                    loadingLabel="Rendering your chart…"
                   >
                     <ChartDisplay />
-                  </Suspense>
+                  </LazySurface>
                 </div>
 
                 <div className="w-full max-w-6xl mx-auto">
-                  <Suspense
-                    fallback={<SurfaceLoading label="Loading chart insights…" />}
+                  <LazySurface
+                    label="chart insights"
+                    loadingLabel="Loading chart insights…"
                   >
                     <AIInterpretation />
-                  </Suspense>
+                  </LazySurface>
                 </div>
 
                 <div className="text-center">
@@ -289,20 +292,22 @@ export default function App() {
 
           {/* Life Timeline tab */}
           {activeTab === 'timeline' && (
-            <Suspense
-              fallback={<SurfaceLoading label="Loading Life Timeline…" />}
+            <LazySurface
+              label="Life Timeline"
+              loadingLabel="Loading Life Timeline…"
             >
               <LifeKLine onRequestChart={() => setActiveTab('chart')} />
-            </Suspense>
+            </LazySurface>
           )}
 
           {/* Compatibility tab */}
           {activeTab === 'match' && (
-            <Suspense
-              fallback={<SurfaceLoading label="Loading Compatibility…" />}
+            <LazySurface
+              label="Compatibility"
+              loadingLabel="Loading Compatibility…"
             >
               <MatchAnalysis />
-            </Suspense>
+            </LazySurface>
           )}
 
           {/* Share Card tab */}
@@ -317,11 +322,12 @@ export default function App() {
               </div>
             ) : (
               <div className="max-w-xl mx-auto">
-                <Suspense
-                  fallback={<SurfaceLoading label="Loading Share Card…" />}
+                <LazySurface
+                  label="Share Card"
+                  loadingLabel="Loading Share Card…"
                 >
                   <ShareCard />
-                </Suspense>
+                </LazySurface>
               </div>
             )
           )}
@@ -394,23 +400,6 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </button>
-    </div>
-  )
-}
-
-function SurfaceLoading({ label }: { label: string }) {
-  return (
-    <div className="flex min-h-[40vh] items-center justify-center">
-      <div
-        role="status"
-        className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-5 py-3 text-sm text-text-muted"
-      >
-        <span
-          aria-hidden="true"
-          className="h-4 w-4 animate-spin rounded-full border-2 border-star border-t-transparent"
-        />
-        {label}
-      </div>
     </div>
   )
 }

@@ -113,6 +113,13 @@ boundaries with announced loading states. Do not make the landing page pay for
 chart calculation, palace rendering, image-export, Markdown, or payment
 dependencies eagerly.
 
+`src/components/LazySurface.tsx` + `LazySurface.test.ts`: shared containment
+for every `React.lazy` product region. Pending imports expose an announced
+status. Import or render failure replaces only that region with an announced
+alert and full-page reload action because React caches a rejected lazy import.
+Do not place the whole app shell inside this boundary or silently retry the
+same rejected module promise.
+
 `api/interpret.ts` + `api/_public-reading.ts`: SERVER-OWNED, default-off public
 AI boundary. It accepts only exact `reading.v1` `natal`, `compatibility`, or
 `yearly` requests; browser messages, prompts, facts, resolved time,
