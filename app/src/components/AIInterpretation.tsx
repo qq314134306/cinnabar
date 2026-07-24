@@ -100,7 +100,7 @@ export function AIInterpretation() {
     setAiInterpretation,
   } = useContentCacheStore()
 
-  const requestKey = birthInfo
+  const requestKey = birthInfo && birthInfo.birthTimeUnknown !== true
     ? getNatalReadingRequestKey(birthInfo, persona)
     : null
   const initialText = (
@@ -271,6 +271,18 @@ export function AIInterpretation() {
   ])
 
   if (!chart) return null
+  if (birthInfo?.birthTimeUnknown === true) {
+    return (
+      <div
+        role="status"
+        className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 text-sm leading-relaxed text-text-secondary"
+      >
+        Local scoring and optional AI reading stay unavailable while the birth
+        hour is completely unknown. Complete the 13-block comparison in Your
+        Chart first.
+      </div>
+    )
+  }
 
   if (!publicAiEnabled) {
     return (

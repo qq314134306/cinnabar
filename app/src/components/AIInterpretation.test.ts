@@ -147,6 +147,29 @@ describe('AIInterpretation public AI gate', () => {
     expect(screen.queryByText('CACHED READING')).toBeNull()
     expect(mocks.streamReading).not.toHaveBeenCalled()
   })
+
+  it('withholds derived readings while the birth hour is completely unknown', () => {
+    useChartStore.setState({
+      birthInfo: {
+        ...BIRTH_INFO,
+        hour: 12,
+        birthTimeReliable: false,
+        birthTimeUnknown: true,
+      },
+      chart: CHART,
+    })
+
+    render(createElement(AIInterpretation))
+
+    expect(screen.getByRole('status').textContent).toContain(
+      'Complete the 13-block comparison',
+    )
+    expect(screen.queryByText('LOCAL CHART SNAPSHOT')).toBeNull()
+    expect(screen.queryByRole('button', {
+      name: 'Get My Free Reading',
+    })).toBeNull()
+    expect(mocks.streamReading).not.toHaveBeenCalled()
+  })
 })
 
 describe('AIInterpretation request ownership', () => {

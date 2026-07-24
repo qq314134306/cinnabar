@@ -40,6 +40,8 @@ export interface BirthInfo {
   resolvedBirthTime?: ResolvedBirthTime
   /** Approximate times may position a chart but must never be presented as an exact hour pillar. */
   birthTimeReliable?: boolean
+  /** True when `hour` is a temporary noon position used only to enter the all-block shortlist. */
+  birthTimeUnknown?: boolean
   isLeapMonth?: boolean
   fixLeap?: boolean
 }

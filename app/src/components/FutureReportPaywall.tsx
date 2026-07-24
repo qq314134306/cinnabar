@@ -70,7 +70,7 @@ type Status = 'idle' | 'checking' | 'generating' | 'error'
 
 function getCurrentChartContextKey(): string | null {
   const birthInfo = useChartStore.getState().birthInfo
-  if (!birthInfo) return null
+  if (!birthInfo || birthInfo.birthTimeUnknown === true) return null
   return JSON.stringify(buildFutureReportRequestInput(
     birthInfo,
     useSettingsStore.getState().persona,
@@ -113,7 +113,9 @@ export function FutureReportPaywall() {
   const birthInfo = useChartStore((state) => state.birthInfo)
   const persona = useSettingsStore((state) => state.persona)
   const chartContextKey = useMemo(() => (
-    futureReportPaymentsEnabled && birthInfo
+    futureReportPaymentsEnabled
+      && birthInfo
+      && birthInfo.birthTimeUnknown !== true
       ? JSON.stringify(buildFutureReportRequestInput(birthInfo, persona))
       : null
   ), [birthInfo, persona])

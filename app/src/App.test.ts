@@ -15,6 +15,10 @@ const mocks = vi.hoisted(() => ({
   initAuth: vi.fn(),
   clearChart: vi.fn(),
   trackPageView: vi.fn(),
+  chartState: {
+    chart: {} as object | null,
+    birthInfo: null as { birthTimeUnknown?: boolean } | null,
+  },
 }))
 
 vi.mock('@vercel/analytics/react', () => ({
@@ -25,7 +29,7 @@ vi.mock('@/lib/analytics', () => ({
 }))
 vi.mock('@/stores', () => {
   const useChartStore = Object.assign(
-    () => ({ chart: {} }),
+    () => mocks.chartState,
     { getState: () => ({ clear: mocks.clearChart }) },
   )
   return {
@@ -70,6 +74,8 @@ vi.mock('@/components/AuthControl', () => ({
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+  mocks.chartState.chart = {}
+  mocks.chartState.birthInfo = null
   document.title = ''
 })
 
@@ -146,5 +152,21 @@ describe('App navigation', () => {
       'Cinnabar — Share Card',
     )
     expect(document.title).toBe('Cinnabar — Share Card')
+  })
+
+  it('holds timeline and sharing until an unknown birth hour is shortlisted', () => {
+    mocks.chartState.birthInfo = { birthTimeUnknown: true }
+    render(createElement(App))
+
+    const primaryNav = screen.getByRole('navigation', { name: 'Primary' })
+    expect((within(primaryNav).getByRole('button', {
+      name: 'Life Timeline',
+    }) as HTMLButtonElement).disabled).toBe(true)
+    expect((within(primaryNav).getByRole('button', {
+      name: 'Share Card',
+    }) as HTMLButtonElement).disabled).toBe(true)
+    expect((within(primaryNav).getByRole('button', {
+      name: 'Compatibility',
+    }) as HTMLButtonElement).disabled).toBe(false)
   })
 })

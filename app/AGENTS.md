@@ -345,8 +345,14 @@ dimension scores or any random value as event evidence. Show points and their
 ledger, never probabilities, accuracy, minute confidence, or a "correct time"
 claim. Applying a civil candidate must be explicit, keep
 `birthTimeReliable=false`, atomically replace chart plus birth input, and clear
-all chart-derived caches. No request, analytics, persistence, account, AI, or
-payment dependency belongs in this flow.
+all chart-derived caches. Early stopping must remain overridable; previously
+recorded answers stay editable and rescore through the same pure engine. The
+one-answer-removal check may describe ranking stability only, never confidence
+or correctness. A `birthTimeUnknown=true` noon value is an internal finder
+position only: do not render its palace chart or enable local/AI/timeline/share/
+payment output, and do not prefill Compatibility from it. Applying a finder
+candidate must clear this marker. No request, analytics, persistence, account,
+AI, or payment dependency belongs in this flow.
 
 `src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI
 prompts, including `buildYearlyChartFacts` (year-by-year Liu Nian facts via

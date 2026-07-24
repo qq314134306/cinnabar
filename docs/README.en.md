@@ -23,9 +23,14 @@
   two-hour windows. It can also open an optional local shortlist across all 13
   civil-time entries, including early and late Rat Hour. Every entry is
   independently solar-resolved before up to five skippable past-event
-  questions produce evidence points, an evidence ledger, and at most three
-  leading possibilities. Equivalent resolved charts remain tied; the tool does
-  not claim to identify an exact or correct birth time. Once
+  questions produce evidence points and an evidence ledger. Users can finish
+  questions left by early stopping, revise any answer with immediate
+  recalculation, and inspect whether the leader survives removal of any one
+  scored answer. A completely unknown hour can enter this flow without
+  pretending the internal noon placeholder is a natal chart; hour-dependent
+  outputs stay locked until a candidate is explicitly applied. Equivalent
+  resolved charts remain tied; the tool does not
+  claim to identify an exact or correct birth time. Once
   cast, the chart also shows a deterministic current-model-year snapshot with
   an overall score and Career, Wealth, Relationships, and Well-being
   dimensions. These local features need no AI request, account, API, or

@@ -180,6 +180,34 @@ describe('MatchAnalysis public AI gate', () => {
     }).textContent).toContain('True solar time adjusted')
   })
 
+  it('does not prefill compatibility from an unknown-hour placeholder', () => {
+    const unknownBirthInfo: BirthInfo = {
+      year: 1986,
+      month: 7,
+      day: 19,
+      hour: 12,
+      gender: 'female',
+      birthplace: 'New York',
+      trueSolarEnabled: false,
+      birthTimeReliable: false,
+      birthTimeUnknown: true,
+    }
+    useChartStore.setState({
+      birthInfo: unknownBirthInfo,
+      chart: generateChart(unknownBirthInfo),
+    })
+
+    render(createElement(MatchAnalysis))
+
+    expect(screen.queryByText(/Using Your Chart details/)).toBeNull()
+    expect((screen.getByRole('combobox', {
+      name: 'Person A year of birth',
+    }) as HTMLSelectElement).value).toBe('1990')
+    expect((screen.getByRole('combobox', {
+      name: 'Person A birth hour',
+    }) as HTMLSelectElement).value).toBe('12')
+  })
+
   it('re-resolves edited inputs and can restore the latest current-chart details', async () => {
     const currentBirthInfo: BirthInfo = {
       year: 1988,

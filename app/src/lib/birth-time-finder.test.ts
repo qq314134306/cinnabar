@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { FunctionalAstrolabe } from './astro'
 import {
+  analyzeBirthTimeRankingRobustness,
   BirthTimeFinderInputError,
   CIVIL_TIME_BLOCKS,
   buildBirthTimeCandidates,
@@ -43,6 +44,7 @@ describe('birth-time candidate preparation', () => {
         birthplace: 'Chengdu',
         trueSolarEnabled: true,
         birthTimeReliable: false,
+        birthTimeUnknown: false,
       },
       resolved: {
         applied: true,
@@ -268,6 +270,63 @@ describe('birth-time event evidence', () => {
       ...ranking,
       scoredAnswerCount: 2,
     })).toBe(false)
+  })
+
+  it('reports when the leader survives removal of any one scored answer', () => {
+    const groups = [
+      mockGroup('a', 'morning'),
+      mockGroup('b', 'evening'),
+      mockGroup('c', 'overnight'),
+    ]
+    const questions = [
+      mockQuestion('work-1', 'work', { a: 1, b: -1, c: 0 }),
+      mockQuestion('home-1', 'home', { a: 1, b: -1, c: 0 }),
+      mockQuestion('move-1', 'relocation', { a: 1, b: -1, c: 0 }),
+    ]
+
+    expect(analyzeBirthTimeRankingRobustness(
+      groups,
+      questions,
+      {
+        'work-1': 'yes',
+        'home-1': 'yes',
+        'move-1': 'yes',
+      },
+      { source: 'none', dayparts: [] },
+    )).toEqual({
+      leaderGroupKey: 'a',
+      testedAnswerCount: 3,
+      stableAfterRemovingAnyOneAnswer: true,
+      influentialQuestionIds: [],
+    })
+  })
+
+  it('names the answers on which a fragile leader depends', () => {
+    const groups = [
+      mockGroup('a', 'morning'),
+      mockGroup('b', 'evening'),
+    ]
+    const questions = [
+      mockQuestion('work-1', 'work', { a: 1, b: 0 }),
+      mockQuestion('home-1', 'home', { a: 1, b: 0 }),
+      mockQuestion('move-1', 'relocation', { a: 0, b: 1 }),
+    ]
+
+    expect(analyzeBirthTimeRankingRobustness(
+      groups,
+      questions,
+      {
+        'work-1': 'yes',
+        'home-1': 'yes',
+        'move-1': 'yes',
+      },
+      { source: 'none', dayparts: [] },
+    )).toMatchObject({
+      leaderGroupKey: 'a',
+      testedAnswerCount: 3,
+      stableAfterRemovingAnyOneAnswer: false,
+      influentialQuestionIds: ['work-1', 'home-1'],
+    })
   })
 })
 

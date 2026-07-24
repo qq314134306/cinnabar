@@ -89,6 +89,10 @@ describe('BirthTimeFinder', () => {
 
     expect(screen.getByText('Most consistent with your answers')).toBeTruthy()
     expect(screen.getByText('+7 evidence points')).toBeTruthy()
+    expect(screen.getByText('One-answer removal check')).toBeTruthy()
+    expect(screen.getByRole('heading', {
+      name: 'Review or change your answers',
+    })).toBeTruthy()
     await waitFor(() => {
       expect(document.activeElement?.getAttribute('aria-labelledby')).toBe(
         'birth-time-finder-results-title',
@@ -102,6 +106,57 @@ describe('BirthTimeFinder', () => {
 
     expect(onApply).toHaveBeenCalledWith(candidates[0])
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('lets an early-stop user answer the remaining questions and revise evidence', async () => {
+    const candidates = [
+      candidate('a', 'Snake Hour', 'morning', 10),
+      candidate('b', 'Dog Hour', 'evening', 20),
+    ]
+    vi.spyOn(finder, 'buildBirthTimeCandidates').mockResolvedValue(candidates)
+    vi.spyOn(finder, 'buildBirthTimeQuestionsAsync').mockResolvedValue([
+      question('work-1', 'work'),
+      question('home-1', 'home'),
+      question('move-1', 'relocation'),
+      question('leadership-1', 'leadership'),
+      question('partnership-1', 'partnership'),
+    ])
+
+    render(createElement(BirthTimeFinder, {
+      birthInfo: BIRTH_INFO,
+      onApply: vi.fn(),
+      onClose: vi.fn(),
+    }))
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Prepare 13 Time Blocks',
+    }))
+    await screen.findByText('Question 1 of 5')
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
+
+    expect(await screen.findByRole('button', {
+      name: 'Ask remaining 2',
+    })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Ask remaining 2',
+    }))
+    expect(await screen.findByText('Question 4 of 5')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
+    expect(screen.getByText('Question 5 of 5')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
+
+    expect(await screen.findByText('+10 evidence points')).toBeTruthy()
+    expect(screen.queryByRole('button', {
+      name: /Ask remaining/,
+    })).toBeNull()
+    expect(screen.getAllByRole('button', {
+      name: /^Change question/,
+    })).toHaveLength(20)
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Change question 1 answer to No',
+    }))
+    expect(screen.getByText('+7 evidence points')).toBeTruthy()
   })
 
   it('keeps exact-place preparation failures inside the tool', async () => {

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { BirthInfo } from '@/lib/astro'
 import {
+  analyzeBirthTimeRankingRobustness,
   BirthTimeFinderInputError,
   buildBirthTimeCandidates,
   buildBirthTimeQuestionsAsync,
@@ -47,6 +48,16 @@ const SOURCES: Array<{
   { value: 'none', label: 'No useful time clue' },
 ]
 
+const ANSWER_OPTIONS: Array<{
+  value: EventAnswer
+  label: string
+}> = [
+  { value: 'yes', label: 'Yes' },
+  { value: 'no', label: 'No' },
+  { value: 'uncertain', label: 'Not sure' },
+  { value: 'skip', label: 'Prefer not to answer' },
+]
+
 const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
@@ -74,6 +85,7 @@ export function BirthTimeFinder({
   const [answers, setAnswers] = useState<Record<string, EventAnswer>>({})
   const [questionIndex, setQuestionIndex] = useState(0)
   const [ranking, setRanking] = useState<BirthTimeRanking | null>(null)
+  const [completeAllQuestions, setCompleteAllQuestions] = useState(false)
   const preparationIdRef = useRef(0)
   const sectionRef = useRef<HTMLElement | null>(null)
   const questionPanelRef = useRef<HTMLDivElement | null>(null)
@@ -99,6 +111,19 @@ export function BirthTimeFinder({
       boundaryTies: ranking.ranked.filter((item) => item.score === cutoffScore),
     }
   }, [ranking])
+  const remainingQuestionCount = useMemo(() => questions.filter(
+    (question) => !Object.hasOwn(answers, question.id),
+  ).length, [answers, questions])
+  const robustness = useMemo(() => (
+    ranking
+      ? analyzeBirthTimeRankingRobustness(
+          groups,
+          questions,
+          answers,
+          recall,
+        )
+      : null
+  ), [answers, groups, questions, ranking, recall])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -131,6 +156,7 @@ export function BirthTimeFinder({
     setAnswers({})
     setQuestionIndex(0)
     setRanking(null)
+    setCompleteAllQuestions(false)
   }
 
   const toggleDaypart = (daypart: RecallDaypart) => {
@@ -172,6 +198,7 @@ export function BirthTimeFinder({
       setQuestions(nextQuestions)
       setAnswers({})
       setQuestionIndex(0)
+      setCompleteAllQuestions(false)
       if (nextQuestions.length === 0) {
         setRanking(scoreBirthTimeGroups(nextGroups, [], {}, recall))
         setPhase('results')
@@ -205,13 +232,40 @@ export function BirthTimeFinder({
     setAnswers(nextAnswers)
     if (
       questionIndex >= questions.length - 1
-      || shouldStopBirthTimeQuestions(nextRanking)
+      || (
+        !completeAllQuestions
+        && shouldStopBirthTimeQuestions(nextRanking)
+      )
     ) {
       setRanking(nextRanking)
       setPhase('results')
     } else {
       setQuestionIndex((current) => current + 1)
     }
+  }
+
+  const continueWithRemainingQuestions = () => {
+    const nextQuestionIndex = questions.findIndex((question) => (
+      !Object.hasOwn(answers, question.id)
+    ))
+    if (nextQuestionIndex < 0) return
+    setCompleteAllQuestions(true)
+    setQuestionIndex(nextQuestionIndex)
+    setPhase('questions')
+  }
+
+  const changeAnswer = (
+    question: BirthTimeQuestion,
+    answer: EventAnswer,
+  ) => {
+    const nextAnswers = { ...answers, [question.id]: answer }
+    setAnswers(nextAnswers)
+    setRanking(scoreBirthTimeGroups(
+      groups,
+      questions,
+      nextAnswers,
+      recall,
+    ))
   }
 
   const currentQuestion = questions[questionIndex] ?? null
@@ -405,6 +459,104 @@ export function BirthTimeFinder({
             </p>
           )}
 
+          {!ranking.noClearSeparation && robustness?.leaderGroupKey && (
+            <div className="mt-3 rounded-lg border border-star/15 bg-star/[0.05] p-3 text-sm leading-relaxed text-text-secondary">
+              <p className="font-medium text-star-light">
+                One-answer removal check
+              </p>
+              {robustness.stableAfterRemovingAnyOneAnswer ? (
+                <p className="mt-1">
+                  The leading group remains highest when any one scored event
+                  answer is removed. This is a stability check inside the
+                  current heuristic—not proof that the hour is correct.
+                </p>
+              ) : (
+                <p className="mt-1">
+                  The leading group changes or ties when removing{' '}
+                  {robustness.influentialQuestionIds.map((questionId) => {
+                    const question = questions.find((item) => (
+                      item.id === questionId
+                    ))
+                    return question
+                      ? `${question.domain} (${question.startYear}–${question.endYear})`
+                      : questionId
+                  }).join(', ')}
+                  . Review those memories before applying a candidate.
+                </p>
+              )}
+            </div>
+          )}
+
+          {remainingQuestionCount > 0 && (
+            <div className="mt-3 rounded-lg border border-gold/15 bg-gold/[0.04] p-3">
+              <p className="text-sm leading-relaxed text-text-secondary">
+                The early-stop rule left {remainingQuestionCount}{' '}
+                {remainingQuestionCount === 1 ? 'question' : 'questions'} unused.
+                You can answer them before choosing a time block.
+              </p>
+              <Button
+                onClick={continueWithRemainingQuestions}
+                variant="secondary"
+                size="sm"
+                className="mt-2"
+              >
+                Ask remaining {remainingQuestionCount}
+              </Button>
+            </div>
+          )}
+
+          {Object.keys(answers).length > 0 && (
+            <section
+              aria-labelledby="birth-time-answer-review-title"
+              className="mt-4 rounded-xl border border-white/[0.08] bg-black/10 p-4"
+            >
+              <h6
+                id="birth-time-answer-review-title"
+                className="text-sm font-medium text-text"
+              >
+                Review or change your answers
+              </h6>
+              <p className="mt-1 text-xs leading-relaxed text-text-muted">
+                Every change reruns the same local scoring rules immediately.
+              </p>
+              <div className="mt-3 space-y-3">
+                {questions.filter((question) => (
+                  Object.hasOwn(answers, question.id)
+                )).map((question, index) => (
+                  <div
+                    key={question.id}
+                    className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3"
+                  >
+                    <p className="text-xs leading-relaxed text-text-secondary">
+                      {index + 1}. {question.prompt}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {ANSWER_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          aria-pressed={answers[question.id] === option.value}
+                          aria-label={`Change question ${index + 1} answer to ${option.label}`}
+                          onClick={() => changeAnswer(question, option.value)}
+                          className={`
+                            rounded-md border px-2.5 py-1 text-xs transition-colors
+                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
+                            ${answers[question.id] === option.value
+                              ? 'border-gold/40 bg-gold/[0.12] text-gold'
+                              : 'border-white/[0.08] text-text-muted hover:bg-white/[0.04]'
+                            }
+                          `}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {displayedResults.cards.length > 0 && (
             <div className="mt-4 grid gap-3 lg:grid-cols-3">
             {displayedResults.cards.map((item, index) => {
@@ -558,7 +710,9 @@ export function BirthTimeFinder({
         Method boundary: the score compares annual Life Palace placement,
         Major Limit palace, and the natal-palace locations of annual Four
         Transformations. It is a deterministic reflective heuristic, not
-        scientific validation or proof of a correct hour.
+        scientific validation or proof of a correct hour. Twins or multiples
+        born close together may remain indistinguishable without independent
+        records.
       </p>
     </section>
   )

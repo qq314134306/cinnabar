@@ -42,12 +42,16 @@ export function BirthTimeSensitivity() {
   const [finderOpen, setFinderOpen] = useState(false)
   const [appliedStatus, setAppliedStatus] = useState<string | null>(null)
   const finderButtonRef = useRef<HTMLButtonElement | null>(null)
+  const timeUnknown = birthInfo?.birthTimeUnknown === true
   const capturePending = useFutureReportActivityStore(
     (state) => state.captureCount > 0,
   )
 
   const buildState = useMemo(() => {
     if (!chart || !birthInfo || birthInfo.birthTimeReliable !== false) {
+      return { result: null, failed: false, attempt: retryVersion }
+    }
+    if (birthInfo.birthTimeUnknown === true) {
       return { result: null, failed: false, attempt: retryVersion }
     }
 
@@ -94,22 +98,24 @@ export function BirthTimeSensitivity() {
     >
       <div className="max-w-3xl">
         <p className="text-[10px] uppercase tracking-[0.18em] text-gold/70">
-          Approximate birth time
+          {timeUnknown ? 'Unknown birth time' : 'Approximate birth time'}
         </p>
         <h3
           id="birth-time-sensitivity-title"
           className="mt-1 text-base font-semibold text-text lg:text-lg"
         >
-          Birth-Time Sensitivity Check
+          {timeUnknown
+            ? 'Start With All 13 Time Blocks'
+            : 'Birth-Time Sensitivity Check'}
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-          Your time was marked approximate. These three local calculations
-          compare the neighboring traditional two-hour windows; they do not
-          identify or rectify your exact birth time.
+          {timeUnknown
+            ? 'No birth hour was supplied. Noon exists only as an internal engine placeholder and is not displayed as your chart; use the all-block comparison before treating hour-based structure as meaningful.'
+            : 'Your time was marked approximate. These three local calculations compare the neighboring traditional two-hour windows; they do not identify or rectify your exact birth time.'}
         </p>
       </div>
 
-      {buildState.failed ? (
+      {!timeUnknown && buildState.failed ? (
         <div
           role="alert"
           className="mt-4 rounded-lg border border-misfortune/20 bg-misfortune/10 p-3"
@@ -130,8 +136,20 @@ export function BirthTimeSensitivity() {
             Retry time comparison
           </button>
         </div>
-      ) : buildState.result ? (
+      ) : timeUnknown || buildState.result ? (
         <>
+          {timeUnknown && (
+            <p
+              role="status"
+              className="mt-4 rounded-lg border border-gold/20 bg-gold/[0.07] px-3 py-2.5 text-sm leading-relaxed text-text-secondary"
+            >
+              No placeholder chart is shown. Cinnabar will independently
+              true-solar-resolve every civil candidate after an exact
+              birthplace is entered below.
+            </p>
+          )}
+          {!timeUnknown && buildState.result && (
+            <>
           <div className="mt-4 grid gap-3 lg:grid-cols-3">
             {buildState.result.scenarios.map((scenario) => {
               const stars = scenario.lifePalace?.majorStars.map(
@@ -228,6 +246,8 @@ export function BirthTimeSensitivity() {
               ? 'The neighboring windows change at least one core chart structure. Treat each as a possibility; this comparison does not determine the correct birth time.'
               : 'The neighboring windows keep the displayed core structure stable. Other chart details may still differ; this comparison does not determine the correct birth time.'}
           </p>
+            </>
+          )}
 
           <div className="mt-4">
             <button

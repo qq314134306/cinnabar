@@ -101,6 +101,13 @@ export interface BirthTimeRanking {
   noClearSeparation: boolean
 }
 
+export interface BirthTimeRankingRobustness {
+  leaderGroupKey: string | null
+  testedAnswerCount: number
+  stableAfterRemovingAnyOneAnswer: boolean
+  influentialQuestionIds: string[]
+}
+
 export class BirthTimeFinderInputError extends Error {}
 
 export const CIVIL_TIME_BLOCKS: CivilTimeBlock[] = [
@@ -318,6 +325,7 @@ export async function buildBirthTimeCandidates(
       trueSolarEnabled: true,
       resolvedBirthTime: resolved,
       birthTimeReliable: false,
+      birthTimeUnknown: false,
     }
 
     candidates.push({
@@ -707,4 +715,63 @@ export function shouldStopBirthTimeQuestions(
     && ranking.scoredDomains.length >= 3
     && ranking.leaderMargin >= 4
   )
+}
+
+function highestScoringGroupKeys(
+  ranking: BirthTimeRanking,
+): string[] {
+  const highestScore = ranking.ranked[0]?.score
+  if (highestScore === undefined) return []
+  return ranking.ranked
+    .filter((item) => item.score === highestScore)
+    .map((item) => item.group.key)
+}
+
+export function analyzeBirthTimeRankingRobustness(
+  groups: BirthTimeCandidateGroup[],
+  questions: BirthTimeQuestion[],
+  answers: Record<string, EventAnswer>,
+  recall: RecallEvidence,
+): BirthTimeRankingRobustness {
+  const ranking = scoreBirthTimeGroups(groups, questions, answers, recall)
+  const leaderKeys = highestScoringGroupKeys(ranking)
+  const testedQuestionIds = questions
+    .filter((question) => (
+      answers[question.id] === 'yes' || answers[question.id] === 'no'
+    ))
+    .map((question) => question.id)
+
+  if (leaderKeys.length !== 1 || testedQuestionIds.length === 0) {
+    return {
+      leaderGroupKey: null,
+      testedAnswerCount: testedQuestionIds.length,
+      stableAfterRemovingAnyOneAnswer: false,
+      influentialQuestionIds: [],
+    }
+  }
+
+  const leaderGroupKey = leaderKeys[0]
+  const influentialQuestionIds = testedQuestionIds.filter((questionId) => {
+    const withoutQuestion = scoreBirthTimeGroups(
+      groups,
+      questions,
+      {
+        ...answers,
+        [questionId]: 'uncertain',
+      },
+      recall,
+    )
+    const alternateLeaders = highestScoringGroupKeys(withoutQuestion)
+    return (
+      alternateLeaders.length !== 1
+      || alternateLeaders[0] !== leaderGroupKey
+    )
+  })
+
+  return {
+    leaderGroupKey,
+    testedAnswerCount: testedQuestionIds.length,
+    stableAfterRemovingAnyOneAnswer: influentialQuestionIds.length === 0,
+    influentialQuestionIds,
+  }
 }

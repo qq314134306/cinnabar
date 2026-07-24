@@ -113,6 +113,63 @@ describe('BirthForm', () => {
     )).toBeTruthy()
   })
 
+  it('accepts a completely unknown hour without presenting noon as user input', async () => {
+    mocks.resolveBirthTimeAsync.mockResolvedValueOnce({
+      year: 1990,
+      month: 1,
+      day: 1,
+      hour: 12,
+      minute: 0,
+      timeIndex: 6,
+      originalShichen: '午时',
+      correctedShichen: '午时',
+      correctionMinutes: 0,
+      applied: false,
+      crossedDate: false,
+      location: null,
+    })
+    render(createElement(BirthForm))
+    fireEvent.change(screen.getByRole('combobox', {
+      name: 'Time of Birth',
+    }), {
+      target: { value: '20' },
+    })
+    fireEvent.change(screen.getByRole('combobox', {
+      name: 'How accurate is this time?',
+    }), {
+      target: { value: 'unknown' },
+    })
+
+    expect((screen.getByRole('combobox', {
+      name: 'Time of Birth',
+    }) as HTMLSelectElement).disabled).toBe(true)
+    expect((screen.getByRole('checkbox', {
+      name: /Auto true solar time correction/,
+    }) as HTMLInputElement).disabled).toBe(true)
+    expect(screen.getByRole('status').textContent).toContain(
+      'Noon will be used only as a temporary chart position.',
+    )
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Continue to Time Search',
+    }))
+    await waitFor(() => {
+      expect(useChartStore.getState().chart).not.toBeNull()
+    })
+
+    expect(mocks.resolveBirthTimeAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hour: 12,
+        enabled: false,
+      }),
+    )
+    expect(useChartStore.getState().birthInfo).toMatchObject({
+      hour: 12,
+      birthTimeReliable: false,
+      birthTimeUnknown: true,
+    })
+  })
+
   it('shows a recoverable error when chart generation cannot complete', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     mocks.resolveBirthTimeAsync.mockRejectedValueOnce(new Error('test failure'))

@@ -157,7 +157,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   independently true-solar-resolves early Rat, eleven standard blocks, and
   late Rat, groups equivalent resolved charts, asks at most five skippable
   non-sensitive past-event questions, and exposes deterministic evidence
-  points plus their ledger. Only an explicit candidate action atomically
+  points plus their ledger. Early-stop leftovers and prior answers remain
+  user-reviewable, and a one-answer-removal check reports ranking stability
+  without a confidence claim. A completely unknown time uses a hidden noon
+  engine position only to enter this flow; derived hour-dependent surfaces
+  remain locked. Only an explicit candidate action atomically
   replaces the chart, preserves approximate status, and clears chart-derived
   caches.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.

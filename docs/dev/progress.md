@@ -55,7 +55,17 @@
   remain visible even when several civil entries share one engine chart.
   Candidate and annual-fact work yields to the main thread in cancellable
   batches, and question/result transitions move keyboard focus predictably.
-  The flow makes no probability or minute-level claim.
+  The result now preserves user agency after early stopping: remaining
+  questions can be completed, every prior answer can be revised with immediate
+  deterministic rescoring, and a one-answer-removal check discloses whether
+  the current leader depends on one remembered event. Twins/multiples are
+  explicitly named as a limitation. The flow makes no probability or minute-
+  level claim.
+  The birth form also accepts a completely unknown hour. Noon exists only as
+  an internal engine position: the palace chart, local snapshot, AI reading,
+  timeline, sharing, paid report, and compatibility prefill do not consume or
+  display it. The all-block finder remains available, and applying a real
+  civil candidate clears the placeholder state before derived features unlock.
   Applying a candidate is explicit, preserves `birthTimeReliable=false`,
   atomically replaces chart plus birth input, and clears chart-derived caches.
   Paid-report access, checkout, and generation are also invalidated by the
@@ -64,10 +74,10 @@
   cache. Once payment capture begins, chart replacement, Start Over, and
   persona changes remain locked until verification finishes so a successful
   purchase cannot be silently detached mid-capture. The complete app passes
-  71 test files / 692 tests, lint, the strict
+  71 test files / 701 tests, lint, the strict
   production build, and the dependency audit with zero known vulnerabilities.
-  The finder is an 18.42 kB raw / 6.64 kB gzip lazy chunk; ChartDisplay remains
-  27.30 kB raw / 9.09 kB gzip, and every JavaScript chunk remains below 500
+  The finder is a 22.15 kB raw / 7.71 kB gzip lazy chunk; ChartDisplay remains
+  28.90 kB raw / 9.53 kB gzip, and every JavaScript chunk remains below 500
   kB. A real desktop production preview prepared all Chengdu candidates in
   about 1.3 seconds, asked five questions, displayed a transparent ranked
   ledger, applied Dragon Hour as a Rabbit-Hour solar-resolved approximate

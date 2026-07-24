@@ -94,6 +94,32 @@ describe('BirthTimeSensitivity', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
+  it('routes a completely unknown hour directly to all 13 blocks', () => {
+    const info = {
+      ...birthInfo(false),
+      birthTimeUnknown: true,
+    }
+    useChartStore.setState({
+      birthInfo: info,
+      chart: generateChart(info),
+    })
+
+    render(createElement(BirthTimeSensitivity))
+
+    expect(screen.getByRole('heading', {
+      name: 'Start With All 13 Time Blocks',
+    })).toBeTruthy()
+    expect(screen.queryByRole('heading', {
+      name: 'Earlier window',
+    })).toBeNull()
+    expect(screen.getByRole('status').textContent).toContain(
+      'No placeholder chart is shown.',
+    )
+    expect(screen.getByRole('button', {
+      name: 'Explore all time blocks with life events',
+    })).toBeTruthy()
+  })
+
   it('lazy-loads the local shortlist only after its explicit entry action', async () => {
     const info = birthInfo(false)
     useChartStore.setState({

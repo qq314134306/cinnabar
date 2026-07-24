@@ -402,8 +402,16 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
         <p>
           <span className="text-text-muted">Hour</span>{' '}
           <span className="text-text">
-            {translateShichen(chart.time)} {chart.timeRange}
-            {birthInfo.birthTimeReliable === false ? ' · Approximate' : ''}
+            {birthInfo.birthTimeUnknown === true
+              ? 'Unknown · shortlist required'
+              : (
+                <>
+                  {translateShichen(chart.time)} {chart.timeRange}
+                  {birthInfo.birthTimeReliable === false
+                    ? ' · Approximate'
+                    : ''}
+                </>
+              )}
           </span>
         </p>
         {showCorrection && resolvedTime && (
@@ -509,6 +517,26 @@ export function ChartDisplay() {
   const [selectedPalace, setSelectedPalace] = useState<string | null>(null)
 
   if (!chart || !birthInfo) return null
+  if (birthInfo.birthTimeUnknown === true) {
+    return (
+      <div className="relative rounded-2xl border border-gold/20 bg-gradient-to-br from-gold/[0.06] to-transparent p-4 shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl lg:p-6">
+        <div className="max-w-3xl">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-gold/70">
+            Chart held until a time block is chosen
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-text lg:text-xl">
+            Birth hour not set
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            Your date and gender are saved, but Cinnabar is not displaying the
+            noon placeholder as a natal chart. Compare all 13 time blocks
+            below, then explicitly apply the candidate you want to inspect.
+          </p>
+        </div>
+        <BirthTimeSensitivity />
+      </div>
+    )
+  }
 
   const palaceData = parsePalaces(chart)
   const selectedPalaceData = palaceData.find(

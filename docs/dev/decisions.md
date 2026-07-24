@@ -1057,6 +1057,14 @@ before chart generation. Candidates that resolve to the same engine date and
 time index are one equivalent chart group and cannot be separated by event
 scoring.
 
+A completely unknown hour is a first-class input state. The browser may use
+noon only as a private engine position needed to host the finder, marked by
+`birthTimeUnknown=true`; it must not render that position as a natal chart or
+feed hour-dependent snapshots, AI, timeline, sharing, paid reports, or
+compatibility prefill. Explicitly applying one of the independently resolved
+civil candidates clears the unknown marker while retaining
+`birthTimeReliable=false`.
+
 The optional rough-time recollection is bounded to ±2 evidence points. The
 question engine considers only elapsed adult years, chooses at most five
 different-domain three-year windows, and allows Yes, No, Not sure, or Prefer
@@ -1073,7 +1081,12 @@ take effect between batches.
 
 Yes contributes signal ×2 and No contributes signal ×−1 because remembered
 events are stronger evidence than remembered absence. Early stopping requires
-three scored answers, three domains, and a four-point leader margin. Results
+three scored answers, three domains, and a four-point leader margin. Early
+stopping is advisory: the user may continue through every remaining selected
+question. Every recorded answer remains editable on the result surface and
+rescoring uses the same pure function. A separate stability check removes each
+scored answer once and reports whether the same unique group remains highest;
+this is a sensitivity diagnostic, never confidence or probability. Results
 show at most three unambiguous groups plus every non-zero contribution. A tie
 that crosses the third-place cutoff is disclosed as one complete, non-
 applicable tier rather than arbitrarily truncated. Fewer than three scored
@@ -1083,3 +1096,4 @@ only mutation. It atomically
 replaces `birthInfo` and `chart`, retains `birthTimeReliable=false`, retains
 the candidate's independently resolved time, and clears every chart-derived
 content cache.
+Twins or multiples born close together are an explicit method limitation.

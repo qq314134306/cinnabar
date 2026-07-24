@@ -326,7 +326,11 @@ export function MatchAnalysis() {
     (state) => state.captureCount > 0,
   )
   const currentBirthInfo = useChartStore((state) => (
-    state.chart && state.birthInfo ? state.birthInfo : null
+    state.chart
+      && state.birthInfo
+      && state.birthInfo.birthTimeUnknown !== true
+      ? state.birthInfo
+      : null
   ))
   const publicAiEnabled = isPublicAiReadingEnabled()
 

@@ -71,12 +71,13 @@ const TAB_ROUTES: Record<TabType, { path: string; title: string }> = {
 }
 
 export default function App() {
-  const { chart } = useChartStore()
+  const { chart, birthInfo } = useChartStore()
   const capturePending = useFutureReportActivityStore(
     (state) => state.captureCount > 0,
   )
   const initAuth = useAuthStore((s) => s.init)
   const [activeTab, setActiveTab] = useState<TabType>('chart')
+  const timeSearchRequired = birthInfo?.birthTimeUnknown === true
 
   // Hydrate the Supabase session + bind the auth listener once.
   useEffect(() => {
@@ -153,6 +154,14 @@ export default function App() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
+                  disabled={timeSearchRequired && (
+                    tab.key === 'timeline' || tab.key === 'share'
+                  )}
+                  title={timeSearchRequired && (
+                    tab.key === 'timeline' || tab.key === 'share'
+                  )
+                    ? 'Choose a birth-time block before opening this feature.'
+                    : undefined}
                   aria-current={activeTab === tab.key ? 'page' : undefined}
                   className={`
                     group relative px-4 py-2 rounded-lg
@@ -161,6 +170,7 @@ export default function App() {
                       ? 'text-text'
                       : 'text-text-muted hover:text-text-secondary'
                     }
+                    disabled:cursor-not-allowed disabled:opacity-40
                   `}
                 >
                   <span
@@ -220,6 +230,14 @@ export default function App() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
+              disabled={timeSearchRequired && (
+                tab.key === 'timeline' || tab.key === 'share'
+              )}
+              title={timeSearchRequired && (
+                tab.key === 'timeline' || tab.key === 'share'
+              )
+                ? 'Choose a birth-time block before opening this feature.'
+                : undefined}
               aria-current={activeTab === tab.key ? 'page' : undefined}
               className={`
                 flex flex-col items-center gap-1 px-4 py-1.5 rounded-lg
@@ -228,6 +246,7 @@ export default function App() {
                   ? 'text-gold'
                   : 'text-text-muted'
                 }
+                disabled:cursor-not-allowed disabled:opacity-40
               `}
             >
               <span

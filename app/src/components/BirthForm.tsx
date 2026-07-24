@@ -17,7 +17,10 @@ const HOUR_OPTIONS = getShichenOptions()
 const BIRTH_TIME_RELIABILITY_OPTIONS = [
   { value: 'recorded', label: 'Recorded or known accurately' },
   { value: 'approximate', label: 'Approximate or uncertain' },
+  { value: 'unknown', label: 'Completely unknown — compare all 13 blocks' },
 ]
+
+type BirthTimeReliability = 'recorded' | 'approximate' | 'unknown'
 
 const GENDER_OPTIONS = [
   { value: 'male', label: 'Male', icon: '♂' },
@@ -31,7 +34,8 @@ export function BirthForm() {
   const [month, setMonth] = useState(1)
   const [day, setDay] = useState(1)
   const [hour, setHour] = useState(12)
-  const [birthTimeReliability, setBirthTimeReliability] = useState<'recorded' | 'approximate'>('recorded')
+  const [birthTimeReliability, setBirthTimeReliability] =
+    useState<BirthTimeReliability>('recorded')
   const [gender, setGender] = useState<Gender>('male')
   const [birthplace, setBirthplace] = useState('')
   const [trueSolarEnabled, setTrueSolarEnabled] = useState(true)
@@ -91,10 +95,11 @@ export function BirthForm() {
   }
 
   const handleBirthTimeReliabilityChange = (
-    nextReliability: 'recorded' | 'approximate',
+    nextReliability: BirthTimeReliability,
   ) => {
     setBirthTimeReliability(nextReliability)
     setTrueSolarEnabled(nextReliability === 'recorded')
+    if (nextReliability === 'unknown') setHour(12)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,11 +109,12 @@ export function BirthForm() {
 
     try {
       const safeDay = clampDayToMonth(year, month, day)
+      const submittedHour = birthTimeReliability === 'unknown' ? 12 : hour
       const resolvedBirthTime = await resolveBirthTimeAsync({
         year,
         month,
         day: safeDay,
-        hour,
+        hour: submittedHour,
         birthplace,
         enabled: trueSolarEnabled,
       })
@@ -116,12 +122,13 @@ export function BirthForm() {
         year,
         month,
         day: safeDay,
-        hour,
+        hour: submittedHour,
         gender,
         birthplace: birthplace.trim() || undefined,
         trueSolarEnabled,
         resolvedBirthTime,
         birthTimeReliable: birthTimeReliability === 'recorded',
+        birthTimeUnknown: birthTimeReliability === 'unknown',
       }
       const { generateChart } = await import('@/lib/astro')
       const chart = generateChart(birthInfo)
@@ -220,13 +227,25 @@ export function BirthForm() {
           options={HOUR_OPTIONS}
           value={hour}
           onChange={(e) => setHour(Number(e.target.value))}
+          disabled={birthTimeReliability === 'unknown'}
         />
+        {birthTimeReliability === 'unknown' && (
+          <p role="status" className="-mt-4 text-xs leading-relaxed text-gold/80">
+            Noon will be used only as a temporary chart position. After
+            casting, open the 13-block life-event comparison before treating
+            any hour-based structure as meaningful.
+          </p>
+        )}
         <Select
           label="How accurate is this time?"
           options={BIRTH_TIME_RELIABILITY_OPTIONS}
           value={birthTimeReliability}
           onChange={(e) => handleBirthTimeReliabilityChange(
-            e.target.value === 'approximate' ? 'approximate' : 'recorded',
+            e.target.value === 'unknown'
+              ? 'unknown'
+              : e.target.value === 'approximate'
+                ? 'approximate'
+                : 'recorded',
           )}
         />
 
@@ -304,7 +323,9 @@ export function BirthForm() {
           <span>
             <span className="block text-sm text-text-secondary font-medium">Auto true solar time correction</span>
             <span className="block text-xs text-text-muted mt-0.5">
-              {birthTimeReliability === 'approximate'
+              {birthTimeReliability === 'unknown'
+                ? 'Unavailable for a placeholder hour. Every shortlist candidate will be corrected independently.'
+                : birthTimeReliability === 'approximate'
                 ? trueSolarEnabled
                   ? 'Enabled by you. Each nearby time window will be corrected separately.'
                   : 'Off by default for an approximate time. You can enable it for comparison.'
@@ -315,6 +336,7 @@ export function BirthForm() {
             type="checkbox"
             checked={trueSolarEnabled}
             onChange={(e) => setTrueSolarEnabled(e.target.checked)}
+            disabled={birthTimeReliability === 'unknown'}
             className="h-5 w-5 accent-star"
           />
         </label>
@@ -344,7 +366,11 @@ export function BirthForm() {
             </>
           ) : (
             <>
-              <span>Cast My Chart</span>
+              <span>
+                {birthTimeReliability === 'unknown'
+                  ? 'Continue to Time Search'
+                  : 'Cast My Chart'}
+              </span>
               <svg
                 className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
                 fill="none"

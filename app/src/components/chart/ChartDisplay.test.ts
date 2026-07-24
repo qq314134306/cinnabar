@@ -160,4 +160,28 @@ describe('ChartDisplay palace explanations', () => {
       name: 'Birth-Time Sensitivity Check',
     })).toBeTruthy()
   })
+
+  it('labels a completely unknown hour as a placeholder', () => {
+    useChartStore.setState({
+      birthInfo: {
+        ...BIRTH_INFO,
+        trueSolarEnabled: false,
+        birthTimeReliable: false,
+        birthTimeUnknown: true,
+      },
+      chart: CHART,
+    })
+
+    render(createElement(ChartDisplay))
+
+    expect(screen.getByRole('heading', {
+      name: 'Birth hour not set',
+    })).toBeTruthy()
+    expect(screen.queryByRole('button', {
+      name: 'Explain Life Palace',
+    })).toBeNull()
+    expect(screen.getByRole('heading', {
+      name: 'Start With All 13 Time Blocks',
+    })).toBeTruthy()
+  })
 })
