@@ -130,6 +130,9 @@ function scoreLatinMatch(query: string, place: Birthplace): number {
 }
 
 export async function resolveBirthTimeAsync(input: ResolveBirthTimeInput): Promise<ResolvedBirthTime> {
+  if (!input.enabled || !input.birthplace?.trim()) {
+    return resolveBirthTime({ ...input, birthplaces: [] })
+  }
   const birthplaces = await loadBirthplaceData()
   return resolveBirthTime({ ...input, birthplaces })
 }
@@ -178,8 +181,15 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
 let birthplaceIndexPromise: Promise<Birthplace[]> | null = null
 
 async function loadBirthplaceData(): Promise<Birthplace[]> {
-  birthplaceIndexPromise ??= buildBirthplaceIndex()
-  return birthplaceIndexPromise
+  const request = birthplaceIndexPromise ??= buildBirthplaceIndex()
+  try {
+    return await request
+  } catch (error) {
+    if (birthplaceIndexPromise === request) {
+      birthplaceIndexPromise = null
+    }
+    throw error
+  }
 }
 
 async function buildBirthplaceIndex(): Promise<Birthplace[]> {

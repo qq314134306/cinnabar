@@ -409,12 +409,17 @@ reports have been reviewed and payment/browser domains are verified.
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city
 English names; UTC offsets are DST-aware via the built-in Intl API (China
-entries default to Asia/Shanghai).
+entries default to Asia/Shanghai). Disabled correction or blank birthplace
+bypasses the location index entirely. A failed lazy index request releases only
+its own cached promise so a later attempt can retry.
 
 `src/components/BirthForm.tsx` + `BirthForm.test.ts`: chart-casting entry. The
 year, month, and day controls retain explicit accessible names, invalid
 month/day combinations are clamped, and a generation failure must leave the
 form retryable with a visible alert rather than only a console message.
+Background birthplace-match failure is contained as fixed, input-described,
+non-blocking status copy; editing retries it and disabling correction remains
+an explicit index-independent path to a chart.
 
 `src/components/AuthControl.tsx` + `AuthControl.test.ts`: header authentication
 state and recovery. When cookie authority is unknown, session retry remains

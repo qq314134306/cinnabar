@@ -39,6 +39,12 @@
 
 ## Recently Completed
 
+- Prevented lazy birthplace data from blocking the base chart. Blank birthplace
+  and disabled true-solar correction now bypass the location index; a failed
+  index promise releases its owned cache entry for a later retry. Background
+  matching catches failures instead of creating an unhandled rejection and
+  shows fixed, input-described, non-blocking recovery copy. A rendered test
+  proves failure containment and successful retry after editing the city.
 - Closed the natal-reading error boundary without changing its visual design.
   Server-owned `ReadingApiError` copy remains available for actionable
   validation/availability states, while unknown runtime exceptions now map to
@@ -683,7 +689,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 63 Vitest files / 623 tests in
+The current cumulative local baseline passed 63 Vitest files / 624 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the

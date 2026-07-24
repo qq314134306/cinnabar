@@ -37,6 +37,7 @@ export function BirthForm() {
   const [trueSolarEnabled, setTrueSolarEnabled] = useState(true)
   const [matchedBirthplace, setMatchedBirthplace] = useState<Birthplace | null>(null)
   const [matchingBirthplace, setMatchingBirthplace] = useState(false)
+  const [birthplaceMatchError, setBirthplaceMatchError] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -54,13 +55,21 @@ export function BirthForm() {
     if (!trueSolarEnabled || !trimmedBirthplace) {
       setMatchedBirthplace(null)
       setMatchingBirthplace(false)
+      setBirthplaceMatchError(false)
       return
     }
 
     setMatchingBirthplace(true)
+    setBirthplaceMatchError(false)
     findBirthplaceAsync(trimmedBirthplace)
       .then((place) => {
         if (active) setMatchedBirthplace(place)
+      })
+      .catch((error) => {
+        if (!active) return
+        console.error('Birthplace matching failed:', error)
+        setMatchedBirthplace(null)
+        setBirthplaceMatchError(true)
       })
       .finally(() => {
         if (active) setMatchingBirthplace(false)
@@ -261,6 +270,8 @@ export function BirthForm() {
             trueSolarEnabled
               ? matchingBirthplace
                 ? 'Matching your birthplace...'
+                : birthplaceMatchError
+                  ? 'City matching is temporarily unavailable. Edit the city to retry, or turn off correction to cast without it.'
                 : matchedBirthplace
                 ? `Matched ${matchedBirthplace.enName ?? matchedBirthplace.name}${matchedBirthplace.country ? `, ${matchedBirthplace.country}` : ''} — true solar time will be fine-tuned automatically.`
                 : birthplace.trim()
@@ -268,6 +279,7 @@ export function BirthForm() {
                   : 'Type your city and it will be matched automatically.'
               : 'True solar time correction is off.'
           }
+          hintRole={birthplaceMatchError ? 'status' : undefined}
           value={birthplace}
           onChange={(e) => setBirthplace(e.target.value)}
         />

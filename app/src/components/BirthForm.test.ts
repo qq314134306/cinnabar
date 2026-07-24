@@ -109,4 +109,38 @@ describe('BirthForm', () => {
       gender: 'male',
     })
   })
+
+  it('contains a birthplace lookup failure and recovers after the city changes', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    mocks.findBirthplaceAsync
+      .mockRejectedValueOnce(new Error('private chunk detail'))
+      .mockResolvedValueOnce({
+        name: 'London',
+        country: 'United Kingdom',
+        enName: 'London',
+        longitude: -0.1276,
+        tz: 'Europe/London',
+      })
+    render(createElement(BirthForm))
+
+    const birthplaceInput = screen.getByRole('textbox', {
+      name: 'Birthplace (optional)',
+    })
+    fireEvent.change(birthplaceInput, { target: { value: 'London' } })
+
+    const lookupStatus = await screen.findByRole('status')
+    expect(lookupStatus.textContent).toBe(
+      'City matching is temporarily unavailable. Edit the city to retry, or turn off correction to cast without it.',
+    )
+    expect(lookupStatus.textContent).not.toContain('private chunk detail')
+    expect(birthplaceInput.getAttribute('aria-describedby')).toBe(lookupStatus.id)
+
+    fireEvent.change(birthplaceInput, { target: { value: 'London ' } })
+
+    expect(await screen.findByText(
+      'Matched London, United Kingdom — true solar time will be fine-tuned automatically.',
+    )).toBeTruthy()
+    expect(screen.queryByRole('status')).toBeNull()
+    expect(mocks.findBirthplaceAsync).toHaveBeenCalledTimes(2)
+  })
 })

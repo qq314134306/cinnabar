@@ -876,3 +876,20 @@ The owned error is rendered as an announced alert and linked to the reading
 action. Starting a retry clears the stale alert before opening the next stream.
 Controller, request-key, and chart-identity checks still decide whether any
 failure is allowed to commit.
+
+## D038 - Birthplace Data Cannot Block a Base Chart
+
+True-solar correction needs the lazy local birthplace index only when the user
+both enables correction and supplies a non-empty birthplace. Blank birthplace
+or disabled correction resolves directly from the entered wall-clock fields,
+so the base chart does not depend on the location, pinyin, or world-city chunks.
+
+A rejected index build clears the cached promise only if that promise is still
+the current owner. This permits a later invocation to retry without allowing an
+older rejection to erase a newer request.
+
+Background form matching catches index failure locally, clears any stale match,
+and exposes fixed non-blocking status copy described by the birthplace input.
+Editing the city starts a new match; turning correction off is the explicit
+index-independent recovery path. Chart submission retains its separate
+announced failure and retry boundary.

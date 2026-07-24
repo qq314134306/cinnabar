@@ -128,7 +128,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/BirthForm.tsx` + `BirthForm.test.ts` - birth input,
   birthplace matching entry, and true solar time options. Date selects have
   explicit accessible names; chart-generation failures remain visibly
-  retryable.
+  retryable. Background place-index failure is input-described and non-blocking;
+  editing retries it, while blank-place or disabled-correction casts bypass the
+  index.
 - `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
@@ -353,7 +355,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   failures restore Build and expose an announced retry state. The full range
   covers ten decadal cycles and is explicitly not presented as a lifespan
   estimate.
-- `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via Intl).
+- `app/src/lib/true-solar-time.ts` - true solar time calculation and birthplace
+  matching helpers (Chinese, pinyin, and world-city input; DST-aware offsets via
+  Intl). Blank/disabled correction bypasses the lazy index, and a failed index
+  promise is released for a later retry.
 - `app/src/lib/birthplace-data.json` - local Chinese city/region coordinate dataset.
 - `app/src/lib/world-cities.json` - curated global city dataset (name, country, longitude, IANA timezone, aliases).
 - `app/src/lib/birth-date.ts` - birth date handling.
