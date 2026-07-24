@@ -113,6 +113,15 @@ boundaries with announced loading states. Do not make the landing page pay for
 chart calculation, palace rendering, image-export, Markdown, or payment
 dependencies eagerly.
 
+The first launchable product surface is the account-independent core: blank-
+place chart casting, the deterministic local snapshot, Life Timeline,
+Compatibility, and Share Card editing/export. It must remain useful when public
+AI and Future Report payment flags are false or absent. A core release
+acceptance pass covers those flows at desktop and 390-by-844 mobile sizes with
+no horizontal page overflow or browser warning/error log. A plain Vite preview
+does not host `api/` and therefore cannot prove authentication or other server
+routes.
+
 `src/components/LazySurface.tsx` + `LazySurface.test.ts`: shared containment
 for every `React.lazy` product region. Pending imports expose an announced
 status. Import or render failure replaces only that region with an announced

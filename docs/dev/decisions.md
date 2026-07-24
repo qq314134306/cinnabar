@@ -893,3 +893,20 @@ and exposes fixed non-blocking status copy described by the birthplace input.
 Editing the city starts a new match; turning correction off is the explicit
 index-independent recovery path. Chart submission retains its separate
 announced failure and retry boundary.
+
+## D039 - The First Launch Surface Does Not Need External Providers
+
+The first useful release is the deterministic local core: cast a chart without
+a birthplace, inspect the chart and current-model snapshot, build a Life
+Timeline, compare two local charts, and customize or export the Share Card.
+These flows must remain reachable when public AI and Future Report payment flags
+are false or absent. Accounts, DeepSeek, Make, Supabase migrations, and PayPal
+are enhancements or provider-backed boundaries, not prerequisites for local
+product value.
+
+Release acceptance for this core uses a production Vite build at desktop and
+390-by-844 mobile sizes. It checks the full local flow, mobile navigation,
+absence of document-level horizontal overflow, and an empty browser
+warning/error log. Because `vite preview` does not serve Vercel `api/`
+functions, any authentication-unavailable state in that harness is not
+provider proof and does not replace an isolated Vercel Preview.

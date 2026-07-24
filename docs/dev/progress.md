@@ -39,6 +39,15 @@
 
 ## Recently Completed
 
+- Accepted the provider-independent core against the real 2026-07-24
+  production Vite build. Desktop navigation cast the default blank-place chart,
+  rendered the deterministic snapshot, built the focused Life Timeline and
+  score radar, generated the default local Compatibility result, and verified
+  Share Card draft cancel plus save. At 390-by-844, mobile navigation reached
+  the existing chart and timeline result with no document-level horizontal
+  overflow. The browser warning/error log stayed empty. The harness does not
+  serve Vercel `api/`, so its authentication-unavailable header is expected and
+  is not server/provider evidence.
 - Prevented lazy birthplace data from blocking the base chart. Blank birthplace
   and disabled true-solar correction now bypass the location index; a failed
   index promise releases its owned cache entry for a later retry. Background
@@ -830,6 +839,10 @@ hosted run or artifact exists yet.
 
 ## Next Useful Work
 
+- Treat the next approved candidate as a provider-independent core release:
+  keep both public-AI and Future Report payment flags false, run the hosted
+  candidate gates, then repeat the accepted chart/timeline/compatibility/share
+  flow in an isolated Vercel Preview before promotion.
 - Explicitly enable GitHub Actions for `qq314134306/cinnabar`, run the
   candidate-verification workflow, require both jobs to pass, and inspect the
   sanitized database artifact. Do not claim hosted proof from workflow YAML or
