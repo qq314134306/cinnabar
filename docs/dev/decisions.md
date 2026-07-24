@@ -1134,3 +1134,22 @@ grounded narrative from silently disagreeing about star or palace ownership.
 If multiple transformations share one palace, the palace context remains
 shared but pressed state belongs only to the exact transformation the user
 selected.
+
+## D048 - Major Limit and Annual Timing Are Structural Overlays
+
+Cinnabar exposes one provider-independent timing lens inside the natal chart.
+For an integer model year it asks the configured iztro chart for a mid-year
+horoscope, then maps the engine-owned Major Limit and annual Life Palace
+positions plus each scope's canonical Lu/Quan/Ke/Ji star order back onto the
+natal palace array. The browser-visible annual layer and
+`buildYearlyChartFacts` use the same pure helper so local navigation and
+server-grounded narrative cannot silently disagree about annual ownership.
+
+The browser offers exactly the already disclosed age 1–100 model range. This
+is a navigable coverage boundary, not a lifespan estimate; the shared helper
+continues to accept later server-requested years so existing paid-report facts
+are not truncated. Changing the visible year clears any palace explanation
+from the previous timing context. A resolved Life Palace or transformation may
+open its natal palace and San Fang Si Zheng view, but unavailable indexes or
+star hosts remain explicit. The lens adds no score, AI request, persistence,
+good/bad label, event prediction, or outcome claim.

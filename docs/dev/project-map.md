@@ -144,7 +144,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/chart/ChartDisplay.tsx` +
   `app/src/lib/chart-explanations.ts` +
   `app/src/lib/palace-relations.ts` +
-  `app/src/lib/chart-transformations.ts` - lazy local chart viewer and its
+  `app/src/lib/chart-transformations.ts` +
+  `app/src/components/chart/TimingLens.tsx` +
+  `app/src/lib/timing-lens.ts` - lazy local chart viewer and its
   presentation-only reflective guide. Palace cards are accessible toggle
   buttons; one selected palace exposes English palace and major-star context,
   derives the focus/opposite/two-trine San Fang Si Zheng group from fixed
@@ -152,7 +154,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   four-palace structure without AI, accounts, or remote data. Its natal Four
   Transformations index extracts major/minor star ownership in canonical
   Lu/Quan/Ke/Ji order and opens the owning palace plus the same relationship
-  view without generating a separate score.
+  view without generating a separate score. Its timing lens uses the engine's
+  Major Limit and annual overlays for one selected model year, maps both Life
+  Palace positions and both Four Transformations layers back to natal palaces,
+  and exposes those palaces through the same relationship view without AI or
+  outcome claims.
 - `app/src/components/chart/BirthTimeSensitivity.tsx` +
   `app/src/lib/birth-time-sensitivity.ts` - three-window local comparison for
   explicitly approximate birth times. It shifts wall-clock time across real
@@ -173,7 +179,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   caches.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts. Its
   natal Four Transformations line reuses the chart's pure transformation index
-  so local navigation and prompt grounding share one ownership source.
+  so local navigation and prompt grounding share one ownership source. Its
+  annual Life Palace and Four Transformations lines reuse the timing-lens
+  helper for the same UI/server grounding boundary.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates (free reading, compatibility, paid Future Report).
 - `app/src/lib/paypal.ts` - PayPal Smart Payment Buttons adapter; passes tier +
   stable attempt ID and allowlisted birth/persona fields to authenticated

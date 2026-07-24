@@ -24,6 +24,20 @@ const CHART = {
   body: '天梁',
   zodiac: '蛇',
   sign: '摩羯座',
+  horoscope: () => ({
+    decadal: {
+      heavenlyStem: '戊',
+      earthlyBranch: '辰',
+      palaceNames: ['夫妻', '兄弟', '父母', '命宫', '福德'],
+      mutagen: ['武曲', '紫微', '天梁', '天机'],
+    },
+    yearly: {
+      heavenlyStem: '丙',
+      earthlyBranch: '午',
+      palaceNames: ['财帛', '命宫', '夫妻', '兄弟', '父母'],
+      mutagen: ['天梁', '紫微', '武曲', '天机'],
+    },
+  }),
   palaces: [
     {
       name: '命宫',
@@ -241,6 +255,38 @@ describe('ChartDisplay palace explanations', () => {
     expect(screen.getByRole('button', {
       name: 'Explain Travel Palace',
     }).getAttribute('data-palace-relation')).toBe('focus')
+  })
+
+  it('opens timing-layer palace context and clears it when the year changes', () => {
+    render(createElement(ChartDisplay))
+
+    const modelYear = Math.min(
+      BIRTH_INFO.year + 99,
+      Math.max(BIRTH_INFO.year, new Date().getFullYear()),
+    )
+    fireEvent.click(screen.getByRole('button', {
+      name: `Open Annual ${modelYear} Ji transformation on Tian Ji in Travel Palace`,
+    }))
+
+    expect(screen.getByRole('heading', {
+      name: 'About the Travel Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Explain Travel Palace',
+    }).getAttribute('data-palace-relation')).toBe('focus')
+
+    fireEvent.change(screen.getByRole('combobox', {
+      name: 'Timing lens year',
+    }), {
+      target: { value: String(modelYear + 1) },
+    })
+
+    expect(screen.queryByRole('heading', {
+      name: 'About the Travel Palace',
+    })).toBeNull()
+    expect(screen.getByRole('button', {
+      name: 'Explain Travel Palace',
+    }).getAttribute('data-palace-relation')).toBeNull()
   })
 
   it('replaces the selected guide and explains an empty major-star space', () => {

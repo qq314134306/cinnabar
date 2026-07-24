@@ -29,6 +29,7 @@ import {
   getSanFangSiZheng,
   type PalaceRelationRole,
 } from '@/lib/palace-relations'
+import { TimingLens } from './TimingLens'
 import {
   translateBrightness,
   translateFiveElementsClass,
@@ -836,6 +837,19 @@ export function ChartDisplay() {
         onSelectTransformation={(transformation) => {
           setSelectedTransformation(transformation.code)
           setSelectedPalace(transformation.palaceName)
+        }}
+      />
+
+      <TimingLens
+        chart={chart}
+        birthInfo={birthInfo}
+        onSelectPalace={(palaceName) => {
+          setSelectedTransformation(null)
+          setSelectedPalace(palaceName)
+        }}
+        onContextChange={() => {
+          setSelectedTransformation(null)
+          setSelectedPalace(null)
         }}
       />
 

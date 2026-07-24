@@ -42,7 +42,7 @@ Targeted examples:
 ```powershell
 npm run test -- true-solar-time
 npm run test -- birth-time-sensitivity BirthForm
-npm run test -- ChartDisplay chart-explanations palace-relations chart-transformations chart-facts
+npm run test -- ChartDisplay TimingLens chart-explanations palace-relations chart-transformations timing-lens chart-facts
 npm run test -- retrieve
 npm run test -- llm
 npm run test -- public-reading
@@ -314,6 +314,8 @@ Follows the Cinnabar glossary; covered by `ziwei-glossary.test.ts`.
 
 `src/lib/chart-explanations.ts` + `src/lib/palace-relations.ts` +
 `src/lib/chart-transformations.ts` +
+`src/lib/timing-lens.ts` +
+`src/components/chart/TimingLens.tsx` +
 `src/components/chart/ChartDisplay.tsx`: local, English reflective guidance for
 the twelve canonical palaces and fourteen major stars. Internal lookup keys stay
 zh-CN. Every palace card is a semantic toggle button; selection owns the single
@@ -331,6 +333,14 @@ interpret one label as a standalone outcome, or create another score. When
 multiple transformations share one palace, only the exact selected
 transformation is pressed even though the palace relationship context is
 shared.
+The timing lens must use the engine-owned Major Limit and yearly objects for
+the selected mid-year date, map both scopes' Life Palace and canonical
+Lu/Quan/Ke/Ji star order back onto the natal palace array, and reuse the same
+pure helper as yearly chart-facts grounding. Its browser control is limited to
+the disclosed age 1–100 model, clears stale palace context when the year
+changes, and may navigate only to resolved natal hosts. It must not add a
+score, infer missing positions, claim an outcome, or frame the range as
+lifespan.
 
 `src/lib/birth-time-sensitivity.ts` +
 `src/components/chart/BirthTimeSensitivity.tsx`: provider-independent
@@ -369,7 +379,8 @@ AI, or payment dependency belongs in this flow.
 prompts, including `buildYearlyChartFacts` (year-by-year Liu Nian facts via
 `chart.horoscope()`) for the paid Future Report. Natal transformation facts
 reuse `src/lib/chart-transformations.ts` so UI navigation and prompt grounding
-cannot disagree about star or palace ownership.
+cannot disagree about star or palace ownership. Annual Life Palace and
+transformation ownership reuse `src/lib/timing-lens.ts` for the same reason.
 
 `src/lib/ai-prompts.ts`: Base system prompt, Scholar/Old Sage personas, and the
 free-reading / compatibility / paid Future Report prompt templates.

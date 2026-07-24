@@ -39,6 +39,29 @@
 
 ## Recently Completed
 
+- Added a provider-independent Major Limit & Year Lens to the natal chart,
+  using [qingnang.cc's public Zi Wei Dou Shu overview](https://www.qingnang.cc/wiki/ziwei/jichu/ziwei-doushu)
+  and its stated natal/Major Limit/annual layering as a product benchmark
+  without copying its code, brand, design, or interpretive claims. Users can
+  switch among the disclosed age 1–100 model years and inspect the engine-owned
+  10-year Major Limit, annual Life Palace, and canonical Lu/Quan/Ke/Ji stars
+  for both timing scopes. Every resolved item navigates back to its natal
+  palace and existing San Fang Si Zheng context; changing the year clears the
+  previous palace context. Missing indexes or star hosts stay unavailable.
+  The browser layer and `buildYearlyChartFacts` now share one pure timing
+  helper, so annual UI navigation and server-grounded facts use the same palace
+  ownership. The helper still accepts later server-requested years, preventing
+  the visible 1–100 browsing boundary from truncating an existing report.
+  This layer adds no score, AI request, persistence, outcome claim, or lifespan
+  estimate. The complete app passes 75 test files / 718 tests, lint, and the
+  strict production build. ChartDisplay remains lazy at 41.89 kB raw /
+  12.76 kB gzip, with every JavaScript chunk below 500 kB. A real production
+  preview confirmed the default 2026 Major Limit and annual overlays, Annual Ji
+  navigation to the Siblings Palace plus exactly one focus, one opposite, and
+  two trines, stale-context cleanup on switching to 2027, no document-level
+  horizontal overflow at desktop or 390-by-844 mobile, and no browser
+  warning/error logs. This acceptance does not choose the final visual
+  direction.
 - Added a provider-independent natal Four Transformations navigation layer,
   using [qingnang.cc's public Zi Wei Dou Shu overview](https://www.qingnang.cc/wiki/ziwei/jichu/ziwei-doushu)
   and its treatment of Four Transformations as a core chart structure as a

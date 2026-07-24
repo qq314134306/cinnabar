@@ -36,8 +36,12 @@
   and major stars without claiming a deterministic outcome. A natal Four
   Transformations index also maps Lu, Quan, Ke, and Ji to their engine-owned
   stars and palaces; choosing one opens that palace and its four-palace
-  context without treating a label as a standalone verdict. The chart also
-  shows a deterministic current-model-year snapshot with
+  context without treating a label as a standalone verdict. A local Major
+  Limit & Year Lens can switch among the age 1–100 model years, overlay the
+  active 10-year Major Limit, annual Life Palace, and both transformation
+  layers, then navigate any mapped item back to its natal palace and
+  four-palace context. This range does not predict outcomes or lifespan. The
+  chart also shows a deterministic current-model-year snapshot with
   an overall score and Career, Wealth, Relationships, and Well-being
   dimensions. These local features need no AI request, account, API, or
   payment.
