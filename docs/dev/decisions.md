@@ -1238,3 +1238,34 @@ selection, luck pillars, compatibility, event claims, and prose
 interpretations remain out of scope until each receives its own tested
 calculation contract and product decision. No agent-skill prompt, remote MCP,
 AI call, account requirement, persistence, or score belongs in this layer.
+
+## D053 - Ten Gods and Hidden Stems Extend the Existing BaZi Contract
+
+Cinnabar may extend the Four Pillars companion with the visible heavenly
+stem's Ten Gods relationship and each earthly branch's ordered hidden stems
+plus their Ten Gods relationship. This remains a local structural view: every
+relationship is relative to the Day Master, and the Day Pillar's visible stem
+is labeled Day Master rather than presented as a second peer.
+
+The Four Pillars result remains the single boundary authority. After
+`lunar-lite` calculates the exact four stems and branches from the
+true-solar-resolved input, a pure typed relationship helper derives Ten Gods
+from the Day Master's and target stem's Five Element generation/control and
+Yin/Yang relationship. A separate explicit table owns the canonical ordered
+hidden stems for all twelve earthly branches. Both must apply to the existing
+result rather than construct a second calendar object, because a second
+calculation path could disagree at a Li Chun or day-boundary instant.
+
+The calculation tests prove that every one of the ten target stems maps to
+exactly one Ten Gods relationship for every Day Master, and pin every hidden
+stem in canonical branch order. Relationships are normalized into a closed,
+typed English vocabulary before reaching the component. Unknown stems,
+branches, or relationships fail the complete local result rather than
+producing partial or invented structure. An approximate birth time makes the
+Hour Pillar and its relationship structure provisional.
+
+This decision does not authorize hidden-stem weighting, strength/weakness
+classification, useful-god selection, luck pillars, compatibility, prose
+interpretation, scores, predictions, AI, persistence, account gating, or a
+network request. Each remains a separate future product and calculation
+decision.

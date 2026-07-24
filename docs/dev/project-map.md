@@ -153,8 +153,14 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   BaZi Four Pillars companion, and its presentation-only reflective guide. The
   BaZi adapter reads the same true-solar-resolved date/time block but asks
   `lunar-lite` for the Li Chun year and solar-term month boundaries, then
-  presents the four raw pillars plus Day Master structure without adding a
-  second interpretation system. Palace cards are accessible toggle buttons;
+  presents the four raw pillars plus Day Master structure. A pure typed helper
+  derives Ten Gods from the Five Element generation/control and Yin/Yang
+  relationship, while an explicit exhaustively-tested twelve-branch table owns
+  ordered hidden stems. Both apply to those exact calculated pillars rather
+  than recasting the date through another boundary path, and normalize into a
+  closed English UI vocabulary. This remains a structural index without
+  strength, weighting, useful-element, or outcome judgment. Palace cards are
+  accessible toggle buttons;
   one selected palace exposes English palace and major-star context,
   derives the focus/opposite/two-trine San Fang Si Zheng group from fixed
   earthly-branch positions, and highlights plus summarizes the complete

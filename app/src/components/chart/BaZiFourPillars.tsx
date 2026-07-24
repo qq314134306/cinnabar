@@ -1,5 +1,8 @@
 import type { BirthInfo } from '@/lib/astro'
-import { buildBaziFourPillars } from '@/lib/bazi-four-pillars'
+import {
+  BAZI_TEN_GOD_LABELS,
+  buildBaziFourPillars,
+} from '@/lib/bazi-four-pillars'
 import {
   BRANCH_EN,
   STEM_EN,
@@ -99,14 +102,37 @@ export function BaZiFourPillars({ birthInfo }: BaZiFourPillarsProps) {
               <h4 className="mt-1 font-mono text-base font-semibold text-text">
                 {translateGanZhi(pillar.ganZhi)}
               </h4>
-              <p className="mt-1 text-xs text-text-secondary">
-                {pillar.polarity} {pillar.element} stem
+              <p
+                data-bazi-visible-ten-god={pillar.scope}
+                className="mt-1 text-xs text-gold/85"
+              >
+                Visible stem · {BAZI_TEN_GOD_LABELS[pillar.visibleTenGod]}
               </p>
               <p className="mt-0.5 text-[10px] text-text-muted">
-                {branchGloss
+                {pillar.polarity} {pillar.element} · {branchGloss
                   ? `${branchGloss.pinyin} · ${branchGloss.zodiac}`
                   : pillar.branch}
               </p>
+              <div
+                data-bazi-hidden-stems={pillar.scope}
+                className="mt-2 border-t border-white/[0.06] pt-2"
+              >
+                <p className="text-[10px] uppercase tracking-wider text-text-muted">
+                  Hidden stems
+                </p>
+                <ul className="mt-1 space-y-0.5">
+                  {pillar.hiddenStems.map((hiddenStem) => (
+                    <li
+                      key={hiddenStem.stem}
+                      className="text-[10px] text-text-secondary"
+                    >
+                      {translateStem(hiddenStem.stem)}
+                      {' · '}
+                      {BAZI_TEN_GOD_LABELS[hiddenStem.tenGod]}
+                    </li>
+                  ))}
+                </ul>
+              </div>
               {isDayPillar && (
                 <span className="mt-2 inline-flex rounded-full bg-gold/10 px-2 py-0.5 text-[10px] text-gold">
                   Day Master source
@@ -119,15 +145,15 @@ export function BaZiFourPillars({ birthInfo }: BaZiFourPillarsProps) {
 
       {birthInfo.birthTimeReliable === false && (
         <p role="note" className="mt-2 text-xs leading-relaxed text-gold/80">
-          The Hour Pillar is provisional because the entered birth time is
-          approximate. Use the birth-time comparison before treating it as
-          stable.
+          The Hour Pillar and its Ten Gods structure are provisional because
+          the entered birth time is approximate. Use the birth-time comparison
+          before treating them as stable.
         </p>
       )}
 
       <p className="mt-2 text-[10px] leading-relaxed text-text-muted">
-        This is a structural companion to the Zi Wei chart, not a prediction
-        or a complete BaZi interpretation.
+        Ten Gods are structural relationships to the Day Master. This view
+        does not judge strength, useful elements, luck cycles, or outcomes.
       </p>
     </section>
   )

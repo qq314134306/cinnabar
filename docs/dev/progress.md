@@ -41,6 +41,27 @@
 
 ## Recently Completed
 
+- Extended the provider-independent BaZi companion with visible-stem Ten Gods
+  and ordered hidden stems plus their Day-Master-relative Ten Gods. The adapter
+  preserves the already-verified `lunar-lite` Four Pillars as the only calendar
+  boundary result, then uses a pure typed Five Element/Yin-Yang relationship
+  helper and an explicit canonical twelve-branch hidden-stem table. It does not
+  recast the date through a second calendar object, preventing a second Li Chun
+  or day-boundary authority. Exhaustive tests cover all ten target stems for
+  every Day Master and pin every hidden-stem sequence. Values are normalized
+  into a closed typed English vocabulary; any unknown relationship fails the
+  complete local result instead of displaying partial structure. Approximate
+  time marks the Hour Pillar and its Ten Gods structure provisional. This adds
+  no hidden-stem weighting, strength/useful-element judgment, luck cycles,
+  prediction, AI, account, persistence, score, or network request. The complete
+  app passes 76 test files / 653 tests, lint, the moderate audit with zero known
+  vulnerabilities, and the strict production build. ChartDisplay remains lazy
+  at 52.87 kB raw / 15.50 kB gzip, and every JavaScript chunk remains below
+  500 kB. A real 1905-pixel-wide Chrome preview confirmed all four visible Ten
+  Gods and hidden-stem groups, the expected default Bing Day Master
+  relationships, no horizontal overflow, and the approximate-hour disclosure.
+  A second 1990-02-01 pass retained the deliberate boundary separation: Zi Wei
+  year Geng-Wu, BaZi Year Pillar Ji-Si, and BaZi Month Pillar Ding-Chou.
 - Added a provider-independent BaZi Four Pillars companion beneath the natal
   chart after reviewing public GitHub agent skills and calculation projects.
   Prompt-only skills with stale or unverifiable source links were not copied

@@ -342,12 +342,17 @@ destinations remain explicit. Do not reconstruct the heavenly-stem table in
 browser code, assign good/bad meaning, or add a score.
 The BaZi Four Pillars companion must calculate only from the chart flow's
 `resolvedBirthTime`, using `lunar-lite` with the Li Chun year boundary and
-solar-term month boundary. It may expose the four raw pillars and Day Master
-stem/polarity/element. Keep the Zi Wei year convention separate and visibly
-labeled. An approximate time makes the Hour Pillar provisional; a missing
-resolved time yields no result. Do not add Ten Gods, hidden stems,
-strength/useful-god judgments, luck pillars, predictions, AI, persistence, or
-scores without a new tested product decision.
+solar-term month boundary. It may expose the four raw pillars, Day Master
+stem/polarity/element, visible-stem Ten Gods, and each branch's ordered hidden
+stems with their Ten Gods. Derive Ten Gods from the typed Five Element
+generation/control and Yin/Yang relationship, and keep the canonical ordered
+twelve-branch hidden-stem table explicit and exhaustively tested. Apply both to
+the already-calculated pillars; do not recalculate a second chart that could
+cross a different boundary. Keep the Zi Wei year convention separate and
+visibly labeled. An approximate time makes the Hour Pillar and its Ten Gods
+structure provisional; a missing resolved time yields no result. Do not add
+strength/useful-god judgments, hidden-stem weights, luck pillars, predictions,
+AI, persistence, or scores without a new tested product decision.
 The timing lens must use the engine-owned Major Limit and yearly objects for
 the selected mid-year date, map both scopes' Life Palace and canonical
 Lu/Quan/Ke/Ji star order back onto the natal palace array, and reuse the same

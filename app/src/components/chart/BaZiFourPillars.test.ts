@@ -57,8 +57,26 @@ describe('BaZiFourPillars', () => {
     expect(container.querySelector(
       '[data-bazi-day-master]',
     )?.textContent).toContain('Bing · Yang Fire')
+    expect(container.querySelector(
+      '[data-bazi-visible-ten-god="year"]',
+    )?.textContent).toContain('Hurting Officer')
+    expect(container.querySelector(
+      '[data-bazi-visible-ten-god="day"]',
+    )?.textContent).toContain('Day Master')
+    expect(container.querySelector(
+      '[data-bazi-hidden-stems="year"]',
+    )?.textContent).toContain('Bing · Peer')
+    expect(container.querySelector(
+      '[data-bazi-hidden-stems="year"]',
+    )?.textContent).toContain('Geng · Indirect Wealth')
+    expect(container.querySelectorAll(
+      '[data-bazi-hidden-stems]',
+    )).toHaveLength(4)
     expect(screen.getByText(
       /Year Pillar uses the Li Chun boundary/,
+    )).toBeTruthy()
+    expect(screen.getByText(
+      /does not judge strength, useful elements, luck cycles, or outcomes/,
     )).toBeTruthy()
   })
 
@@ -71,7 +89,7 @@ describe('BaZiFourPillars', () => {
     }))
 
     expect(screen.getByRole('note').textContent).toContain(
-      'Hour Pillar is provisional',
+      'Hour Pillar and its Ten Gods structure are provisional',
     )
   })
 
