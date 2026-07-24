@@ -457,7 +457,10 @@ changes to its font or layout require inspecting a real exported PNG, because
 the browser preview alone does not reveal canvas text-measurement regressions.
 The default quote and customization path work without AI; an existing AI
 narrative may supply a quote but product copy must not present it as a
-prerequisite.
+prerequisite. PNG export is single-flight, removes its temporary download
+anchor even if the click throws, and exposes an input-independent announced
+retry state instead of a blocking browser alert. Starting a retry clears the
+stale error.
 
 `tests/api-typecheck.test.ts`: Contract coverage that keeps
 `tsconfig.api.json` in the root build graph, keeps strict API type checking

@@ -126,4 +126,57 @@ describe('ShareCard', () => {
     expect(anchor.download).toBe('cinnabar-reading-geng-wu.png')
     expect(anchor.href).toContain('data:image/png;base64,share-card')
   })
+
+  it('contains duplicate exports while one image is being generated', async () => {
+    let finishExport: ((value: { toDataURL: typeof mocks.toDataURL }) => void)
+      | undefined
+    mocks.html2canvas.mockImplementationOnce(() => new Promise((resolve) => {
+      finishExport = resolve
+    }))
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined)
+    render(createElement(ShareCard))
+
+    const saveButton = screen.getByRole('button', { name: 'Save Share Image' })
+    fireEvent.click(saveButton)
+    fireEvent.click(saveButton)
+
+    await waitFor(() => {
+      expect(mocks.html2canvas).toHaveBeenCalledOnce()
+    })
+    expect((saveButton as HTMLButtonElement).disabled).toBe(true)
+
+    finishExport?.({ toDataURL: mocks.toDataURL })
+    await waitFor(() => {
+      expect(click).toHaveBeenCalledOnce()
+    })
+    expect((saveButton as HTMLButtonElement).disabled).toBe(false)
+  })
+
+  it('shows an announced retry state and recovers after export failure', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    mocks.html2canvas.mockRejectedValueOnce(new Error('canvas unavailable'))
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined)
+    render(createElement(ShareCard))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save Share Image' }))
+
+    expect((await screen.findByRole('alert')).textContent).toContain(
+      "We couldn't create this image. Please try again.",
+    )
+    const saveButton = screen.getByRole('button', { name: 'Save Share Image' })
+    expect((saveButton as HTMLButtonElement).disabled).toBe(false)
+    expect(saveButton.getAttribute('aria-describedby')).toBe(
+      'share-card-download-error',
+    )
+
+    fireEvent.click(saveButton)
+
+    await waitFor(() => {
+      expect(click).toHaveBeenCalledOnce()
+    })
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(mocks.html2canvas).toHaveBeenCalledTimes(2)
+  })
 })

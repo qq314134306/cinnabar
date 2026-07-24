@@ -809,3 +809,16 @@ LifeKLine entry chunk from 842.58 kB / 272.38 kB gzip to
 351.80 kB / 105.52 kB gzip. The deferred ScoreRadar chunk is
 489.92 kB / 167.10 kB gzip, leaving every generated JavaScript chunk below
 Vite's 500 kB warning threshold.
+
+## D033 - Share Card Export Is Recoverable and Single-Flight
+
+The local PNG export must run at most once per Share Card instance at a time.
+The visible disabled state is backed by an imperative in-flight guard so rapid
+or synthetic duplicate activation cannot start concurrent html2canvas work.
+The temporary download anchor is removed in a `finally` path even if browser
+download activation throws.
+
+Canvas, font, encoding, or download failure is contained inside the Share Card
+as a stable announced alert linked to the Save action. It must not use a
+blocking browser `alert()`, expose raw exception details, or leave the action
+disabled. A retry clears the stale error before requesting a fresh export.

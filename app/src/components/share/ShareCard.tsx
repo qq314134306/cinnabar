@@ -90,7 +90,9 @@ export function ShareCard() {
   const { chart, birthInfo } = useChartStore()
   const { aiInterpretation } = useContentCacheStore()
   const cardRef = useRef<HTMLDivElement>(null)
+  const downloadInFlightRef = useRef(false)
   const [generating, setGenerating] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
   const [customQuote, setCustomQuote] = useState('')
   const [isEditing, setIsEditing] = useState(false)
 
@@ -104,8 +106,10 @@ export function ShareCard() {
   const fiveElements = chart ? translateFiveElementsClass(chart.fiveElementsClass) : ''
 
   const handleDownload = useCallback(async () => {
-    if (!cardRef.current) return
+    if (!cardRef.current || downloadInFlightRef.current) return
 
+    downloadInFlightRef.current = true
+    setDownloadError(null)
     setGenerating(true)
     try {
       await document.fonts.ready
@@ -123,12 +127,18 @@ export function ShareCard() {
       link.download = `cinnabar-reading-${ganZhiEn.toLowerCase() || 'chart'}.png`
       link.href = dataUrl
       document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      try {
+        link.click()
+      } finally {
+        link.remove()
+      }
     } catch (err) {
       console.error('Image generation failed:', err)
-      alert(`Image generation failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      setDownloadError(
+        "We couldn't create this image. Please try again.",
+      )
     } finally {
+      downloadInFlightRef.current = false
       setGenerating(false)
     }
   }, [ganZhiEn])
@@ -353,6 +363,7 @@ export function ShareCard() {
       <Button
         onClick={handleDownload}
         disabled={generating}
+        aria-describedby={downloadError ? 'share-card-download-error' : undefined}
         className="w-full"
         variant="gold"
       >
@@ -365,6 +376,16 @@ export function ShareCard() {
           'Save Share Image'
         )}
       </Button>
+
+      {downloadError && (
+        <p
+          id="share-card-download-error"
+          role="alert"
+          className="rounded-lg border border-misfortune/20 bg-misfortune/10 px-4 py-3 text-center text-sm text-misfortune"
+        >
+          {downloadError}
+        </p>
+      )}
 
       <p className="text-center text-text-muted text-xs">
         Save the image and share it anywhere ✨

@@ -39,6 +39,14 @@
 
 ## Recently Completed
 
+- Made local Share Card image export recoverable and single-flight. An
+  imperative guard prevents concurrent html2canvas work even under duplicate
+  activation, while the button exposes its busy state. Canvas, encoding, or
+  download failure now restores the action and shows stable, action-linked,
+  announced retry copy instead of a blocking browser alert or raw exception.
+  Retrying clears the stale error, and the temporary download anchor is removed
+  even if download activation throws. Focused tests cover the existing 2x PNG
+  contract plus duplicate suppression and failure-to-success recovery.
 - Split Life Timeline's radar visualization from its entry path. Opening the
   feature now loads the Recharts timeline shell, scope disclaimer, empty state,
   and build action without ECharts; ScoreRadar loads through a compact,
@@ -649,7 +657,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 62 Vitest files / 613 tests in
+The current cumulative local baseline passed 62 Vitest files / 615 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the
