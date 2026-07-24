@@ -331,11 +331,12 @@ multiple transformations share one palace, only the exact selected
 transformation is pressed even though the palace relationship context is
 shared.
 The selected-palace origin map must resolve the source through the engine's
-`chart.palace()` functional API before calling `mutagedPlaces()`. Keep the
-engine's canonical Lu/Quan/Ke/Ji order, show all four slots, and navigate only
-to engine-returned destination palaces. Missing destinations remain explicit;
-do not reconstruct the heavenly-stem table in browser code, assign good/bad
-meaning, or add a score.
+`chart.palace()` functional API before calling `mutagedPlaces()`. Join those
+destinations with iztro's active `getMutagensByHeavenlyStem()` result so each
+canonical Lu/Quan/Ke/Ji slot identifies its transformed star, and navigate only
+to engine-returned destination palaces. Show all four slots; missing stars or
+destinations remain explicit. Do not reconstruct the heavenly-stem table in
+browser code, assign good/bad meaning, or add a score.
 The timing lens must use the engine-owned Major Limit and yearly objects for
 the selected mid-year date, map both scopes' Life Palace and canonical
 Lu/Quan/Ke/Ji star order back onto the natal palace array, and reuse the same

@@ -254,20 +254,32 @@ describe('ChartDisplay palace explanations', () => {
     })
     expect(originHeading).toBeTruthy()
     expect(originHeading.parentElement?.textContent).toContain(
-      'This is structural navigation only; it does not judge direction or outcome.',
+      'star-to-palace map. This is structural navigation only; it does not judge direction or outcome.',
     )
     expect(container.querySelectorAll(
       '[data-palace-origin-transformation]',
     )).toHaveLength(4)
     expect(container.querySelector(
       '[data-palace-origin-transformation="禄"]',
+    )?.textContent).toContain('Ju Men')
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="禄"]',
     )?.textContent).toContain('Children Palace')
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="权"]',
+    )?.textContent).toContain('Tai Yang')
     expect(container.querySelector(
       '[data-palace-origin-transformation="权"]',
     )?.textContent).toContain('Career Palace')
     expect(container.querySelector(
       '[data-palace-origin-transformation="科"]',
+    )?.textContent).toContain('Wen Qu')
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="科"]',
     )?.textContent).toContain('Fortune Palace')
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="忌"]',
+    )?.textContent).toContain('Wen Chang')
     expect(container.querySelector(
       '[data-palace-origin-transformation="忌"]',
     )?.textContent).toContain('Travel Palace')
@@ -294,7 +306,7 @@ describe('ChartDisplay palace explanations', () => {
       chart: realChart,
     })
 
-    render(createElement(ChartDisplay))
+    const { container } = render(createElement(ChartDisplay))
     fireEvent.click(screen.getByRole('button', {
       name: 'Explain Life Palace',
     }))
@@ -302,15 +314,27 @@ describe('ChartDisplay palace explanations', () => {
     expect(screen.getByRole('button', {
       name: 'Open Lu destination in Spouse Palace',
     })).toBeTruthy()
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="禄"]',
+    )?.textContent).toContain('Ju Men')
     expect(screen.getByRole('button', {
       name: 'Open Quan destination in Career Palace',
     })).toBeTruthy()
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="权"]',
+    )?.textContent).toContain('Tai Yang')
     expect(screen.getByRole('button', {
       name: 'Open Ke destination in Property Palace',
     })).toBeTruthy()
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="科"]',
+    )?.textContent).toContain('Wen Qu')
     expect(screen.getByRole('button', {
       name: 'Open Ji destination in Children Palace',
     })).toBeTruthy()
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="忌"]',
+    )?.textContent).toContain('Wen Chang')
   })
 
   it('indexes all four natal transformations and opens their owner palace', () => {

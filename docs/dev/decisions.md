@@ -1203,9 +1203,12 @@ the raw `chart.palaces` array is insufficient because it bypasses the engine's
 functional lookup initialization in the real browser path.
 
 The adapter normalizes names, branches, and same-palace state but does not copy
-or reconstruct the heavenly-stem transformation table. All four slots remain
-visible; an unresolved destination stays explicitly unavailable. Available
-destinations may open the existing palace explanation, San Fang Si Zheng, and
-flanking context. This is structural navigation only and adds no score,
-supportive/difficult classification, event prediction, AI request, account
-requirement, or network dependency.
+or reconstruct the heavenly-stem transformation table. Each canonical slot
+also names the transformed star from iztro's configuration-aware
+`getMutagensByHeavenlyStem()` result, completing the source-stem → star →
+destination-palace chain without creating a second calculation authority. All
+four slots remain visible; an unresolved star or destination stays explicitly
+unavailable. Available destinations may open the existing palace explanation,
+San Fang Si Zheng, and flanking context. This is structural navigation only
+and adds no score, supportive/difficult classification, event prediction, AI
+request, account requirement, or network dependency.

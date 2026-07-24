@@ -159,9 +159,12 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   Transformations index extracts major/minor star ownership in canonical
   Lu/Quan/Ke/Ji order and opens the owning palace plus the same relationship
   view without generating a separate score. The selected-palace panel resolves
-  its source with `chart.palace()` and normalizes the functional palace's
-  `mutagedPlaces()` result into four destination links; missing engine results
-  stay unavailable instead of being reconstructed from a copied stem table.
+  its source with `chart.palace()`, joins the functional palace's
+  `mutagedPlaces()` destinations with iztro's active
+  `getMutagensByHeavenlyStem()` star order, and presents the complete
+  source-stem → transformed-star → destination-palace chain. Missing engine
+  results stay unavailable instead of being reconstructed from a copied stem
+  table.
   Its timing lens uses the engine's
   Major Limit and annual overlays for one selected model year, maps both Life
   Palace positions and both Four Transformations layers back to natal palaces,

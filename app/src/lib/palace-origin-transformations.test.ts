@@ -13,29 +13,37 @@ const SOURCE = {
 
 describe('palace-origin Four Transformations', () => {
   it('keeps canonical Lu, Quan, Ke, Ji order and engine-owned destinations', () => {
-    expect(buildPalaceOriginTransformations(SOURCE, [
-      { name: '夫妻', earthlyBranch: '巳' },
-      { name: '官禄', earthlyBranch: '亥' },
-      { name: '田宅', earthlyBranch: '戌' },
-      { name: '子女', earthlyBranch: '辰' },
-    ])).toEqual([
+    expect(buildPalaceOriginTransformations(
+      SOURCE,
+      [
+        { name: '夫妻', earthlyBranch: '巳' },
+        { name: '官禄', earthlyBranch: '亥' },
+        { name: '田宅', earthlyBranch: '戌' },
+        { name: '子女', earthlyBranch: '辰' },
+      ],
+      ['巨门', '太阳', '文曲', '文昌'],
+    )).toEqual([
       expect.objectContaining({
         code: '禄',
+        starName: '巨门',
         targetPalaceName: '夫妻',
         targetPalaceBranch: '巳',
       }),
       expect.objectContaining({
         code: '权',
+        starName: '太阳',
         targetPalaceName: '官禄',
         targetPalaceBranch: '亥',
       }),
       expect.objectContaining({
         code: '科',
+        starName: '文曲',
         targetPalaceName: '田宅',
         targetPalaceBranch: '戌',
       }),
       expect.objectContaining({
         code: '忌',
+        starName: '文昌',
         targetPalaceName: '子女',
         targetPalaceBranch: '辰',
       }),
@@ -43,22 +51,27 @@ describe('palace-origin Four Transformations', () => {
   })
 
   it('marks a transformation that remains in the source palace', () => {
-    const result = buildPalaceOriginTransformations(SOURCE, [
-      { name: '命宫', earthlyBranch: '未' },
-    ])
+    const result = buildPalaceOriginTransformations(
+      SOURCE,
+      [{ name: '命宫', earthlyBranch: '未' }],
+      ['巨门', '太阳', '文曲', '文昌'],
+    )
 
     expect(result[0].isSamePalace).toBe(true)
     expect(result.slice(1).every((item) => !item.isSamePalace)).toBe(true)
   })
 
   it('keeps all four slots explicit when the engine cannot resolve a host', () => {
-    const result = buildPalaceOriginTransformations(SOURCE, [
-      { name: '夫妻', earthlyBranch: '巳' },
-    ])
+    const result = buildPalaceOriginTransformations(
+      SOURCE,
+      [{ name: '夫妻', earthlyBranch: '巳' }],
+      ['巨门'],
+    )
 
     expect(result).toHaveLength(4)
     expect(result[1]).toMatchObject({
       code: '权',
+      starName: null,
       targetPalaceName: null,
       targetPalaceBranch: null,
     })
@@ -88,21 +101,25 @@ describe('palace-origin Four Transformations', () => {
     expect(collectPalaceOriginTransformations(lifePalace)).toEqual([
       expect.objectContaining({
         code: '禄',
+        starName: '巨门',
         targetPalaceName: '夫妻',
         targetPalaceBranch: '巳',
       }),
       expect.objectContaining({
         code: '权',
+        starName: '太阳',
         targetPalaceName: '官禄',
         targetPalaceBranch: '亥',
       }),
       expect.objectContaining({
         code: '科',
+        starName: '文曲',
         targetPalaceName: '田宅',
         targetPalaceBranch: '戌',
       }),
       expect.objectContaining({
         code: '忌',
+        starName: '文昌',
         targetPalaceName: '子女',
         targetPalaceBranch: '辰',
       }),

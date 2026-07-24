@@ -613,9 +613,9 @@ function PalaceExplanationPanel({
           <>
             <p className="mt-1 text-xs leading-relaxed text-text-secondary">
               The selected palace&apos;s {translateStem(palace.stem)} stem
-              supplies an engine-owned Lu, Quan, Ke, and Ji destination map.
-              This is structural navigation only; it does not judge direction
-              or outcome.
+              supplies an engine-owned Lu, Quan, Ke, and Ji star-to-palace
+              map. This is structural navigation only; it does not judge
+              direction or outcome.
             </p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {originTransformations.map((transformation) => {
@@ -636,9 +636,15 @@ function PalaceExplanationPanel({
                     <p className="text-xs font-semibold">
                       {info?.code ?? transformation.code}
                     </p>
+                    <p className="mt-1 text-sm font-medium text-gold">
+                      {transformation.starName
+                        ? translateStarLabel(transformation.starName)
+                        : 'Star unavailable'}
+                    </p>
                     {targetLabel ? (
                       <>
-                        <h5 className="mt-1 text-sm font-medium text-text">
+                        <h5 className="mt-1 text-xs font-medium text-text-secondary">
+                          <span className="text-text-muted">Flows to </span>
                           {targetLabel}
                         </h5>
                         <p className="mt-0.5 text-[10px] text-text-muted">

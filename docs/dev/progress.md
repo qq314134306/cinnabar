@@ -41,6 +41,24 @@
 
 ## Recently Completed
 
+- Completed the selected-palace flying-transformation chain from source stem to
+  transformed star to destination palace. The adapter now joins
+  `mutagedPlaces()` with iztro's configuration-aware
+  `getMutagensByHeavenlyStem()` output in canonical Lu/Quan/Ke/Ji order, so
+  each card identifies both the affected major or minor star and its
+  engine-owned destination. The existing target navigation, same-palace
+  marker, explicit unavailable states, and non-predictive boundary remain
+  unchanged. No heavenly-stem table, score, AI, account, or network dependency
+  is added. Pure and rendered coverage verifies injected partial results, the
+  configured real-engine mapping, English star labels, and destination
+  navigation. The complete app passes 74 test files / 641 tests, lint, and the
+  strict production build; ChartDisplay remains lazy at 46.86 kB raw /
+  13.75 kB gzip, and every JavaScript chunk remains below 500 kB. A real
+  1905-pixel-wide Chrome preview confirmed the default Life Palace chain
+  Lu/Ju Men→Spouse, Quan/Tai Yang→Career, Ke/Wen Qu→Property, and
+  Ji/Wen Chang→Children. Opening the Lu target selected the Spouse Palace with
+  exactly one focus, one opposite, and two trines, and the document had no
+  horizontal overflow.
 - Added a provider-independent palace-origin Four Transformations map to each
   selected natal palace, using
   [qingnang.cc's public Zi Wei Dou Shu overview](https://www.qingnang.cc/wiki/ziwei/jichu/ziwei-doushu)
