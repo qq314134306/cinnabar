@@ -191,9 +191,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   html2canvas-stable Georgia/Times font stack, explicit width, and word wrapping
   because the display webfont previously produced overlapping words only in the
   saved artifact. Its default/custom quote path works without AI; an available
-  AI narrative is only an optional quote source. PNG generation is single-
-  flight and failures are announced inline with a retryable action rather than
-  a blocking browser alert.
+  AI narrative is only an optional quote source. Custom copy uses a separate
+  draft so Cancel is reversible and Done trims/saves, with a 240-character
+  export-safe limit. PNG generation is single-flight and failures are announced
+  inline with a retryable action rather than a blocking browser alert.
 - `app/src/lib/supabase.ts` - lazy browser Supabase client for `legacy` rollback
   only (public publishable key; never constructed for a new `dual`/`opaque`
   login).

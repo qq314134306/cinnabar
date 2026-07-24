@@ -834,3 +834,16 @@ without exposing the raw exception or creating a partial cache.
 Starting a retry clears the stale error before recalculation. A successful
 retry commits the complete lifetime cache and replaces the failure state with
 the normal range and year controls.
+
+## D035 - Share Card Quote Editing Uses a Bounded Draft
+
+The Share Card editor must not mutate the displayed or exportable quote while a
+user is still editing. Opening the editor copies the committed custom quote
+into a draft, Cancel discards that draft, and Done trims and commits it. This
+keeps the two actions semantically distinct and lets a user safely abandon an
+experiment without reconstructing the previous copy.
+
+Custom copy is limited to 240 characters in both the textarea contract and the
+state update path. The editor exposes the boundary with a live character count
+and an explicit accessible name. This matches the existing optional-AI quote
+ceiling and protects the fixed-height exported card from unbounded user text.

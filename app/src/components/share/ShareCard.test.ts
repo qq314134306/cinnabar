@@ -86,7 +86,7 @@ describe('ShareCard', () => {
     fireEvent.click(screen.getByRole('button', {
       name: '✎ Customize the quote',
     }))
-    fireEvent.change(screen.getByRole('textbox'), {
+    fireEvent.change(screen.getByRole('textbox', { name: 'Custom quote' }), {
       target: {
         value: 'Clarity grows when I choose the next honest step.',
       },
@@ -99,6 +99,66 @@ describe('ShareCard', () => {
     expect(quote.style.fontFamily).toContain('Georgia')
     expect(quote.style.maxWidth).toBe('288px')
     expect(quote.style.overflowWrap).toBe('break-word')
+  })
+
+  it('cancels a draft without replacing the saved quote', () => {
+    render(createElement(ShareCard))
+
+    fireEvent.click(screen.getByRole('button', {
+      name: '✎ Customize the quote',
+    }))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Custom quote' }), {
+      target: {
+        value: 'The saved line remains when a later draft is cancelled.',
+      },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+
+    const savedQuote = '"The saved line remains when a later draft is cancelled."'
+    expect(screen.getByText(savedQuote)).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', {
+      name: '✎ Customize the quote',
+    }))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Custom quote' }), {
+      target: {
+        value: 'This draft should be discarded.',
+      },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.getByText(savedQuote)).toBeTruthy()
+    expect(screen.queryByText('"This draft should be discarded."')).toBeNull()
+    expect(screen.queryByRole('textbox', { name: 'Custom quote' })).toBeNull()
+  })
+
+  it('bounds custom copy to the export-safe length', () => {
+    render(createElement(ShareCard))
+
+    fireEvent.click(screen.getByRole('button', {
+      name: '✎ Customize the quote',
+    }))
+    const quoteInput = screen.getByRole('textbox', {
+      name: 'Custom quote',
+    }) as HTMLTextAreaElement
+    fireEvent.change(quoteInput, {
+      target: {
+        value: 'x'.repeat(300),
+      },
+    })
+
+    expect(quoteInput.maxLength).toBe(240)
+    expect(quoteInput.value).toHaveLength(240)
+    expect(screen.getByText('240 / 240')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+    fireEvent.click(screen.getByRole('button', {
+      name: '✎ Customize the quote',
+    }))
+    expect(
+      (screen.getByRole('textbox', { name: 'Custom quote' }) as HTMLTextAreaElement)
+        .value,
+    ).toHaveLength(240)
   })
 
   it('renders the card to a doubled PNG and triggers its download', async () => {

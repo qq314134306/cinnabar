@@ -17,6 +17,7 @@ import { translateFiveElementsClass, translateGanZhi, translateStarLabel } from 
 const FONT_DISPLAY = "'Cormorant Garamond', 'Georgia', serif"
 const FONT_BODY = "'Inter', system-ui, sans-serif"
 const FONT_QUOTE = "'Georgia', 'Times New Roman', serif"
+const MAX_CUSTOM_QUOTE_LENGTH = 240
 
 /* ------------------------------------------------------------
    Sexagenary year (stem-branch) helpers
@@ -94,6 +95,7 @@ export function ShareCard() {
   const [generating, setGenerating] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
   const [customQuote, setCustomQuote] = useState('')
+  const [quoteDraft, setQuoteDraft] = useState('')
   const [isEditing, setIsEditing] = useState(false)
 
   const extractedQuote = aiInterpretation ? extractQuote(aiInterpretation) : null
@@ -104,6 +106,21 @@ export function ShareCard() {
   const stars = chart ? getLifePalaceStars(chart) : ''
   const pattern = chart ? getPatternName(chart) : null
   const fiveElements = chart ? translateFiveElementsClass(chart.fiveElementsClass) : ''
+
+  const startEditing = () => {
+    setQuoteDraft(customQuote)
+    setIsEditing(true)
+  }
+
+  const cancelEditing = () => {
+    setQuoteDraft(customQuote)
+    setIsEditing(false)
+  }
+
+  const saveEditing = () => {
+    setCustomQuote(quoteDraft.trim())
+    setIsEditing(false)
+  }
 
   const handleDownload = useCallback(async () => {
     if (!cardRef.current || downloadInFlightRef.current) return
@@ -334,24 +351,37 @@ export function ShareCard() {
         {isEditing ? (
           <div className="space-y-2">
             <textarea
-              value={customQuote}
-              onChange={(e) => setCustomQuote(e.target.value)}
+              aria-label="Custom quote"
+              aria-describedby="share-card-quote-count"
+              maxLength={MAX_CUSTOM_QUOTE_LENGTH}
+              value={quoteDraft}
+              onChange={(e) => setQuoteDraft(
+                e.target.value.slice(0, MAX_CUSTOM_QUOTE_LENGTH),
+              )}
               placeholder="Write your own quote — line breaks are kept..."
               className="w-full h-24 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-text placeholder:text-text-muted focus:outline-none focus:border-gold/30 resize-none"
               style={{ fontFamily: FONT_DISPLAY }}
             />
-            <div className="flex gap-2">
-              <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
-                Cancel
-              </Button>
-              <Button size="sm" onClick={() => setIsEditing(false)}>
-                Done
-              </Button>
+            <div className="flex items-center justify-between gap-3">
+              <p
+                id="share-card-quote-count"
+                className="text-xs text-text-muted"
+              >
+                {quoteDraft.length} / {MAX_CUSTOM_QUOTE_LENGTH}
+              </p>
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" onClick={cancelEditing}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={saveEditing}>
+                  Done
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
           <button
-            onClick={() => setIsEditing(true)}
+            onClick={startEditing}
             className="w-full py-2 text-sm text-text-muted hover:text-text-secondary transition-colors"
           >
             ✎ Customize the quote

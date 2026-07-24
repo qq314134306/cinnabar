@@ -39,6 +39,11 @@
 
 ## Recently Completed
 
+- Made Share Card quote editing reversible and export-bounded. The textarea now
+  owns a separate draft, Cancel restores the previously committed quote, and
+  Done trims and saves. An explicit accessible name, live count, and redundant
+  state/textarea 240-character boundary protect the fixed export layout.
+  Rendered tests cover save, cancel-after-save, and overlong programmatic input.
 - Fixed a hidden Life Timeline failure path. A local calculation exception
   previously wrote error copy into a loading-only label and immediately hid it
   when the Build button returned. The feature now restores the enabled Build
@@ -664,7 +669,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 62 Vitest files / 616 tests in
+The current cumulative local baseline passed 62 Vitest files / 618 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the
