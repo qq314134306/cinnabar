@@ -39,6 +39,13 @@
 
 ## Recently Completed
 
+- Fixed a hidden Life Timeline failure path. A local calculation exception
+  previously wrote error copy into a loading-only label and immediately hid it
+  when the Build button returned. The feature now restores the enabled Build
+  action with an action-linked announced alert, keeps the cache empty, and
+  clears the stale error when retry begins. A rendered failure-to-success test
+  verifies that the second attempt commits the timeline and reveals the year
+  selector.
 - Made local Share Card image export recoverable and single-flight. An
   imperative guard prevents concurrent html2canvas work even under duplicate
   activation, while the button exposes its busy state. Canvas, encoding, or
@@ -657,7 +664,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 62 Vitest files / 615 tests in
+The current cumulative local baseline passed 62 Vitest files / 616 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the

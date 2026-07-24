@@ -110,6 +110,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
 })
 
 describe('Life Timeline', () => {
@@ -158,5 +159,37 @@ describe('Life Timeline', () => {
       target: { value: 'full' },
     })
     expect(screen.getByRole('option', { name: /Age 100/ })).toBeTruthy()
+  })
+
+  it('announces a local build failure and recovers on retry', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    mocks.generateLifetimeKLines.mockImplementationOnce(() => {
+      throw new Error('test calculation failure')
+    })
+    render(createElement(LifeKLine))
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Build My Life Timeline',
+    }))
+
+    expect((await screen.findByRole('alert')).textContent).toContain(
+      'Could not build the timeline. Please try again.',
+    )
+    const buildButton = screen.getByRole('button', {
+      name: 'Build My Life Timeline',
+    })
+    expect((buildButton as HTMLButtonElement).disabled).toBe(false)
+    expect(buildButton.getAttribute('aria-describedby')).toBe(
+      'life-timeline-generation-error',
+    )
+    expect(screen.queryByRole('combobox', { name: 'Choose a year' })).toBeNull()
+
+    fireEvent.click(buildButton)
+
+    expect(await screen.findByRole('combobox', {
+      name: 'Choose a year',
+    })).toBeTruthy()
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(mocks.generateLifetimeKLines).toHaveBeenCalledTimes(2)
   })
 })

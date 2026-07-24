@@ -822,3 +822,15 @@ Canvas, font, encoding, or download failure is contained inside the Share Card
 as a stable announced alert linked to the Save action. It must not use a
 blocking browser `alert()`, expose raw exception details, or leave the action
 disabled. A retry clears the stale error before requesting a fresh export.
+
+## D034 - Life Timeline Calculation Failure Is Visible
+
+The deterministic timeline calculator is local but still fallible when chart
+data is malformed or a calculation dependency throws. A failure must not
+silently collapse back to the idle Build button. Life Timeline restores the
+enabled action and exposes a stable announced alert linked to that action,
+without exposing the raw exception or creating a partial cache.
+
+Starting a retry clears the stale error before recalculation. A successful
+retry commits the complete lifetime cache and replaces the failure state with
+the normal range and year controls.

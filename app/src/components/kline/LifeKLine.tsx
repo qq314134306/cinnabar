@@ -224,6 +224,7 @@ export function LifeKLine({ onRequestChart }: LifeKLineProps) {
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState('')
+  const [generationError, setGenerationError] = useState<string | null>(null)
   const [selectedPoint, setSelectedPoint] = useState<LifetimeKLinePoint | null>(null)
   const [timelineRange, setTimelineRange] = useState<'focus' | 'full'>('focus')
 
@@ -234,6 +235,7 @@ export function LifeKLine({ onRequestChart }: LifeKLineProps) {
   const generateKLines = useCallback(() => {
     if (!chart || !birthInfo) return
 
+    setGenerationError(null)
     setIsGenerating(true)
     setProgress('Building timeline...')
 
@@ -250,7 +252,8 @@ export function LifeKLine({ onRequestChart }: LifeKLineProps) {
       setProgress('')
     } catch (error) {
       console.error('Life Timeline generation failed:', error)
-      setProgress('Could not build the timeline. Try again.')
+      setProgress('')
+      setGenerationError('Could not build the timeline. Please try again.')
     }
 
     setIsGenerating(false)
@@ -356,6 +359,9 @@ export function LifeKLine({ onRequestChart }: LifeKLineProps) {
           <button
             onClick={generateKLines}
             disabled={isGenerating}
+            aria-describedby={
+              generationError ? 'life-timeline-generation-error' : undefined
+            }
             className="px-8 py-3 rounded-xl bg-gradient-to-r from-star to-gold text-night font-medium hover:shadow-[0_0_30px_rgba(124,58,237,0.4)] transition-all duration-300 disabled:opacity-50"
           >
             {isGenerating ? (
@@ -367,6 +373,15 @@ export function LifeKLine({ onRequestChart }: LifeKLineProps) {
               </span>
             )}
           </button>
+          {generationError && (
+            <p
+              id="life-timeline-generation-error"
+              role="alert"
+              className="rounded-lg border border-misfortune/20 bg-misfortune/10 px-4 py-3 text-center text-sm text-misfortune"
+            >
+              {generationError}
+            </p>
+          )}
         </div>
       ) : (
         <>
