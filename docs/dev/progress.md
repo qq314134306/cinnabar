@@ -39,6 +39,25 @@
 
 ## Recently Completed
 
+- Made Compatibility use the same true-solar-time boundary as the natal chart.
+  Person A now prefills from the saved chart without trusting stored derived
+  time data, and either person can keep a birthplace plus explicitly enable
+  local true-solar correction. Each enabled birthplace must resolve to an exact
+  bundled city match before comparison; both corrected birth inputs are then
+  rebuilt independently for the local score and the optional server reading.
+  Edits, retries, persona changes, overlapping clicks, and unmounts cannot
+  commit stale local results. The result names the matched city, minute
+  correction, corrected shichen, and any date crossing for each person.
+  Provider requests carry only allowlisted user-authoritative fields, omit the
+  birthplace when correction is off, and are locally preflighted before they
+  can consume a request. The complete app passes 68 test files / 670 tests,
+  lint, the strict production build, and the dependency audit with zero known
+  vulnerabilities. MatchAnalysis remains lazy at 20.55 kB raw / 6.58 kB gzip,
+  and every JavaScript chunk remains below 500 kB. A real production preview
+  confirmed Chengdu (-67 minutes, Snake Hour) and New York (-56 minutes, Goat
+  Hour), rejected a prefix-only city with fixed copy, restored Person A from
+  the saved chart, and showed no document-level horizontal overflow at the
+  available desktop viewport.
 - Closed the birth-time reliability dead end in the provider-independent chart.
   Selecting “Approximate or uncertain” now defaults automatic true-solar
   correction off while leaving an explicit re-enable available. The resulting
@@ -905,6 +924,15 @@ hosted run or artifact exists yet.
 
 ## Next Useful Work
 
+- Build a provider-independent birth-time shortlist inside the existing
+  sensitivity check, using qingnang.cc's public 寻时定盘 flow as a product
+  benchmark rather than a copied design. Generate the full 13 civil-time
+  candidates (including early and late Rat Hour), require an exact local
+  birthplace, independently resolve true solar time before scoring, ask a
+  bounded set of non-sensitive past-event questions, expose the evidence
+  ledger, and return a top-three or no-clear-separation result. Never replace
+  the saved chart until the user explicitly chooses a candidate, and do not
+  claim minute-level or statistically validated certainty.
 - Expand `/learn/<slug>` only with an owner-approved topic or supplied outline;
   keep each page static, script-free, 400-800 English words, linked in the
   sitemap, and within the established claim boundary. Prove the first

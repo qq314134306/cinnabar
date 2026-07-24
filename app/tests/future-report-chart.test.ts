@@ -132,6 +132,21 @@ describe('server-authoritative Future Report chart reconstruction', () => {
     }, NOW)).rejects.toMatchObject({ code: 'INVALID_BIRTHPLACE' })
   })
 
+  it('ignores a supplied birthplace when true solar correction is disabled', async () => {
+    const identity = await rebuildChartIdentity({
+      ...BASE_INPUT,
+      birth: {
+        ...BASE_INPUT.birth,
+        birthplace: 'New York',
+        trueSolarEnabled: false,
+      },
+    }, NOW)
+
+    expect(identity.birth.location).toBeNull()
+    expect(identity.birth.resolved.trueSolarApplied).toBe(false)
+    expect(identity.birth.resolved.correctionMinutes).toBe(0)
+  })
+
   it('does not emit an hour pillar when the entered birth time is marked unreliable', async () => {
     const snapshot = await rebuildFutureReportSnapshot({
       ...BASE_INPUT,

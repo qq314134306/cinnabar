@@ -510,7 +510,21 @@ uncached; its controller, exact request key, and both input identities own
 every streamed commit. Keep both paths free of analytics unless product and
 privacy requirements explicitly change. Person A and Person B controls must
 retain unique element IDs, person-specific accessible names, independent radio
-groups, and an announced recoverable local-error state.
+groups, and an announced recoverable local-error state. When a current chart
+exists, Person A starts from its editable date, hour, gender, birthplace, solar
+toggle, and reliability fields but never carries the stored
+`resolvedBirthTime`; both people are resolved again from the local birthplace
+index before comparison. Enabled birthplace input must satisfy the same exact
+match predicate used by the server. Correction-off input keeps its text in the
+form but omits the birthplace from the AI wire contract. Local resolution and
+AI streaming have separate ownership/error state, so persona-only changes
+cannot erase a valid local result and stale resolution promises cannot commit
+after an edit. New compatibility AI requests use the full allowlisted birth
+shape for both people; the server temporarily accepts the legacy five-field
+shape only when both people use it for rolling-deployment compatibility.
+Reject mixed legacy/full people. Compatibility may surface controlled
+birthplace-validation copy and server-owned `ReadingApiError` messages, but
+unknown client/runtime failures must map to fixed retry copy.
 
 `src/components/share/ShareCard.tsx` + `ShareCard.test.ts`: deterministic
 chart-summary card and local PNG export. The quote renderer uses an

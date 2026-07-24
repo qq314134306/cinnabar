@@ -79,6 +79,37 @@ export async function findBirthplaceAsync(input?: string): Promise<Birthplace | 
   return findBirthplaceInData(input, birthplaces)
 }
 
+export function isExactBirthplaceMatch(
+  query: string,
+  place: Birthplace,
+): boolean {
+  if (/[\u3400-\u9fff]/u.test(query)) {
+    const normalized = query.trim().replace(/\s+/gu, '')
+    const candidates = [
+      place.name,
+      place.province,
+      place.city,
+      place.area,
+      [place.province, place.city].filter(Boolean).join(''),
+      [place.city, place.area].filter(Boolean).join(''),
+      [place.province, place.city, place.area].filter(Boolean).join(''),
+    ]
+      .filter((candidate): candidate is string => Boolean(candidate))
+      .map((candidate) => candidate.trim().replace(/\s+/gu, ''))
+
+    return candidates.some((candidate) => (
+      candidate === normalized
+      || stripAdministrativeSuffix(candidate) === stripAdministrativeSuffix(normalized)
+    ))
+  }
+
+  const normalized = normalizeLatin(query)
+  return Boolean(
+    normalized
+    && place.latinKeys?.some((candidate) => candidate === normalized),
+  )
+}
+
 export function findBirthplaceInData(input: string | undefined, birthplaces: Birthplace[]): Birthplace | null {
   const normalized = normalizePlace(input)
   if (!normalized) return null

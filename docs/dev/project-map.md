@@ -202,10 +202,17 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   direction, emotional rhythm, and resilience. It is symmetric, needs no
   account/API/payment, and is explicitly reflective rather than scientific.
   Person A/B date, hour, and gender controls use unique IDs and
-  person-specific accessible names; local failures are announced and retryable.
+  person-specific accessible names. Each person also has a uniquely named
+  optional birthplace and true-solar-time toggle. Person A is initially
+  prefilled from an available current chart without retaining its derived
+  resolution; Compare Locally resolves both people again, requires the shared
+  exact-place predicate, displays the applied correction, and rejects stale
+  async work after edits. Local failures are announced and retryable.
   The optional uncached AI narrative retains controller/request-key/
-  input-identity ownership; changes, retries, and unmount reject stale tokens
-  and errors.
+  input-identity ownership, sends both full allowlisted birth shapes, and is
+  preflighted by the same local place check before quota/provider work.
+  Changes, retries, and unmount reject stale tokens and errors; persona changes
+  do not invalidate the separately owned local result.
 - `app/src/components/share/ShareCard.tsx` + `ShareCard.test.ts` - local
   editable chart-summary card and 2x PNG export. The quote area uses an
   html2canvas-stable Georgia/Times font stack, explicit width, and word wrapping

@@ -29,8 +29,8 @@ export interface CompatibilityReadingRequest {
   version: typeof READING_CONTRACT_VERSION
   operation: 'compatibility'
   persona: ReadingPersona
-  personA: ReadingBirthBasic
-  personB: ReadingBirthBasic
+  personA: ReadingBirthFull
+  personB: ReadingBirthFull
 }
 
 export interface YearlyReadingRequest {
@@ -52,6 +52,7 @@ export type ReadingRequest =
  */
 export function serializeFullBirthInfo(birthInfo: BirthInfo): ReadingBirthFull {
   const birthplace = birthInfo.birthplace?.trim()
+  const trueSolarEnabled = birthInfo.trueSolarEnabled ?? true
 
   return {
     year: birthInfo.year,
@@ -59,13 +60,13 @@ export function serializeFullBirthInfo(birthInfo: BirthInfo): ReadingBirthFull {
     day: birthInfo.day,
     hour: birthInfo.hour,
     gender: birthInfo.gender,
-    ...(birthplace ? { birthplace } : {}),
-    trueSolarEnabled: birthInfo.trueSolarEnabled ?? true,
+    ...(trueSolarEnabled && birthplace ? { birthplace } : {}),
+    trueSolarEnabled,
     birthTimeReliable: birthInfo.birthTimeReliable ?? false,
   }
 }
 
-/** Projects a person onto the smaller compatibility contract. */
+/** Legacy five-field projection retained for non-reading compatibility data. */
 export function serializeBasicBirthInfo(birthInfo: BirthInfo): ReadingBirthBasic {
   return {
     year: birthInfo.year,
@@ -97,8 +98,8 @@ export function buildCompatibilityReadingRequest(
     version: READING_CONTRACT_VERSION,
     operation: 'compatibility',
     persona,
-    personA: serializeBasicBirthInfo(personA),
-    personB: serializeBasicBirthInfo(personB),
+    personA: serializeFullBirthInfo(personA),
+    personB: serializeFullBirthInfo(personB),
   }
 }
 
@@ -133,8 +134,8 @@ export function serializeReadingRequest(request: ReadingRequest): ReadingRequest
         version: READING_CONTRACT_VERSION,
         operation: 'compatibility',
         persona: request.persona,
-        personA: serializeBasicBirthInfo(request.personA),
-        personB: serializeBasicBirthInfo(request.personB),
+        personA: serializeFullBirthInfo(request.personA),
+        personB: serializeFullBirthInfo(request.personB),
       }
     case 'yearly':
       return {

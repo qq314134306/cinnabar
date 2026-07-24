@@ -40,6 +40,19 @@ const BASIC_BIRTH_B = {
   gender: 'female',
 } as const
 
+const COMPATIBILITY_BIRTH_A = {
+  ...BASIC_BIRTH_A,
+  birthplace: 'New York',
+  trueSolarEnabled: true,
+  birthTimeReliable: true,
+} as const
+
+const COMPATIBILITY_BIRTH_B = {
+  ...BASIC_BIRTH_B,
+  trueSolarEnabled: true,
+  birthTimeReliable: true,
+} as const
+
 const VALID_BODIES = {
   natal: {
     version: 'reading.v1',
@@ -51,8 +64,8 @@ const VALID_BODIES = {
     version: 'reading.v1',
     operation: 'compatibility',
     persona: 'sage',
-    personA: BASIC_BIRTH_A,
-    personB: BASIC_BIRTH_B,
+    personA: COMPATIBILITY_BIRTH_A,
+    personB: COMPATIBILITY_BIRTH_B,
   },
   yearly: {
     version: 'reading.v1',
@@ -176,6 +189,42 @@ describe('public reading server authority', () => {
     },
   )
 
+  it('accepts legacy five-field compatibility people during rolling deployment', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(sseResponse())
+    const response = await handlePublicReading(request({
+      ...VALID_BODIES.compatibility,
+      personA: BASIC_BIRTH_A,
+      personB: BASIC_BIRTH_B,
+    }), {
+      now: () => NOW,
+      claimQuota: allowedQuota,
+      fetchImpl,
+    })
+
+    expect(response.status).toBe(200)
+    await expect(response.text()).resolves.toContain('"content":"ok"')
+    expect(fetchImpl).toHaveBeenCalledOnce()
+  })
+
+  it('accepts a compatibility birthplace while solar correction is disabled', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(sseResponse())
+    const response = await handlePublicReading(request({
+      ...VALID_BODIES.compatibility,
+      personA: {
+        ...COMPATIBILITY_BIRTH_A,
+        trueSolarEnabled: false,
+      },
+    }), {
+      now: () => NOW,
+      claimQuota: allowedQuota,
+      fetchImpl,
+    })
+
+    expect(response.status).toBe(200)
+    await response.text()
+    expect(fetchImpl).toHaveBeenCalledOnce()
+  })
+
   it('uses only purpose-separated HMAC subjects in the service-role RPC', async () => {
     const single = vi.fn().mockResolvedValue({
       data: { allowed: true, retry_after_seconds: 60 },
@@ -228,6 +277,35 @@ describe('public reading rejection boundary', () => {
       400,
     ],
     [
+      'compatibility nested extra key',
+      {
+        ...VALID_BODIES.compatibility,
+        personA: { ...COMPATIBILITY_BIRTH_A, facts: 'attack' },
+      },
+      400,
+    ],
+    [
+      'compatibility missing solar setting',
+      {
+        ...VALID_BODIES.compatibility,
+        personA: BASIC_BIRTH_A,
+        personB: {
+          ...BASIC_BIRTH_B,
+          birthTimeReliable: true,
+        },
+      },
+      400,
+    ],
+    [
+      'mixed legacy and full compatibility people',
+      {
+        ...VALID_BODIES.compatibility,
+        personA: BASIC_BIRTH_A,
+        personB: COMPATIBILITY_BIRTH_B,
+      },
+      400,
+    ],
+    [
       'minor natal subject',
       { ...VALID_BODIES.natal, birth: { ...FULL_BIRTH, year: 2014 } },
       403,
@@ -236,7 +314,7 @@ describe('public reading rejection boundary', () => {
       'minor compatibility subject',
       {
         ...VALID_BODIES.compatibility,
-        personB: { ...BASIC_BIRTH_B, year: 2015 },
+        personB: { ...COMPATIBILITY_BIRTH_B, year: 2015 },
       },
       403,
     ],
@@ -252,6 +330,24 @@ describe('public reading rejection boundary', () => {
 
     expect(response.status).toBe(status)
     expect(response.headers.get('Cache-Control')).toBe('no-store')
+    expect(fetchImpl).not.toHaveBeenCalled()
+  })
+
+  it('rejects a non-exact compatibility birthplace before provider fetch', async () => {
+    const fetchImpl = vi.fn()
+    const response = await handlePublicReading(request({
+      ...VALID_BODIES.compatibility,
+      personA: {
+        ...COMPATIBILITY_BIRTH_A,
+        birthplace: 'New Y',
+      },
+    }), {
+      now: () => NOW,
+      claimQuota: allowedQuota,
+      fetchImpl,
+    })
+
+    expect(response.status).toBe(400)
     expect(fetchImpl).not.toHaveBeenCalled()
   })
 

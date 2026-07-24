@@ -1000,3 +1000,37 @@ three complete charts, or sends a network request. A stable result does not
 claim every detail is identical; a changed result presents the candidates as
 possibilities. Calculation failure is contained below the main chart with
 fixed copy and an explicit retry.
+
+## D044 - Compatibility Resolves Both People Through One Solar-Time Contract
+
+Compatibility may prefill Person A from an existing chart, but editable state
+contains only the user-authoritative birth fields: date, selected hour, gender,
+optional birthplace, solar-correction toggle, and reliability. It never carries
+the chart's derived `resolvedBirthTime`. Every local comparison resolves both
+people again from the bundled birthplace index, requires the same exact-place
+predicate as the server, then passes the two ephemeral resolved inputs into the
+existing deterministic score model. The result states the matched place,
+minute correction, corrected two-hour band, and any calendar-date crossing.
+An enabled but unmatched or merely prefix-matched place blocks the comparison;
+turning correction off deliberately uses the selected band as entered.
+
+Person A edits switch the form to an explicit manual source and reveal one
+`Use My Chart` recovery action. The current chart is not mutated, Person B is
+never prefilled, and comparison never starts automatically. Local resolution
+owns its own monotonic run identifier, result, busy state, and error. AI
+streaming retains its independent controller/request-key/input-identity
+ownership, so a persona-only change cannot erase the local result and late
+place-resolution work cannot commit after an edit or unmount.
+
+The compatibility `reading.v1` browser request now projects both people through
+the same full birth allowlist used by other reading operations. It sends no
+resolved time, coordinates, timezone, chart facts, prompt, or messages. A
+birthplace is omitted from the wire when correction is off, while the editable
+text remains available if the user re-enables it. The server resolves and
+rebuilds both charts independently before prompt construction. It temporarily
+accepts the prior five-field compatibility shape as an uncorrected
+rolling-deployment fallback only when both people use that shape; mixed legacy
+and full people are rejected so correction cannot silently apply to one side.
+New clients never emit the legacy shape. AI preflight and streaming preserve
+server-owned `ReadingApiError` copy plus controlled birthplace-validation copy;
+all unknown browser/runtime failures use one fixed retry message.

@@ -250,6 +250,14 @@ function parseBasicBirth(
   }, now).birth
 }
 
+function isBasicBirthShape(value: unknown): boolean {
+  return (
+    isRecord(value)
+    && Object.keys(value).length === BASIC_BIRTH_KEYS.size
+    && Object.keys(value).every((key) => BASIC_BIRTH_KEYS.has(key))
+  )
+}
+
 function requireAdult(birth: FutureReportBirthRequest, now: Date): void {
   const adultAt = Date.UTC(
     birth.year + 18,
@@ -288,8 +296,16 @@ function parseReading(value: unknown, now: Date): ParsedReading {
       new Set(['version', 'operation', 'persona', 'personA', 'personB']),
     )
     const persona = requirePersona(value.persona)
-    const personA = parseBasicBirth(value.personA, persona, now)
-    const personB = parseBasicBirth(value.personB, persona, now)
+    const personAIsBasic = isBasicBirthShape(value.personA)
+    const personBIsBasic = isBasicBirthShape(value.personB)
+    if (personAIsBasic !== personBIsBasic) {
+      throw new PublicReadingError(400, 'invalid_request')
+    }
+    // Rolling-deployment compatibility applies only to an entire old-client
+    // request. Mixed people would silently apply solar correction to one side.
+    const parsePerson = personAIsBasic ? parseBasicBirth : parseFullBirth
+    const personA = parsePerson(value.personA, persona, now)
+    const personB = parsePerson(value.personB, persona, now)
     requireAdult(personA, now)
     requireAdult(personB, now)
     return { operation: 'compatibility', persona, personA, personB }

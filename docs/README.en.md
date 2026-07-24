@@ -37,8 +37,11 @@
   time, coordinates, or timezone. `DEEPSEEK_API_KEY` stays on the server; there
   is no in-app API-key or model configuration.
 - **Compatibility** — produces a four-dimension deterministic local comparison
-  without an account or API. When public AI is enabled, users may optionally
-  add a narrative reading.
+  without an account or API. Person A can reuse the visible details from the
+  current chart, and both people can apply locally calculated true solar time
+  from an optional birthplace. The result shows whether and how each birth-hour
+  band was corrected. When public AI is enabled, users may optionally add a
+  narrative reading from the same allowlisted birth settings.
 - **Share Card** — creates a shareable Soul Card from the calculated chart.
 
 ## Local development

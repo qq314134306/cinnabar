@@ -5,12 +5,17 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useSettingsStore } from '@/stores'
+import { useChartStore, useSettingsStore } from '@/stores'
 import type { BirthInfo, Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
-import { getShichenOptions } from '@/lib/shichen'
+import { getShichenOptions, hourToShichen } from '@/lib/shichen'
+import {
+  isExactBirthplaceMatch,
+  resolveBirthTimeAsync,
+  type ResolvedBirthTime,
+} from '@/lib/true-solar-time'
 import { DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
-import { streamReading } from '@/lib/llm'
+import { ReadingApiError, streamReading } from '@/lib/llm'
 import {
   isPublicAiReadingEnabled,
   PUBLIC_AI_UNAVAILABLE_MESSAGE,
@@ -20,7 +25,7 @@ import {
   compareBirthCharts,
   type LocalCompatibilityResult,
 } from '@/lib/compatibility-score'
-import { Button, Select } from '@/components/ui'
+import { Button, Input, Select } from '@/components/ui'
 
 const YEAR_OPTIONS = getYearOptions()
 const MONTH_OPTIONS = getMonthOptions()
@@ -81,19 +86,72 @@ const MarkdownComponents = {
 
 interface PersonInputProps {
   label: string
-  value: BirthInfo
-  onChange: (info: BirthInfo) => void
+  value: CompatibilityBirthInfo
+  onChange: (
+    info: CompatibilityBirthInfo,
+    field: CompatibilityBirthField,
+  ) => void
   disabled: boolean
+}
+
+type CompatibilityBirthField = 'year' | 'month' | 'day' | 'hour' | 'gender'
+  | 'birthplace'
+  | 'trueSolarEnabled'
+type CompatibilityBirthInfo = Pick<
+  BirthInfo,
+  'year' | 'month' | 'day' | 'hour' | 'gender'
+> & {
+  birthplace?: string
+  trueSolarEnabled: boolean
+  birthTimeReliable: boolean
+}
+
+const DEFAULT_PERSON_A: CompatibilityBirthInfo = {
+  year: 1990,
+  month: 1,
+  day: 1,
+  hour: 12,
+  gender: 'male',
+  trueSolarEnabled: true,
+  birthTimeReliable: true,
+}
+
+const DEFAULT_PERSON_B: CompatibilityBirthInfo = {
+  year: 1992,
+  month: 6,
+  day: 15,
+  hour: 14,
+  gender: 'female',
+  trueSolarEnabled: true,
+  birthTimeReliable: true,
+}
+
+function toCompatibilityBirthInfo(info: BirthInfo): CompatibilityBirthInfo {
+  return {
+    year: info.year,
+    month: info.month,
+    day: info.day,
+    hour: info.hour,
+    gender: info.gender,
+    ...(info.birthplace?.trim()
+      ? { birthplace: info.birthplace.trim() }
+      : {}),
+    trueSolarEnabled: info.trueSolarEnabled ?? true,
+    birthTimeReliable: info.birthTimeReliable ?? false,
+  }
 }
 
 function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
   const inputIdPrefix = label.toLowerCase().replace(/\s+/g, '-')
-  const update = (field: keyof BirthInfo, val: number | Gender) => {
-    const next = { ...value, [field]: val }
+  const update = (
+    field: CompatibilityBirthField,
+    val: number | Gender | string | boolean,
+  ) => {
+    const next = { ...value, [field]: val } as CompatibilityBirthInfo
     if (field === 'year' || field === 'month') {
       next.day = clampDayToMonth(next.year, next.month, next.day)
     }
-    onChange(next)
+    onChange(next, field)
   }
   const dayOptions = getDayOptions(value.year, value.month)
 
@@ -179,9 +237,79 @@ function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
             </label>
           ))}
         </fieldset>
+        <Input
+          id={`${inputIdPrefix}-birthplace`}
+          label="Birthplace (optional)"
+          aria-label={`${label} birthplace`}
+          placeholder="City, e.g. Shanghai or New York"
+          hint="Used locally to calculate true solar time."
+          value={value.birthplace ?? ''}
+          onChange={(e) => update('birthplace', e.target.value)}
+          disabled={disabled}
+        />
+        <label
+          htmlFor={`${inputIdPrefix}-true-solar`}
+          className={`
+            flex items-center gap-3 rounded-lg border border-white/[0.08]
+            bg-white/[0.025] px-3 py-2 text-sm text-text-secondary
+            ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+          `}
+        >
+          <input
+            id={`${inputIdPrefix}-true-solar`}
+            type="checkbox"
+            aria-label={`${label} apply true solar time`}
+            checked={value.trueSolarEnabled}
+            onChange={(e) => update('trueSolarEnabled', e.target.checked)}
+            disabled={disabled}
+            className="h-4 w-4 accent-gold"
+          />
+          Apply true solar time when a birthplace is entered
+        </label>
       </div>
     </div>
   )
+}
+
+interface CompatibilityResolution {
+  personA: ResolvedBirthTime
+  personB: ResolvedBirthTime
+}
+
+class CompatibilityInputError extends Error {}
+
+async function resolveCompatibilityPerson(
+  label: string,
+  info: CompatibilityBirthInfo,
+): Promise<BirthInfo> {
+  const birthplace = info.birthplace?.trim()
+  const resolvedBirthTime = await resolveBirthTimeAsync({
+    year: info.year,
+    month: info.month,
+    day: info.day,
+    hour: info.hour,
+    birthplace,
+    enabled: info.trueSolarEnabled,
+  })
+
+  if (
+    info.trueSolarEnabled
+    && birthplace
+    && (
+      !resolvedBirthTime.location
+      || !isExactBirthplaceMatch(birthplace, resolvedBirthTime.location)
+    )
+  ) {
+    throw new CompatibilityInputError(
+      `${label} birthplace could not be matched. Enter a recognized city or turn off true solar time.`,
+    )
+  }
+
+  return {
+    ...info,
+    ...(birthplace ? { birthplace } : {}),
+    resolvedBirthTime,
+  }
 }
 
 /* ------------------------------------------------------------
@@ -190,27 +318,41 @@ function PersonInput({ label, value, onChange, disabled }: PersonInputProps) {
 
 export function MatchAnalysis() {
   const { persona, setPersona } = useSettingsStore()
+  const currentBirthInfo = useChartStore((state) => (
+    state.chart && state.birthInfo ? state.birthInfo : null
+  ))
   const publicAiEnabled = isPublicAiReadingEnabled()
 
-  const [person1, setPerson1] = useState<BirthInfo>({
-    year: 1990, month: 1, day: 1, hour: 12, gender: 'male',
-  })
-  const [person2, setPerson2] = useState<BirthInfo>({
-    year: 1992, month: 6, day: 15, hour: 14, gender: 'female',
-  })
+  const [person1, setPerson1] = useState<CompatibilityBirthInfo>(
+    () => currentBirthInfo
+      ? toCompatibilityBirthInfo(currentBirthInfo)
+      : DEFAULT_PERSON_A,
+  )
+  const [person1Source, setPerson1Source] = useState<'chart' | 'manual'>(
+    () => currentBirthInfo ? 'chart' : 'manual',
+  )
+  const [person1TimingEdited, setPerson1TimingEdited] = useState(false)
+  const [person2, setPerson2] = useState<CompatibilityBirthInfo>(DEFAULT_PERSON_B)
   const [localResult, setLocalResult] = useState<LocalCompatibilityResult | null>(null)
+  const [localResolution, setLocalResolution] = useState<CompatibilityResolution | null>(null)
+  const [comparing, setComparing] = useState(false)
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [localError, setLocalError] = useState<string | null>(null)
+  const [aiError, setAiError] = useState<string | null>(null)
   const requestRef = useRef<AbortController | null>(null)
+  const comparisonIdRef = useRef(0)
+  const comparisonBusyRef = useRef(false)
   const request = useMemo(
     () => buildCompatibilityReadingRequest(person1, person2, persona),
     [person1, person2, persona],
   )
   const requestKey = useMemo(() => JSON.stringify(request), [request])
-  const previousRequestKeyRef = useRef(requestKey)
-  const previousPerson1Ref = useRef(person1)
-  const previousPerson2Ref = useRef(person2)
+  const previousLocalPerson1Ref = useRef(person1)
+  const previousLocalPerson2Ref = useRef(person2)
+  const previousAiRequestKeyRef = useRef(requestKey)
+  const previousAiPerson1Ref = useRef(person1)
+  const previousAiPerson2Ref = useRef(person2)
   const latestRequestKeyRef = useRef(requestKey)
   const latestPerson1Ref = useRef(person1)
   const latestPerson2Ref = useRef(person2)
@@ -220,53 +362,137 @@ export function MatchAnalysis() {
   latestPerson2Ref.current = person2
 
   useEffect(() => {
-    const contextChanged = (
-      previousRequestKeyRef.current !== requestKey
-      || previousPerson1Ref.current !== person1
-      || previousPerson2Ref.current !== person2
+    const peopleChanged = (
+      previousLocalPerson1Ref.current !== person1
+      || previousLocalPerson2Ref.current !== person2
     )
-    previousRequestKeyRef.current = requestKey
-    previousPerson1Ref.current = person1
-    previousPerson2Ref.current = person2
-    if (!contextChanged) return
+    previousLocalPerson1Ref.current = person1
+    previousLocalPerson2Ref.current = person2
+    if (!peopleChanged) return
+
+    comparisonIdRef.current += 1
+    comparisonBusyRef.current = false
+    setComparing(false)
+    setLocalResult(null)
+    setLocalResolution(null)
+    setLocalError(null)
+  }, [person1, person2])
+
+  useEffect(() => {
+    const requestChanged = (
+      previousAiRequestKeyRef.current !== requestKey
+      || previousAiPerson1Ref.current !== person1
+      || previousAiPerson2Ref.current !== person2
+    )
+    previousAiRequestKeyRef.current = requestKey
+    previousAiPerson1Ref.current = person1
+    previousAiPerson2Ref.current = person2
+    if (!requestChanged) return
 
     const controller = requestRef.current
     requestRef.current = null
     controller?.abort()
     setLoading(false)
-    setLocalResult(null)
     setResult('')
-    setError(null)
+    setAiError(null)
   }, [person1, person2, requestKey])
 
   useEffect(() => {
     return () => {
+      comparisonIdRef.current += 1
+      comparisonBusyRef.current = false
       const controller = requestRef.current
       requestRef.current = null
       controller?.abort()
     }
   }, [])
 
-  const handleLocalCompare = useCallback(() => {
+  const handlePerson1Change = useCallback((
+    next: CompatibilityBirthInfo,
+    field: CompatibilityBirthField,
+  ) => {
+    const timingChanged = (
+      field === 'year'
+      || field === 'month'
+      || field === 'day'
+      || field === 'hour'
+      || field === 'birthplace'
+      || field === 'trueSolarEnabled'
+    )
+    setPerson1(next)
+    setPerson1Source('manual')
+    setPerson1TimingEdited((wasEdited) => wasEdited || timingChanged)
+  }, [])
+
+  const handlePerson2Change = useCallback((next: CompatibilityBirthInfo) => {
+    setPerson2(next)
+  }, [])
+
+  const handleUseCurrentChart = useCallback(() => {
+    if (!currentBirthInfo) return
+    setPerson1(toCompatibilityBirthInfo(currentBirthInfo))
+    setPerson1Source('chart')
+    setPerson1TimingEdited(false)
+  }, [currentBirthInfo])
+
+  const handleLocalCompare = useCallback(async () => {
+    if (comparisonBusyRef.current || requestRef.current) return
+    comparisonBusyRef.current = true
+    const comparisonId = comparisonIdRef.current + 1
+    comparisonIdRef.current = comparisonId
+    const activePerson1 = person1
+    const activePerson2 = person2
+    setComparing(true)
+    setLocalResult(null)
+    setLocalResolution(null)
+    setLocalError(null)
+
     try {
-      setLocalResult(compareBirthCharts(person1, person2))
-      setError(null)
+      const [resolvedPerson1, resolvedPerson2] = await Promise.all([
+        resolveCompatibilityPerson('Person A', activePerson1),
+        resolveCompatibilityPerson('Person B', activePerson2),
+      ])
+      if (
+        comparisonIdRef.current !== comparisonId
+        || latestPerson1Ref.current !== activePerson1
+        || latestPerson2Ref.current !== activePerson2
+      ) return
+
+      setLocalResult(compareBirthCharts(resolvedPerson1, resolvedPerson2))
+      setLocalResolution({
+        personA: resolvedPerson1.resolvedBirthTime!,
+        personB: resolvedPerson2.resolvedBirthTime!,
+      })
+      setLocalError(null)
     } catch (err) {
+      if (
+        comparisonIdRef.current !== comparisonId
+        || latestPerson1Ref.current !== activePerson1
+        || latestPerson2Ref.current !== activePerson2
+      ) return
       setLocalResult(null)
-      setError(
-        err instanceof Error
+      setLocalResolution(null)
+      setLocalError(
+        err instanceof CompatibilityInputError
           ? err.message
           : 'The local comparison could not be built. Check both birth dates and try again.',
       )
+    } finally {
+      if (comparisonIdRef.current === comparisonId) {
+        comparisonBusyRef.current = false
+        setComparing(false)
+      }
     }
   }, [person1, person2])
 
   const handleAnalyze = useCallback(async () => {
-    if (!publicAiEnabled) return
+    if (
+      !publicAiEnabled
+      || comparing
+      || comparisonBusyRef.current
+      || requestRef.current
+    ) return
 
-    const previousController = requestRef.current
-    requestRef.current = null
-    previousController?.abort()
     const controller = new AbortController()
     requestRef.current = controller
     const activePerson1 = person1
@@ -274,10 +500,21 @@ export function MatchAnalysis() {
     const activeRequestKey = requestKey
 
     setLoading(true)
-    setError(null)
+    setAiError(null)
     setResult('')
 
     try {
+      await Promise.all([
+        resolveCompatibilityPerson('Person A', activePerson1),
+        resolveCompatibilityPerson('Person B', activePerson2),
+      ])
+      if (
+        requestRef.current !== controller
+        || latestRequestKeyRef.current !== activeRequestKey
+        || latestPerson1Ref.current !== activePerson1
+        || latestPerson2Ref.current !== activePerson2
+      ) return
+
       let fullText = ''
       for await (const token of streamReading(request, { signal: controller.signal })) {
         if (
@@ -303,14 +540,20 @@ export function MatchAnalysis() {
         || latestPerson1Ref.current !== activePerson1
         || latestPerson2Ref.current !== activePerson2
       ) return
-      setError(err instanceof Error ? err.message : 'The analysis failed. Please try again.')
+      setAiError(
+        err instanceof CompatibilityInputError
+          ? err.message
+          : err instanceof ReadingApiError
+            ? err.message
+            : 'The analysis failed. Please try again.',
+      )
     } finally {
       if (requestRef.current === controller) {
         requestRef.current = null
         setLoading(false)
       }
     }
-  }, [person1, person2, publicAiEnabled, request, requestKey])
+  }, [comparing, person1, person2, publicAiEnabled, request, requestKey])
 
   return (
     <div className="animate-fade-in space-y-8 max-w-6xl mx-auto">
@@ -346,11 +589,11 @@ export function MatchAnalysis() {
           <div className="flex flex-wrap items-center gap-3">
             <Button
               onClick={handleLocalCompare}
-              disabled={loading}
+              disabled={loading || comparing}
               size="sm"
               variant="gold"
             >
-              Compare Locally
+              {comparing ? 'Resolving solar time…' : 'Compare Locally'}
             </Button>
 
             {publicAiEnabled && (
@@ -374,7 +617,7 @@ export function MatchAnalysis() {
 
                 <Button
                   onClick={handleAnalyze}
-                  disabled={loading}
+                  disabled={loading || comparing}
                   size="sm"
                   variant="secondary"
                 >
@@ -395,15 +638,49 @@ export function MatchAnalysis() {
           <PersonInput
             label="Person A"
             value={person1}
-            onChange={setPerson1}
+            onChange={handlePerson1Change}
             disabled={loading}
           />
           <PersonInput
             label="Person B"
             value={person2}
-            onChange={setPerson2}
+            onChange={handlePerson2Change}
             disabled={loading}
           />
+        </div>
+
+        <div
+          role="status"
+          className="mt-4 flex flex-col gap-3 rounded-lg border border-white/[0.08] bg-white/[0.025] p-3 text-sm text-text-secondary sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div>
+            <p className="font-medium text-text">
+              {person1Source === 'chart' && currentBirthInfo
+                ? 'Using Your Chart details'
+                : currentBirthInfo
+                  ? 'Edited details'
+                  : 'No chart is loaded'}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-text-muted">
+              {person1Source === 'chart' && currentBirthInfo
+                ? `Prefilled with the saved date, hour, gender, birthplace, and solar-time setting.${currentBirthInfo.birthTimeReliable === false ? ' Your saved birth time is approximate, so review Person A’s birth-hour band.' : ''}`
+                : currentBirthInfo && person1TimingEdited
+                  ? 'Date, time, and birthplace changes are resolved again when you compare.'
+                  : currentBirthInfo
+                    ? 'Person A uses manual details for this comparison.'
+                    : 'Enter both people manually—local comparison still works.'}
+            </p>
+          </div>
+          {currentBirthInfo && person1Source === 'manual' && (
+            <Button
+              onClick={handleUseCurrentChart}
+              disabled={loading}
+              size="sm"
+              variant="secondary"
+            >
+              Use My Chart
+            </Button>
+          )}
         </div>
 
         {!publicAiEnabled && (
@@ -416,12 +693,21 @@ export function MatchAnalysis() {
           </div>
         )}
 
-        {error && (
+        {localError && (
           <div
             role="alert"
             className="mt-4 p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm border border-misfortune/20"
           >
-            {error}
+            {localError}
+          </div>
+        )}
+
+        {aiError && (
+          <div
+            role="alert"
+            className="mt-4 p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm border border-misfortune/20"
+          >
+            {aiError}
           </div>
         )}
       </div>
@@ -450,7 +736,17 @@ export function MatchAnalysis() {
           </div>
         )}
 
-        {localResult && <LocalCompatibilitySnapshot result={localResult} />}
+        {localResult && localResolution && (
+          <>
+            <SolarResolutionSummary
+              people={[
+                ['Person A', person1, localResolution.personA],
+                ['Person B', person2, localResolution.personB],
+              ]}
+            />
+            <LocalCompatibilitySnapshot result={localResult} />
+          </>
+        )}
       </div>
 
       {publicAiEnabled && (
@@ -497,6 +793,51 @@ export function MatchAnalysis() {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function SolarResolutionSummary({
+  people,
+}: {
+  people: Array<[
+    label: string,
+    input: CompatibilityBirthInfo,
+    resolved: ResolvedBirthTime,
+  ]>
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="True solar time resolution"
+      className="mb-6 grid gap-3 md:grid-cols-2"
+    >
+      {people.map(([label, input, resolved]) => {
+        const locationName = resolved.location
+          ? resolved.location.enName ?? resolved.location.name
+          : null
+        const correction = resolved.correctionMinutes > 0
+          ? `+${resolved.correctionMinutes}`
+          : String(resolved.correctionMinutes)
+
+        return (
+          <div
+            key={label}
+            className="rounded-xl border border-gold/15 bg-gold/[0.04] p-4"
+          >
+            <p className="text-xs uppercase tracking-[0.16em] text-gold/80">
+              {label} · Solar-time check
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+              {resolved.applied && locationName
+                ? `Matched ${locationName}. True solar time adjusted ${correction} minutes to ${hourToShichen(resolved.hour)}${resolved.crossedDate ? ' on the adjacent calendar date' : ''}.`
+                : input.trueSolarEnabled
+                  ? 'No birthplace was entered, so the selected birth-hour band was used without solar correction.'
+                  : 'True solar correction is off; the selected birth-hour band was used as entered.'}
+            </p>
+          </div>
+        )
+      })}
     </div>
   )
 }

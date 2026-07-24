@@ -19,6 +19,7 @@ import {
   buildZiWeiChartFacts,
 } from '../src/lib/chart-facts'
 import {
+  isExactBirthplaceMatch,
   resolveBirthTime,
   resolveBirthTimeAsync,
   type Birthplace,
@@ -243,57 +244,10 @@ export function parseFutureReportRequestInput(
   }
 }
 
-function normalizeLatin(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/gu, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/gu, '')
-}
-
-function normalizeCjk(value: string): string {
-  return value.trim().replace(/\s+/gu, '')
-}
-
-function stripAdministrativeSuffix(value: string): string {
-  return value.replace(
-    /(特别行政区|自治州|地区|盟|省|市|县|区)$/u,
-    '',
-  )
-}
-
-function isStrictLocationQuery(query: string, place: Birthplace): boolean {
-  if (/[\u3400-\u9fff]/u.test(query)) {
-    const normalized = normalizeCjk(query)
-    const candidates = [
-      place.name,
-      place.province,
-      place.city,
-      place.area,
-      [place.province, place.city].filter(Boolean).join(''),
-      [place.city, place.area].filter(Boolean).join(''),
-      [place.province, place.city, place.area].filter(Boolean).join(''),
-    ]
-      .filter((candidate): candidate is string => Boolean(candidate))
-      .map(normalizeCjk)
-
-    return candidates.some((candidate) => (
-      candidate === normalized
-      || stripAdministrativeSuffix(candidate) === stripAdministrativeSuffix(normalized)
-    ))
-  }
-
-  const normalized = normalizeLatin(query)
-  return Boolean(
-    normalized
-    && place.latinKeys?.some((candidate) => candidate === normalized),
-  )
-}
-
 async function resolveTrustedBirthTime(
   birth: FutureReportBirthRequest,
 ): Promise<ResolvedBirthTime> {
-  if (!birth.birthplace) {
+  if (!birth.trueSolarEnabled || !birth.birthplace) {
     return resolveBirthTime({
       year: birth.year,
       month: birth.month,
@@ -313,7 +267,7 @@ async function resolveTrustedBirthTime(
   })
   if (
     !resolved.location
-    || !isStrictLocationQuery(birth.birthplace, resolved.location)
+    || !isExactBirthplaceMatch(birth.birthplace, resolved.location)
   ) {
     throw new HttpError(
       'Birthplace could not be matched exactly.',

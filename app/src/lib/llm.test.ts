@@ -115,7 +115,22 @@ describe('reading.v1 browser contract', () => {
     })
   })
 
-  it('serializes compatibility people to the strict five-field shape', () => {
+  it('omits birthplace from the wire contract when solar correction is off', () => {
+    expect(serializeFullBirthInfo({
+      ...birthInfo,
+      trueSolarEnabled: false,
+    })).toEqual({
+      year: 1990,
+      month: 4,
+      day: 18,
+      hour: 23,
+      gender: 'female',
+      trueSolarEnabled: false,
+      birthTimeReliable: false,
+    })
+  })
+
+  it('retains the legacy five-field projection without derived metadata', () => {
     expect(serializeBasicBirthInfo({
       ...birthInfo,
       trueSolarEnabled: false,
@@ -153,6 +168,9 @@ describe('reading.v1 browser contract', () => {
         day: 18,
         hour: 23,
         gender: 'female',
+        birthplace: 'Taipei',
+        trueSolarEnabled: true,
+        birthTimeReliable: false,
       },
       personB: {
         year: 1990,
@@ -160,6 +178,9 @@ describe('reading.v1 browser contract', () => {
         day: 18,
         hour: 23,
         gender: 'male',
+        birthplace: 'Taipei',
+        trueSolarEnabled: true,
+        birthTimeReliable: false,
       },
     })
     expect(yearly).toMatchObject({
