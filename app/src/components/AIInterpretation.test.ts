@@ -4,6 +4,7 @@ import { StrictMode, createElement } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
+import { ReadingApiError } from '@/lib/llm'
 import { buildNatalReadingRequest } from '@/lib/reading-contract'
 import {
   useChartStore,
@@ -19,6 +20,7 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/lib/llm', () => ({
+  ReadingApiError: class ReadingApiError extends Error {},
   streamReading: mocks.streamReading,
 }))
 
@@ -303,7 +305,15 @@ describe('AIInterpretation request ownership', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Read Again' }))
     await flushAsyncWork()
 
-    expect(screen.getByText('temporary failure')).toBeTruthy()
+    const failure = screen.getByRole('alert')
+    expect(failure.textContent).toBe(
+      'The reading could not be completed. Please try again.',
+    )
+    expect(failure.textContent).not.toContain('temporary failure')
+    expect(
+      screen.getByRole('button', { name: 'Get My Free Reading' })
+        .getAttribute('aria-describedby'),
+    ).toBe('ai-reading-error')
     expect(screen.queryByText('OLD')).toBeNull()
     expect(useContentCacheStore.getState().aiInterpretation).toBeNull()
 
@@ -317,6 +327,26 @@ describe('AIInterpretation request ownership', () => {
     })
     expect(screen.getByText('NEW')).toBeTruthy()
     expect(screen.queryByText('OLDNEW')).toBeNull()
+    expect(screen.queryByRole('alert')).toBeNull()
     expect(mocks.completeReading).toHaveBeenCalledTimes(1)
+  })
+
+  it('preserves a stable reading-service message', async () => {
+    mocks.streamReading.mockReturnValue((async function* () {
+      yield* []
+      throw new ReadingApiError(
+        'Please check your birth details.',
+        'READING_INPUT_INVALID',
+        422,
+      )
+    })())
+
+    render(createElement(AIInterpretation))
+    fireEvent.click(screen.getByRole('button', { name: 'Get My Free Reading' }))
+    await flushAsyncWork()
+
+    expect(screen.getByRole('alert').textContent).toBe(
+      'Please check your birth details.',
+    )
   })
 })

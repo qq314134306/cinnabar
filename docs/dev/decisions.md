@@ -864,3 +864,15 @@ Clipboard success is an announced, temporary state whose timer is replaced on
 retry and cleared on unmount. Clipboard absence or rejection shows an announced
 failure with the canonical site address as a manual fallback, while leaving
 the Copy action available for retry.
+
+## D037 - Natal Reading Errors Keep a Public Boundary
+
+The natal-reading client may show the message from `ReadingApiError`, because
+that class represents the server-owned, stable public error envelope. Any
+other thrown value or client/runtime exception maps to one fixed retry message;
+raw exception text must not become product copy.
+
+The owned error is rendered as an announced alert and linked to the reading
+action. Starting a retry clears the stale alert before opening the next stream.
+Controller, request-key, and chart-identity checks still decide whether any
+failure is allowed to commit.

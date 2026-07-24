@@ -336,6 +336,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/AIInterpretation.tsx` - request-keyed natal-reading cache
   and guarded streaming UI. Retry and chart/persona changes abort the old
   controller and reject late tokens, cache writes, errors, and analytics.
+  Server-owned `ReadingApiError` messages remain visible; unknown exceptions
+  become fixed, action-linked announced retry copy.
 - `app/tests/future-report-generation-reliability.test.ts` +
   `app/src/components/AIInterpretation.test.ts` +
   `app/src/stores/auth.test.ts` - bounded paid-generation, request-keyed stream,

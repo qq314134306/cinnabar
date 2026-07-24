@@ -308,7 +308,10 @@ cache is an atomic `{content, requestKey}` pair keyed by the exact serialized
 `reading.v1` request. Retry and chart/persona changes abort and clear the old
 stream. Keep controller + request-key + chart guards on tokens, cache writes,
 errors, and completion analytics; never restore cache from an effect after a
-retry has cleared it.
+retry has cleared it. A `ReadingApiError` may expose its server-owned stable
+message; every unknown client/runtime exception maps to fixed retry copy. The
+visible failure is an announced alert linked to the reading action, and retry
+clears it before starting a new request.
 
 `src/lib/fortune-score.ts` + `src/components/kline/LifeKLine.tsx`: visible Life
 Timeline uses the deterministic local calculator. Its default view stays

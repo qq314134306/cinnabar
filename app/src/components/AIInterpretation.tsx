@@ -9,7 +9,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
 import { DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
-import { streamReading } from '@/lib/llm'
+import { ReadingApiError, streamReading } from '@/lib/llm'
 import {
   isPublicAiReadingEnabled,
   PUBLIC_AI_UNAVAILABLE_MESSAGE,
@@ -28,6 +28,8 @@ import { analytics } from '@/lib/analytics'
    ------------------------------------------------------------ */
 
 const CHAR_INTERVAL = 35
+const READING_RETRY_MESSAGE =
+  'The reading could not be completed. Please try again.'
 
 const PERSONAS: Persona[] = ['scholar', 'sage']
 
@@ -238,7 +240,11 @@ export function AIInterpretation() {
         || latestRequestKeyRef.current !== activeRequestKey
         || latestChartRef.current !== activeChart
       ) return
-      setError(err instanceof Error ? err.message : 'The reading failed. Please try again.')
+      setError(
+        err instanceof ReadingApiError
+          ? err.message
+          : READING_RETRY_MESSAGE,
+      )
     } finally {
       if (requestRef.current === controller) {
         requestRef.current = null
@@ -337,7 +343,13 @@ export function AIInterpretation() {
             ))}
           </div>
 
-          <Button onClick={handleInterpret} disabled={loading} size="sm" variant="gold">
+          <Button
+            onClick={handleInterpret}
+            disabled={loading}
+            aria-describedby={error ? 'ai-reading-error' : undefined}
+            size="sm"
+            variant="gold"
+          >
             {loading ? (
               <span className="flex items-center gap-2">
                 <span className="w-3 h-3 border-2 border-night border-t-transparent rounded-full animate-spin" />
@@ -349,7 +361,11 @@ export function AIInterpretation() {
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm mb-4 border border-misfortune/20">
+        <div
+          id="ai-reading-error"
+          role="alert"
+          className="p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm mb-4 border border-misfortune/20"
+        >
           {error}
         </div>
       )}

@@ -39,6 +39,13 @@
 
 ## Recently Completed
 
+- Closed the natal-reading error boundary without changing its visual design.
+  Server-owned `ReadingApiError` copy remains available for actionable
+  validation/availability states, while unknown runtime exceptions now map to
+  one fixed retry message. The active failure is announced and linked to the
+  reading action; retry clears it. Rendered tests prove unknown-detail
+  containment, stable service-message preservation, and failure-to-success
+  recovery under the existing request ownership guards.
 - Contained Soul Card share failures. Image generation is now imperatively
   single-flight, always removes its temporary anchor, and replaces the
   raw-detail browser alert with an action-linked announced retry state.
@@ -676,7 +683,7 @@ no-`psql` failure exercise, and `git diff --check`. The existing large-chunk
 warning remained non-fatal. These are local mock/contract/static checks, not a
 hosted database run, deployment proof, or Supabase/PayPal/other provider proof.
 
-The current cumulative local baseline passed 63 Vitest files / 622 tests in
+The current cumulative local baseline passed 63 Vitest files / 623 tests in
 the latest full-suite run. It includes the Life Timeline navigation, focused
 range, full ages 1-100 model, and lifespan-disclaimer contracts; the symmetric
 local Compatibility model plus its default-off-AI interaction contract; the
@@ -856,6 +863,9 @@ hosted run or artifact exists yet.
 - Use GitHub issue templates for new feature, bug, and internal development work.
 - Keep the in-app open source links pointed at the source repository unless the
   public repository strategy changes.
+- Before final UI design or polish begins, pause for owner participation and
+  agree the visual direction, color/typography treatment, information density,
+  and mobile character before implementing a style change.
 
 [PROTOCOL]: Update this file after each feature, fix, release, deployment change,
 or notable verification run.
