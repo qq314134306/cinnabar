@@ -7,19 +7,31 @@ import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
 import { ChartDisplay } from '@/components/chart'
-import { AIInterpretation } from '@/components/AIInterpretation'
-import { MatchAnalysis } from '@/components/match'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
-import { ShareCard } from '@/components/share'
 import { ExitIntentModal } from '@/components/ExitIntentModal'
 import { AuthControl } from '@/components/AuthControl'
 import { useChartStore, useAuthStore } from '@/stores'
 import { trackPageView } from '@/lib/analytics'
 
+const AIInterpretation = lazy(async () => {
+  const module = await import('@/components/AIInterpretation')
+  return { default: module.AIInterpretation }
+})
+
 const LifeKLine = lazy(async () => {
   const module = await import('@/components/kline/LifeKLine')
   return { default: module.LifeKLine }
+})
+
+const MatchAnalysis = lazy(async () => {
+  const module = await import('@/components/match/MatchAnalysis')
+  return { default: module.MatchAnalysis }
+})
+
+const ShareCard = lazy(async () => {
+  const module = await import('@/components/share/ShareCard')
+  return { default: module.ShareCard }
 })
 
 type TabType = 'chart' | 'timeline' | 'match' | 'share'
@@ -63,6 +75,7 @@ export default function App() {
   // router, so tabs are our virtual routes).
   useEffect(() => {
     const route = TAB_ROUTES[activeTab]
+    document.title = route.title
     trackPageView(route.path, route.title)
   }, [activeTab])
 
@@ -239,7 +252,11 @@ export default function App() {
                 </div>
 
                 <div className="w-full max-w-6xl mx-auto">
-                  <AIInterpretation />
+                  <Suspense
+                    fallback={<SurfaceLoading label="Loading chart insights…" />}
+                  >
+                    <AIInterpretation />
+                  </Suspense>
                 </div>
 
                 <div className="text-center">
@@ -264,13 +281,21 @@ export default function App() {
 
           {/* Life Timeline tab */}
           {activeTab === 'timeline' && (
-            <Suspense fallback={<TimelineLoading />}>
+            <Suspense
+              fallback={<SurfaceLoading label="Loading Life Timeline…" />}
+            >
               <LifeKLine onRequestChart={() => setActiveTab('chart')} />
             </Suspense>
           )}
 
           {/* Compatibility tab */}
-          {activeTab === 'match' && <MatchAnalysis />}
+          {activeTab === 'match' && (
+            <Suspense
+              fallback={<SurfaceLoading label="Loading Compatibility…" />}
+            >
+              <MatchAnalysis />
+            </Suspense>
+          )}
 
           {/* Share Card tab */}
           {activeTab === 'share' && (
@@ -284,7 +309,11 @@ export default function App() {
               </div>
             ) : (
               <div className="max-w-xl mx-auto">
-                <ShareCard />
+                <Suspense
+                  fallback={<SurfaceLoading label="Loading Share Card…" />}
+                >
+                  <ShareCard />
+                </Suspense>
               </div>
             )
           )}
@@ -361,7 +390,7 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
   )
 }
 
-function TimelineLoading() {
+function SurfaceLoading({ label }: { label: string }) {
   return (
     <div className="flex min-h-[40vh] items-center justify-center">
       <div
@@ -372,7 +401,7 @@ function TimelineLoading() {
           aria-hidden="true"
           className="h-4 w-4 animate-spin rounded-full border-2 border-star border-t-transparent"
         />
-        Loading Life Timeline…
+        {label}
       </div>
     </div>
   )

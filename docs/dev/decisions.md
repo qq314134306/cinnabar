@@ -754,3 +754,24 @@ Visual icons are excluded from accessible names. A delayed exit-intent success
 close is cleared on unmount, and unavailable session storage degrades only its
 once-per-session hint. These UI guarantees do not alter authentication,
 subscription, OTP consumption, or external-provider authority.
+
+## D030 - Secondary Product Surfaces Do Not Tax the Landing Page
+
+The landing and base chart are the shortest path to product value, so
+`BirthForm` and `ChartDisplay` stay synchronous. Optional AI narrative, Life
+Timeline, Compatibility, and the populated Share Card are lazy boundaries with
+announced loading states. Their Markdown, image-export, matching, and payment
+dependencies must not return to the initial application chunk merely because
+their navigation controls are visible.
+
+The empty Share Card state remains synchronous so a user without a chart gets
+an immediate recovery action. Tab changes update the semantic active state,
+document title, and analytics virtual route together; this code splitting does
+not create browser-history routes or alter authentication and provider
+authority.
+
+The 2026-07-23 production build reduced the initial main script from
+1,416.78 kB / 421.89 kB gzip to 981.91 kB / 299.97 kB gzip, a reduction of
+434.87 kB raw (30.7%) and 121.92 kB gzip (28.9%). The remaining chunk-over-
+500-KB warning is tracked separately and is not evidence that these optional
+surfaces were eagerly restored.

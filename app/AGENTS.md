@@ -104,7 +104,12 @@ proofs pass. Future Report payments remain last and disabled.
 Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
 codebase but is hidden from navigation). Desktop and mobile navigation have
 distinct accessible labels, expose the active surface with
-`aria-current="page"`, and keep decorative tab icons out of accessible names.
+`aria-current="page"`, keep decorative tab icons out of accessible names, and
+update the document title plus analytics virtual route together. BirthForm and
+the base chart remain in the initial application path. Optional AI narrative,
+Life Timeline, Compatibility, and populated Share Card surfaces are lazy
+boundaries with announced loading states; do not make the landing page pay for
+their calculation, image-export, Markdown, or payment dependencies eagerly.
 
 `api/interpret.ts` + `api/_public-reading.ts`: SERVER-OWNED, default-off public
 AI boundary. It accepts only exact `reading.v1` `natal`, `compatibility`, or

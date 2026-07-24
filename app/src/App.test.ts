@@ -44,13 +44,13 @@ vi.mock('@/components/chart', () => ({
 vi.mock('@/components/AIInterpretation', () => ({
   AIInterpretation: () => createElement('div', null, 'AI Interpretation'),
 }))
-vi.mock('@/components/match', () => ({
+vi.mock('@/components/match/MatchAnalysis', () => ({
   MatchAnalysis: () => createElement('div', null, 'Match Analysis'),
 }))
 vi.mock('@/components/kline/LifeKLine', () => ({
   LifeKLine: () => createElement('div', null, 'Life Timeline Content'),
 }))
-vi.mock('@/components/share', () => ({
+vi.mock('@/components/share/ShareCard', () => ({
   ShareCard: () => createElement('div', null, 'Share Card Content'),
 }))
 vi.mock('@/components/OpenSourceLinks', () => ({
@@ -67,6 +67,7 @@ vi.mock('@/components/AuthControl', () => ({
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+  document.title = ''
 })
 
 describe('App navigation', () => {
@@ -105,5 +106,42 @@ describe('App navigation', () => {
       '/life-timeline',
       'Cinnabar — Life Timeline',
     )
+    expect(document.title).toBe('Cinnabar — Life Timeline')
+  })
+
+  it('loads secondary surfaces on demand and reports their virtual routes', async () => {
+    render(createElement(App))
+
+    const primaryNav = screen.getByRole('navigation', { name: 'Primary' })
+
+    fireEvent.click(
+      within(primaryNav).getByRole('button', { name: 'Compatibility' }),
+    )
+
+    expect(await screen.findByText('Match Analysis')).toBeTruthy()
+    expect(
+      within(primaryNav).getByRole('button', { name: 'Compatibility' })
+        .getAttribute('aria-current'),
+    ).toBe('page')
+    expect(mocks.trackPageView).toHaveBeenLastCalledWith(
+      '/compatibility',
+      'Cinnabar — Compatibility',
+    )
+    expect(document.title).toBe('Cinnabar — Compatibility')
+
+    fireEvent.click(
+      within(primaryNav).getByRole('button', { name: 'Share Card' }),
+    )
+
+    expect(await screen.findByText('Share Card Content')).toBeTruthy()
+    expect(
+      within(primaryNav).getByRole('button', { name: 'Share Card' })
+        .getAttribute('aria-current'),
+    ).toBe('page')
+    expect(mocks.trackPageView).toHaveBeenLastCalledWith(
+      '/share-card',
+      'Cinnabar — Share Card',
+    )
+    expect(document.title).toBe('Cinnabar — Share Card')
   })
 })
