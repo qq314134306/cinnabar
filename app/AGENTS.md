@@ -41,6 +41,7 @@ Targeted examples:
 
 ```powershell
 npm run test -- true-solar-time
+npm run test -- birth-time-sensitivity BirthForm
 npm run test -- ChartDisplay chart-explanations
 npm run test -- retrieve
 npm run test -- llm
@@ -320,6 +321,16 @@ interpretation, and an empty major-star palace is explained explicitly. Keep
 the copy non-deterministic and free of medical, financial, relationship, or
 career promises.
 
+`src/lib/birth-time-sensitivity.ts` +
+`src/components/chart/BirthTimeSensitivity.tsx`: provider-independent
+uncertainty comparison for birth times explicitly marked approximate. It owns
+exactly three scenarios: the selected wall-clock time and the adjacent
+two-hour windows. Shift the wall-clock input before resolving each scenario so
+Rat-hour date boundaries and an explicitly re-enabled true-solar correction
+remain correct. The comparison is passive: it summarizes Life Palace stars,
+Body Palace branch, and element class without replacing the canonical chart or
+claiming rectification. A comparison failure must stay local and retryable.
+
 `src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI
 prompts, including `buildYearlyChartFacts` (year-by-year Liu Nian facts via
 `chart.horoscope()`) for the paid Future Report.
@@ -449,7 +460,10 @@ month/day combinations are clamped, and a generation failure must leave the
 form retryable with a visible alert rather than only a console message.
 Background birthplace-match failure is contained as fixed, input-described,
 non-blocking status copy; editing retries it and disabling correction remains
-an explicit index-independent path to a chart.
+an explicit index-independent path to a chart. Choosing an approximate birth
+time defaults automatic true-solar correction off; the user may explicitly
+turn it back on for the three-window sensitivity comparison. Recorded-time
+defaults remain unchanged.
 
 `src/components/AuthControl.tsx` + `AuthControl.test.ts`: header authentication
 state and recovery. When cookie authority is unknown, session retry remains

@@ -976,3 +976,27 @@ that one palace or star never defines an outcome, and domain-sensitive palaces
 must not become medical diagnosis, financial advice, relationship prediction,
 career guarantee, or other deterministic claim. This feature belongs to the
 already-lazy ChartDisplay chunk so it cannot add work to the landing path.
+
+## D043 - Approximate Birth Time Produces a Sensitivity Check, Not False Precision
+
+An explicit “Approximate or uncertain” choice is product input, not metadata
+reserved for a future AI request. Choosing it defaults automatic true-solar
+correction off. The user may deliberately turn correction back on, in which
+case the interface explains that each nearby candidate is corrected
+separately. Recorded-time defaults and the canonical chart-generation path
+otherwise remain unchanged.
+
+The local sensitivity check owns exactly three scenarios: two hours before the
+entered wall-clock time, the selected time, and two hours after it. Wall-clock
+time shifts before resolution, so early/late Rat Hour can cross a real calendar
+date. When the submitted chart has a resolved local birthplace and correction
+is enabled, each shifted input runs through that same location independently;
+the implementation cannot increment an iztro time index on a fixed date.
+
+The check compares only Life Palace branch and major stars, Body Palace branch,
+and Five Elements class. It labels the selected representative chart but never
+mutates it, chooses a correct time, performs birth-time rectification, renders
+three complete charts, or sends a network request. A stable result does not
+claim every detail is identical; a changed result presents the candidates as
+possibilities. Calculation failure is contained below the main chart with
+fixed copy and an explicit retry.

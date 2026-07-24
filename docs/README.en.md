@@ -18,10 +18,13 @@
 ## What is available
 
 - **Your Chart** — casts a 12-palace Zi Wei Dou Shu chart with `iztro`, local
-  birthplace matching, and true solar time correction. Once cast, it also
-  shows a deterministic current-model-year snapshot with an overall score and
-  Career, Wealth, Relationships, and Well-being dimensions. This snapshot
-  needs no AI request, account, API, or payment.
+  birthplace matching, and true solar time correction. An explicitly
+  approximate time receives a local comparison of the neighboring traditional
+  two-hour windows without claiming to identify the correct birth time. Once
+  cast, the chart also shows a deterministic current-model-year snapshot with
+  an overall score and Career, Wealth, Relationships, and Well-being
+  dimensions. These local features need no AI request, account, API, or
+  payment.
 - **Life Timeline** — builds a local deterministic cycle view, focused by
   default on five years before through 25 years after the current age. The
   optional age 1–100 model range covers ten decadal cycles; it does not estimate

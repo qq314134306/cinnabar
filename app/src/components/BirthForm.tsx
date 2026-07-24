@@ -90,6 +90,13 @@ export function BirthForm() {
     setDay((currentDay) => clampDayToMonth(year, nextMonth, currentDay))
   }
 
+  const handleBirthTimeReliabilityChange = (
+    nextReliability: 'recorded' | 'approximate',
+  ) => {
+    setBirthTimeReliability(nextReliability)
+    setTrueSolarEnabled(nextReliability === 'recorded')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage(null)
@@ -215,7 +222,7 @@ export function BirthForm() {
           label="How accurate is this time?"
           options={BIRTH_TIME_RELIABILITY_OPTIONS}
           value={birthTimeReliability}
-          onChange={(e) => setBirthTimeReliability(
+          onChange={(e) => handleBirthTimeReliabilityChange(
             e.target.value === 'approximate' ? 'approximate' : 'recorded',
           )}
         />
@@ -294,7 +301,11 @@ export function BirthForm() {
           <span>
             <span className="block text-sm text-text-secondary font-medium">Auto true solar time correction</span>
             <span className="block text-xs text-text-muted mt-0.5">
-              Handled from your birthplace — no coordinates needed.
+              {birthTimeReliability === 'approximate'
+                ? trueSolarEnabled
+                  ? 'Enabled by you. Each nearby time window will be corrected separately.'
+                  : 'Off by default for an approximate time. You can enable it for comparison.'
+                : 'Handled from your birthplace — no coordinates needed.'}
             </span>
           </span>
           <input

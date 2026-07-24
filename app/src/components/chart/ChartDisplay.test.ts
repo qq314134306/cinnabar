@@ -140,4 +140,24 @@ describe('ChartDisplay palace explanations', () => {
     })).toBeNull()
     expect(palaceButton.getAttribute('aria-pressed')).toBe('false')
   })
+
+  it('labels an approximate chart and exposes its local sensitivity check', () => {
+    useChartStore.setState({
+      birthInfo: {
+        ...BIRTH_INFO,
+        trueSolarEnabled: false,
+        birthTimeReliable: false,
+      },
+      chart: CHART,
+    })
+
+    render(createElement(ChartDisplay))
+
+    expect(screen.getByText(
+      /Horse Hour 11:00-13:00 · Approximate/,
+    )).toBeTruthy()
+    expect(screen.getByRole('heading', {
+      name: 'Birth-Time Sensitivity Check',
+    })).toBeTruthy()
+  })
 })

@@ -29,9 +29,10 @@ Primary runtime flow:
 3. True solar time correction can adjust the effective birth time.
 4. iztro generates the chart (zh-CN keys internally).
 5. App state stores the chart and user selections.
-6. UI renders chart, deterministic Life Timeline, match (Compatibility), share,
-   and AI reading views through the English glossary layer. Yearly Fortune
-   remains hidden because it depends on the disabled public-AI path.
+6. UI renders chart, approximate-time sensitivity when requested,
+   deterministic Life Timeline, match (Compatibility), share, and AI reading
+   views through the English glossary layer. Yearly Fortune remains hidden
+   because it depends on the disabled public-AI path.
 7. AI reading clients send only an allowlisted `reading.v1`
    `natal`/`compatibility`/`yearly` product request to `/api/interpret`. The
    server validates 18+ eligibility, rebuilds the chart and prompt, claims the
@@ -136,7 +137,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   explicit accessible names; chart-generation failures remain visibly
   retryable. Background place-index failure is input-described and non-blocking;
   editing retries it, while blank-place or disabled-correction casts bypass the
-  index.
+  index. Approximate-time selection defaults correction off but permits an
+  explicit re-enable.
 - `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/components/chart/ChartDisplay.tsx` +
@@ -144,6 +146,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   presentation-only reflective guide. Palace cards are accessible toggle
   buttons; one selected palace exposes English palace and major-star context
   without AI, accounts, or remote data.
+- `app/src/components/chart/BirthTimeSensitivity.tsx` +
+  `app/src/lib/birth-time-sensitivity.ts` - three-window local comparison for
+  explicitly approximate birth times. It shifts wall-clock time across real
+  dates, resolves each candidate independently, and summarizes core structural
+  differences without mutating the selected chart.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates (free reading, compatibility, paid Future Report).
 - `app/src/lib/paypal.ts` - PayPal Smart Payment Buttons adapter; passes tier +

@@ -39,6 +39,28 @@
 
 ## Recently Completed
 
+- Closed the birth-time reliability dead end in the provider-independent chart.
+  Selecting “Approximate or uncertain” now defaults automatic true-solar
+  correction off while leaving an explicit re-enable available. The resulting
+  chart labels its hour as approximate and adds a passive Birth-Time
+  Sensitivity Check for the previous, selected, and next two-hour windows.
+  Each candidate shifts the entered wall clock first, crosses calendar dates
+  correctly around Rat Hour, then independently reapplies a manually enabled
+  correction from the already-resolved local birthplace. The comparison shows
+  Life Palace stars, Body Palace branch, element class, and a stable/changed
+  summary; it never replaces the selected chart or claims to determine the
+  correct time. Failure is fixed-copy, local, and retryable. Focused tests cover
+  both date-boundary directions, true-solar recomputation, stable and changed
+  structures, zero-fetch rendering, recorded-time absence, failure recovery,
+  the form default, and explicit correction re-enable. The complete app passes
+  68 test files / 650 tests,
+  lint, the strict production build, and the moderate audit with zero known
+  vulnerabilities. ChartDisplay remains lazy at 25.31 kB raw / 8.37 kB gzip,
+  and every JavaScript chunk remains below 500 kB. A real desktop production
+  preview confirmed that a recorded time keeps the comparison absent, an
+  approximate selection turns correction off, and the resulting chart exposes
+  exactly Earlier / Chart used / Later summaries plus the non-rectification
+  boundary with no document-level horizontal overflow.
 - Finished the chart's previously inert palace selection as a useful local
   reading surface. All palace cards are now keyboard-focusable toggle buttons
   with selection state and a shared explanatory panel. The panel covers the

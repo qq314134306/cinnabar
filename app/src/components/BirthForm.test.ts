@@ -51,6 +51,68 @@ describe('BirthForm', () => {
     expect(screen.getByRole('combobox', { name: 'Day of birth' })).toBeTruthy()
   })
 
+  it('defaults solar correction off for an approximate time and stores the uncertainty', async () => {
+    mocks.resolveBirthTimeAsync.mockResolvedValueOnce({
+      year: 1990,
+      month: 1,
+      day: 1,
+      hour: 12,
+      minute: 0,
+      timeIndex: 6,
+      originalShichen: '午时',
+      correctedShichen: '午时',
+      correctionMinutes: 0,
+      applied: false,
+      crossedDate: false,
+      location: null,
+    })
+    render(createElement(BirthForm))
+
+    fireEvent.change(screen.getByRole('combobox', {
+      name: 'How accurate is this time?',
+    }), {
+      target: { value: 'approximate' },
+    })
+
+    const correction = screen.getByRole('checkbox', {
+      name: /Auto true solar time correction/,
+    }) as HTMLInputElement
+    expect(correction.checked).toBe(false)
+    expect(screen.getByText(
+      'Off by default for an approximate time. You can enable it for comparison.',
+    )).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cast My Chart' }))
+
+    await waitFor(() => {
+      expect(useChartStore.getState().chart).not.toBeNull()
+    })
+    expect(mocks.resolveBirthTimeAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ enabled: false }),
+    )
+    expect(useChartStore.getState().birthInfo?.birthTimeReliable).toBe(false)
+  })
+
+  it('lets an approximate-time user explicitly re-enable solar correction', () => {
+    render(createElement(BirthForm))
+
+    fireEvent.change(screen.getByRole('combobox', {
+      name: 'How accurate is this time?',
+    }), {
+      target: { value: 'approximate' },
+    })
+    const correction = screen.getByRole('checkbox', {
+      name: /Auto true solar time correction/,
+    }) as HTMLInputElement
+
+    fireEvent.click(correction)
+
+    expect(correction.checked).toBe(true)
+    expect(screen.getByText(
+      'Enabled by you. Each nearby time window will be corrected separately.',
+    )).toBeTruthy()
+  })
+
   it('shows a recoverable error when chart generation cannot complete', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     mocks.resolveBirthTimeAsync.mockRejectedValueOnce(new Error('test failure'))
