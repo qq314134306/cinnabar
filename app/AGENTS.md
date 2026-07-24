@@ -42,6 +42,7 @@ Targeted examples:
 ```powershell
 npm run test -- true-solar-time
 npm run test -- birth-time-sensitivity BirthForm
+npm run test -- bazi-four-pillars BaZiFourPillars ChartDisplay
 npm run test -- ChartDisplay TimingLens chart-explanations palace-relations chart-transformations palace-origin-transformations timing-lens chart-facts
 npm run test -- retrieve
 npm run test -- llm
@@ -307,6 +308,8 @@ Follows the Cinnabar glossary; covered by `ziwei-glossary.test.ts`.
 `src/lib/chart-explanations.ts` + `src/lib/palace-relations.ts` +
 `src/lib/chart-transformations.ts` +
 `src/lib/palace-origin-transformations.ts` +
+`src/lib/bazi-four-pillars.ts` +
+`src/components/chart/BaZiFourPillars.tsx` +
 `src/lib/timing-lens.ts` +
 `src/components/chart/TimingLens.tsx` +
 `src/components/chart/ChartDisplay.tsx`: local, English reflective guidance for
@@ -337,6 +340,14 @@ canonical Lu/Quan/Ke/Ji slot identifies its transformed star, and navigate only
 to engine-returned destination palaces. Show all four slots; missing stars or
 destinations remain explicit. Do not reconstruct the heavenly-stem table in
 browser code, assign good/bad meaning, or add a score.
+The BaZi Four Pillars companion must calculate only from the chart flow's
+`resolvedBirthTime`, using `lunar-lite` with the Li Chun year boundary and
+solar-term month boundary. It may expose the four raw pillars and Day Master
+stem/polarity/element. Keep the Zi Wei year convention separate and visibly
+labeled. An approximate time makes the Hour Pillar provisional; a missing
+resolved time yields no result. Do not add Ten Gods, hidden stems,
+strength/useful-god judgments, luck pillars, predictions, AI, persistence, or
+scores without a new tested product decision.
 The timing lens must use the engine-owned Major Limit and yearly objects for
 the selected mid-year date, map both scopes' Life Palace and canonical
 Lu/Quan/Ke/Ji star order back onto the natal palace array, and reuse the same

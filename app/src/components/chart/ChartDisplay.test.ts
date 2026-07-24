@@ -17,6 +17,22 @@ const BIRTH_INFO: BirthInfo = {
   day: 1,
   hour: 12,
   gender: 'male',
+  trueSolarEnabled: false,
+  birthTimeReliable: true,
+  resolvedBirthTime: {
+    year: 1990,
+    month: 1,
+    day: 1,
+    hour: 12,
+    minute: 0,
+    timeIndex: 6,
+    originalShichen: '午时',
+    correctedShichen: '午时',
+    correctionMinutes: 0,
+    applied: false,
+    crossedDate: false,
+    location: null,
+  },
 }
 
 const CHART = {
@@ -132,7 +148,14 @@ afterEach(() => {
 
 describe('ChartDisplay palace explanations', () => {
   it('opens a local reflective guide from a semantic palace button', () => {
-    render(createElement(ChartDisplay))
+    const { container } = render(createElement(ChartDisplay))
+
+    expect(screen.getByRole('heading', {
+      name: 'BaZi · Four Pillars',
+    })).toBeTruthy()
+    expect(container.querySelector(
+      '[data-bazi-day-master]',
+    )?.textContent).toContain('Bing · Yang Fire')
 
     const palaceButton = screen.getByRole('button', {
       name: 'Explain Life Palace',

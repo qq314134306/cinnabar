@@ -1212,3 +1212,29 @@ unavailable. Available destinations may open the existing palace explanation,
 San Fang Si Zheng, and flanking context. This is structural navigation only
 and adds no score, supportive/difficult classification, event prediction, AI
 request, account requirement, or network dependency.
+
+## D052 - BaZi Starts as a Structural Four Pillars Companion
+
+Cinnabar's first BaZi surface is a provider-independent structural companion
+to the existing Zi Wei natal chart, not a second predictive reading product.
+It calculates the Year, Month, Day, and Hour Pillars from the exact
+`resolvedBirthTime` already owned by the chart-casting flow. This preserves
+true-solar corrections, including a corrected date crossing, and prevents two
+birth-time authorities from diverging inside the browser.
+
+BaZi and Zi Wei retain separate calendar conventions. The existing Zi Wei
+engine stays on its documented lunar-year boundary, while the BaZi adapter
+calls `lunar-lite` with the Li Chun year boundary and solar-term month boundary.
+The center metadata therefore says `Zi Wei year`; the companion panel
+explicitly discloses its BaZi boundaries. `lunar-lite` is declared directly
+rather than imported only as iztro's transitive dependency, keeping the
+calculation authority and dependency ownership reviewable.
+
+The first surface may show the four translated stem-branch pairs and the Day
+Master's stem, Yin/Yang polarity, and Five Element. An approximate birth time
+must mark the Hour Pillar provisional; a missing resolved birth time produces
+no fabricated result. Ten Gods, hidden stems, strength/weakness, useful-god
+selection, luck pillars, compatibility, event claims, and prose
+interpretations remain out of scope until each receives its own tested
+calculation contract and product decision. No agent-skill prompt, remote MCP,
+AI call, account requirement, persistence, or score belongs in this layer.

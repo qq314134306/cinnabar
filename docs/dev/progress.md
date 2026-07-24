@@ -41,6 +41,30 @@
 
 ## Recently Completed
 
+- Added a provider-independent BaZi Four Pillars companion beneath the natal
+  chart after reviewing public GitHub agent skills and calculation projects.
+  Prompt-only skills with stale or unverifiable source links were not copied
+  into the product. The implementation instead declares the already
+  iztro-aligned, MIT-licensed
+  [lunar-lite](https://github.com/SylarLong/lunar-lite) calculation library as
+  a direct dependency and uses its typed Four Pillars API. The panel derives
+  Year, Month, Day, and Hour Pillars from the same true-solar-resolved date and
+  two-hour block used by the Zi Wei chart, but deliberately requests BaZi's Li
+  Chun year boundary and solar-term month boundary rather than reusing the Zi
+  Wei lunar-year convention. It identifies the Day Master stem, polarity, and
+  Five Element, translates all four pillars into English, and marks the Hour
+  Pillar provisional for approximate birth times. It adds no Ten Gods, hidden
+  stems, strength judgment, prediction, AI, account, persistence, or network
+  request. The center label is now explicitly `Zi Wei year` so the two calendar
+  conventions cannot be mistaken for one another. A clean `npm ci` and
+  moderate audit found zero known vulnerabilities; the complete app passes 76
+  test files / 650 tests, lint, and the strict production build. ChartDisplay
+  remains lazy at 51.02 kB raw / 14.82 kB gzip, and every JavaScript chunk
+  remains below 500 kB. A real 1905-pixel-wide Chrome preview confirmed all
+  four default pillars, the Bing / Yang Fire Day Master, no horizontal
+  overflow, and the calendar-boundary separation on 1990-02-01: the Zi Wei
+  center showed Geng-Wu while BaZi correctly retained the pre-Li-Chun Ji-Si
+  Year Pillar and Ding-Chou Month Pillar.
 - Completed the selected-palace flying-transformation chain from source stem to
   transformed star to destination palace. The adapter now joins
   `mutagedPlaces()` with iztro's configuration-aware

@@ -142,14 +142,20 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/components/chart/ChartDisplay.tsx` +
+  `app/src/components/chart/BaZiFourPillars.tsx` +
+  `app/src/lib/bazi-four-pillars.ts` +
   `app/src/lib/chart-explanations.ts` +
   `app/src/lib/palace-relations.ts` +
   `app/src/lib/chart-transformations.ts` +
   `app/src/lib/palace-origin-transformations.ts` +
   `app/src/components/chart/TimingLens.tsx` +
-  `app/src/lib/timing-lens.ts` - lazy local chart viewer and its
-  presentation-only reflective guide. Palace cards are accessible toggle
-  buttons; one selected palace exposes English palace and major-star context,
+  `app/src/lib/timing-lens.ts` - lazy local chart viewer, its deterministic
+  BaZi Four Pillars companion, and its presentation-only reflective guide. The
+  BaZi adapter reads the same true-solar-resolved date/time block but asks
+  `lunar-lite` for the Li Chun year and solar-term month boundaries, then
+  presents the four raw pillars plus Day Master structure without adding a
+  second interpretation system. Palace cards are accessible toggle buttons;
+  one selected palace exposes English palace and major-star context,
   derives the focus/opposite/two-trine San Fang Si Zheng group from fixed
   earthly-branch positions, and highlights plus summarizes the complete
   four-palace structure without AI, accounts, or remote data. The same

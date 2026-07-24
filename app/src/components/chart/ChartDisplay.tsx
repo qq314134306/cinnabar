@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 import { BirthTimeSensitivity } from './BirthTimeSensitivity'
+import { BaZiFourPillars } from './BaZiFourPillars'
 import {
   getMajorStarExplanation,
   getPalaceExplanation,
@@ -778,7 +779,7 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       {/* Info list */}
       <div className="text-xs lg:text-sm text-text-secondary space-y-1.5 text-center">
         <p><span className="text-text-muted">Born</span> <span className="text-text">{solarDate}</span></p>
-        <p><span className="text-text-muted">Pillars</span> <span className="text-text font-mono">{translateGanZhi(yearGanZhi)} year</span></p>
+        <p><span className="text-text-muted">Zi Wei year</span> <span className="text-text font-mono">{translateGanZhi(yearGanZhi)}</span></p>
         <p>
           <span className="text-text-muted">Hour</span>{' '}
           <span className="text-text">
@@ -1026,6 +1027,8 @@ export function ChartDisplay() {
           setSelectedPalace(transformation.palaceName)
         }}
       />
+
+      <BaZiFourPillars birthInfo={birthInfo} />
 
       <TimingLens
         chart={chart}
