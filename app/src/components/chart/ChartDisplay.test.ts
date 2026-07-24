@@ -49,6 +49,42 @@ const CHART = {
       changsheng12: '帝旺',
       isBodyPalace: false,
     },
+    {
+      name: '官禄',
+      heavenlyStem: '癸',
+      earthlyBranch: '酉',
+      majorStars: [{ name: '紫微', mutagen: '权' }],
+      minorStars: [],
+      adjectiveStars: [],
+      decadal: { range: [25, 34] },
+      boshi12: '青龙',
+      changsheng12: '冠带',
+      isBodyPalace: false,
+    },
+    {
+      name: '迁移',
+      heavenlyStem: '甲',
+      earthlyBranch: '亥',
+      majorStars: [{ name: '天机' }],
+      minorStars: [],
+      adjectiveStars: [],
+      decadal: { range: [35, 44] },
+      boshi12: '小耗',
+      changsheng12: '长生',
+      isBodyPalace: false,
+    },
+    {
+      name: '福德',
+      heavenlyStem: '乙',
+      earthlyBranch: '丑',
+      majorStars: [{ name: '武曲' }],
+      minorStars: [],
+      adjectiveStars: [],
+      decadal: { range: [45, 54] },
+      boshi12: '将军',
+      changsheng12: '养',
+      isBodyPalace: false,
+    },
   ],
 } as unknown as FunctionalAstrolabe
 
@@ -103,6 +139,45 @@ describe('ChartDisplay palace explanations', () => {
       name: 'About the Life Palace',
     })).toBeNull()
     expect(palaceButton.getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('highlights and summarizes the selected palace four-palace structure', () => {
+    const { container } = render(createElement(ChartDisplay))
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Explain Life Palace',
+    }))
+
+    expect(screen.getByRole('heading', {
+      name: 'San Fang Si Zheng · Four-palace view',
+    })).toBeTruthy()
+    expect(screen.getByText(
+      /This organizes context; it does not calculate strength/,
+    )).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Explain Life Palace',
+    }).getAttribute('data-palace-relation')).toBe('focus')
+    expect(screen.getByRole('button', {
+      name: 'Explain Life Palace',
+    }).getAttribute('aria-describedby')).toBe('palace-relation-巳')
+    expect(screen.getByRole('button', {
+      name: 'Explain Career Palace',
+    }).getAttribute('data-palace-relation')).toBe('trine')
+    expect(screen.getByRole('button', {
+      name: 'Explain Travel Palace',
+    }).getAttribute('data-palace-relation')).toBe('opposite')
+    expect(screen.getByRole('button', {
+      name: 'Explain Fortune Palace',
+    }).getAttribute('data-palace-relation')).toBe('trine')
+    expect(screen.getByRole('button', {
+      name: 'Explain Wealth Palace',
+    }).getAttribute('data-palace-relation')).toBeNull()
+    expect(container.querySelectorAll('[data-relation-summary]')).toHaveLength(4)
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Close palace explanation',
+    }))
+    expect(container.querySelectorAll('[data-palace-relation]')).toHaveLength(0)
   })
 
   it('replaces the selected guide and explains an empty major-star space', () => {

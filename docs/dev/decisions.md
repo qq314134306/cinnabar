@@ -1097,3 +1097,20 @@ replaces `birthInfo` and `chart`, retains `birthTimeReliable=false`, retains
 the candidate's independently resolved time, and clears every chart-derived
 content cache.
 Twins or multiples born close together are an explicit method limitation.
+
+## D046 - Palace Reading Uses a Four-Palace Relationship View
+
+A selected natal palace is not presented as an isolated interpretation.
+Cinnabar derives its San Fang Si Zheng structure locally from the fixed order
+of the twelve earthly branches: the selected focus branch, the branches four
+and eight positions away as the two trines, and the branch six positions away
+as the opposite. The selected state highlights those four existing palace
+cards and the same explanation panel summarizes their palace names, branches,
+and major stars.
+
+This relationship layer is structural navigation, not another fortune score.
+It does not borrow stars into an empty palace, calculate strength, rank good or
+bad configurations, or claim that the four-palace group determines an outcome.
+Unknown branch values produce no invented relationship. The helper stays pure
+and provider-independent, while all zh-CN engine labels continue to translate
+only at presentation time.

@@ -142,10 +142,13 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/components/chart/ChartDisplay.tsx` +
-  `app/src/lib/chart-explanations.ts` - lazy local chart viewer and its
+  `app/src/lib/chart-explanations.ts` +
+  `app/src/lib/palace-relations.ts` - lazy local chart viewer and its
   presentation-only reflective guide. Palace cards are accessible toggle
-  buttons; one selected palace exposes English palace and major-star context
-  without AI, accounts, or remote data.
+  buttons; one selected palace exposes English palace and major-star context,
+  derives the focus/opposite/two-trine San Fang Si Zheng group from fixed
+  earthly-branch positions, and highlights plus summarizes the complete
+  four-palace structure without AI, accounts, or remote data.
 - `app/src/components/chart/BirthTimeSensitivity.tsx` +
   `app/src/lib/birth-time-sensitivity.ts` - three-window local comparison for
   explicitly approximate birth times. It shifts wall-clock time across real

@@ -19,6 +19,10 @@ import {
   getPalaceExplanation,
 } from '@/lib/chart-explanations'
 import {
+  getSanFangSiZheng,
+  type PalaceRelationRole,
+} from '@/lib/palace-relations'
+import {
   translateBrightness,
   translateFiveElementsClass,
   translateGanZhi,
@@ -156,23 +160,33 @@ function StarTag({ star, showBrightness = true }: StarTagProps) {
 
 interface PalaceCardProps extends PalaceData {
   isSelected?: boolean
+  relation?: PalaceRelationRole
   onClick?: () => void
 }
 
 function PalaceCard({
   name, stem, branch, majorStars, minorStars, adjectiveStars, decadal,
-  boshi12, changsheng12, isLife, isBody, isSelected, onClick
+  boshi12, changsheng12, isLife, isBody, isSelected, relation, onClick
 }: PalaceCardProps) {
   const decadalRange = decadal?.range ? `${decadal.range[0]}-${decadal.range[1]}` : ''
   const displayName = translatePalaceName(name)
+  const relationLabel = relation === 'focus'
+    ? 'Focus'
+    : relation === 'trine'
+      ? 'Trine'
+      : relation === 'opposite'
+        ? 'Opposite'
+        : null
 
   return (
     <button
       type="button"
       onClick={onClick}
+      data-palace-relation={relation}
       aria-label={`Explain ${displayName}`}
       aria-pressed={isSelected}
       aria-controls={isSelected ? 'selected-palace-explanation' : undefined}
+      aria-describedby={relationLabel ? `palace-relation-${branch}` : undefined}
       className={`
         group relative p-1.5 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col text-left
         bg-white/[0.03] backdrop-blur-sm
@@ -183,6 +197,8 @@ function PalaceCard({
         focus-visible:ring-offset-2 focus-visible:ring-offset-night
         ${isLife ? 'ring-1 ring-gold/50 bg-gold/[0.03]' : ''}
         ${isBody ? 'ring-1 ring-star/50 bg-star/[0.03]' : ''}
+        ${relation === 'trine' ? 'ring-1 ring-gold/40 bg-gold/[0.05]' : ''}
+        ${relation === 'opposite' ? 'ring-1 ring-star/40 bg-star/[0.05]' : ''}
         ${isSelected ? 'ring-2 ring-star' : ''}
       `}
     >
@@ -203,6 +219,24 @@ function PalaceCard({
           </span>
         </div>
       </div>
+
+      {relationLabel && (
+        <span
+          id={`palace-relation-${branch}`}
+          className={`
+          mb-1 w-fit rounded-full border px-1.5 py-0.5 text-[8px]
+          uppercase tracking-wider
+          ${relation === 'focus'
+            ? 'border-star/30 text-star-light'
+            : relation === 'opposite'
+              ? 'border-star/20 text-star-light/80'
+              : 'border-gold/20 text-gold/80'
+          }
+        `}
+        >
+          {relationLabel}
+        </span>
+      )}
 
       {/* Major stars */}
       <div className="flex flex-wrap gap-0.5 mb-1">
@@ -244,11 +278,16 @@ function PalaceCard({
 
 interface PalaceExplanationPanelProps {
   palace: PalaceData
+  relatedPalaces: Array<{
+    palace: PalaceData
+    role: PalaceRelationRole
+  }>
   onClose: () => void
 }
 
 function PalaceExplanationPanel({
   palace,
+  relatedPalaces,
   onClose,
 }: PalaceExplanationPanelProps) {
   const palaceExplanation = getPalaceExplanation(palace.name)
@@ -312,6 +351,74 @@ function PalaceExplanationPanel({
           A local guide for this palace is not available yet.
         </p>
       )}
+
+      <section
+        aria-labelledby="san-fang-si-zheng-heading"
+        className="mt-4 border-t border-white/[0.08] pt-4"
+      >
+        <h4
+          id="san-fang-si-zheng-heading"
+          className="text-xs font-medium uppercase tracking-wider text-text-muted"
+        >
+          San Fang Si Zheng · Four-palace view
+        </h4>
+        {relatedPalaces.length === 4 ? (
+          <>
+            <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+              Read the focus palace together with its opposite and two trine
+              palaces. This organizes context; it does not calculate strength
+              or determine an outcome.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedPalaces.map(({ palace: relatedPalace, role }, index) => {
+                const trineNumber = relatedPalaces
+                  .slice(0, index + 1)
+                  .filter((item) => item.role === 'trine')
+                  .length
+                const roleLabel = role === 'focus'
+                  ? 'Focus'
+                  : role === 'opposite'
+                    ? 'Opposite'
+                    : `Trine ${trineNumber}`
+
+                return (
+                  <article
+                    key={relatedPalace.branch}
+                    data-relation-summary={role}
+                    className="rounded-lg border border-white/[0.06] bg-black/10 p-3"
+                  >
+                    <p className="text-[9px] uppercase tracking-wider text-text-muted">
+                      {roleLabel}
+                    </p>
+                    <h5 className="mt-1 text-sm font-medium text-gold">
+                      {translatePalaceName(relatedPalace.name)}
+                    </h5>
+                    <p className="mt-0.5 text-[10px] text-text-muted">
+                      {translateBranch(relatedPalace.branch)}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {relatedPalace.majorStars.length > 0 ? (
+                        relatedPalace.majorStars.map((star) => (
+                          <StarTag key={star.name} star={star} />
+                        ))
+                      ) : (
+                        <span className="text-xs text-text-muted">
+                          No major star
+                        </span>
+                      )}
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+            A four-palace relationship is unavailable for this engine label.
+            Cinnabar will not invent one.
+          </p>
+        )}
+      </section>
 
       <div className="mt-4 border-t border-white/[0.08] pt-4">
         <h4 className="text-xs font-medium uppercase tracking-wider text-text-muted">
@@ -542,6 +649,16 @@ export function ChartDisplay() {
   const selectedPalaceData = palaceData.find(
     (palace) => palace.name === selectedPalace,
   ) ?? null
+  const selectedRelations = selectedPalaceData
+    ? getSanFangSiZheng(selectedPalaceData.branch)
+    : []
+  const relationByBranch = new Map(
+    selectedRelations.map((relation) => [relation.branch, relation.role]),
+  )
+  const relatedPalaces = selectedRelations.flatMap((relation) => {
+    const palace = palaceData.find((item) => item.branch === relation.branch)
+    return palace ? [{ palace, role: relation.role }] : []
+  })
   const grid: (PalaceData | null)[][] = Array(4).fill(null).map(() => Array(4).fill(null))
 
   palaceData.forEach((p) => {
@@ -559,6 +676,7 @@ export function ChartDisplay() {
         key={key}
         {...palace}
         isSelected={selectedPalace === palace.name}
+        relation={relationByBranch.get(palace.branch)}
         onClick={() => setSelectedPalace((current) => (
           current === palace.name ? null : palace.name
         ))}
@@ -600,6 +718,7 @@ export function ChartDisplay() {
       {selectedPalaceData && (
         <PalaceExplanationPanel
           palace={selectedPalaceData}
+          relatedPalaces={relatedPalaces}
           onClose={() => setSelectedPalace(null)}
         />
       )}

@@ -31,7 +31,10 @@
   outputs stay locked until a candidate is explicitly applied. Equivalent
   resolved charts remain tied; the tool does not
   claim to identify an exact or correct birth time. Once
-  cast, the chart also shows a deterministic current-model-year snapshot with
+  cast, selecting any palace locally highlights its focus, opposite, and two
+  trine palaces, then summarizes the four-palace San Fang Si Zheng structure
+  and major stars without claiming a deterministic outcome. The chart also
+  shows a deterministic current-model-year snapshot with
   an overall score and Career, Wealth, Relationships, and Well-being
   dimensions. These local features need no AI request, account, API, or
   payment.

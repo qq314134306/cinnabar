@@ -39,6 +39,25 @@
 
 ## Recently Completed
 
+- Added a provider-independent San Fang Si Zheng reading layer to the natal
+  chart, using qingnang.cc's public emphasis on whole-chart reading as a product
+  benchmark without copying its code, design, or interpretive claims. Selecting
+  any palace now derives the focus, opposite, and two trine palaces from the
+  fixed earthly-branch order, highlights all four existing palace cards, and
+  summarizes their English palace names, branches, major stars, brightness,
+  and Four Transformations in the same local explanation surface. Switching or
+  closing selection replaces or clears the complete relationship state.
+  Unknown branches receive no invented relationship, empty palaces remain
+  explicit, and the view states that it organizes context rather than
+  calculating strength or determining an outcome. Pure tests cover all twelve
+  branches, uniqueness, reciprocity, and the unknown-value boundary; rendered
+  tests cover the four-card state and cleanup. The complete app passes 72 test
+  files / 706 tests, lint, and the strict production build. ChartDisplay remains
+  lazy at 31.59 kB raw / 10.30 kB gzip, with every JavaScript chunk below
+  500 kB. A real production preview confirmed exactly one focus, one opposite,
+  two trines, four summaries, no document-level horizontal overflow at desktop
+  or 390-by-844 mobile, and no browser warning/error logs. This acceptance does
+  not choose the final visual direction.
 - Added the first provider-independent 13-candidate birth-time shortlist inside
   the approximate-time sensitivity panel, using qingnang.cc's public
   寻时定盘 progression as a product benchmark without copying its design or
