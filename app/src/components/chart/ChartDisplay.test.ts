@@ -3,7 +3,11 @@
 import { createElement } from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
+import {
+  generateChart,
+  type BirthInfo,
+  type FunctionalAstrolabe,
+} from '@/lib/astro'
 import { useChartStore } from '@/stores'
 import { ChartDisplay } from './ChartDisplay'
 
@@ -217,6 +221,96 @@ describe('ChartDisplay palace explanations', () => {
       name: 'Close palace explanation',
     }))
     expect(container.querySelectorAll('[data-palace-relation]')).toHaveLength(0)
+  })
+
+  it('maps the selected palace transformations and navigates to a destination palace', () => {
+    const palacesWithOrigins = CHART.palaces.map((palace) => ({ ...palace }))
+    palacesWithOrigins[0] = {
+      ...palacesWithOrigins[0],
+      mutagedPlaces: () => [
+        palacesWithOrigins[5],
+        palacesWithOrigins[2],
+        palacesWithOrigins[4],
+        palacesWithOrigins[3],
+      ],
+    }
+    const chartWithOrigins = {
+      ...CHART,
+      palaces: palacesWithOrigins,
+    } as unknown as FunctionalAstrolabe
+    useChartStore.setState({
+      birthInfo: BIRTH_INFO,
+      chart: chartWithOrigins,
+    })
+
+    const { container } = render(createElement(ChartDisplay))
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Explain Life Palace',
+    }))
+
+    const originHeading = screen.getByRole('heading', {
+      name: 'Palace-origin Four Transformations',
+    })
+    expect(originHeading).toBeTruthy()
+    expect(originHeading.parentElement?.textContent).toContain(
+      'This is structural navigation only; it does not judge direction or outcome.',
+    )
+    expect(container.querySelectorAll(
+      '[data-palace-origin-transformation]',
+    )).toHaveLength(4)
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="禄"]',
+    )?.textContent).toContain('Children Palace')
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="权"]',
+    )?.textContent).toContain('Career Palace')
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="科"]',
+    )?.textContent).toContain('Fortune Palace')
+    expect(container.querySelector(
+      '[data-palace-origin-transformation="忌"]',
+    )?.textContent).toContain('Travel Palace')
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Open Lu destination in Children Palace',
+    }))
+
+    expect(screen.getByRole('heading', {
+      name: 'About the Children Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Explain Children Palace',
+    }).getAttribute('data-palace-relation')).toBe('focus')
+  })
+
+  it('renders palace-origin destinations from a real iztro chart', () => {
+    const realChart = generateChart({
+      ...BIRTH_INFO,
+      trueSolarEnabled: false,
+    })
+    useChartStore.setState({
+      birthInfo: BIRTH_INFO,
+      chart: realChart,
+    })
+
+    render(createElement(ChartDisplay))
+    fireEvent.click(screen.getByRole('button', {
+      name: 'Explain Life Palace',
+    }))
+
+    expect(screen.getByRole('button', {
+      name: 'Open Lu destination in Spouse Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Open Quan destination in Career Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Open Ke destination in Property Palace',
+    })).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Open Ji destination in Children Palace',
+    })).toBeTruthy()
   })
 
   it('indexes all four natal transformations and opens their owner palace', () => {

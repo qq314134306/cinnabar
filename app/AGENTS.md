@@ -42,7 +42,7 @@ Targeted examples:
 ```powershell
 npm run test -- true-solar-time
 npm run test -- birth-time-sensitivity BirthForm
-npm run test -- ChartDisplay TimingLens chart-explanations palace-relations chart-transformations timing-lens chart-facts
+npm run test -- ChartDisplay TimingLens chart-explanations palace-relations chart-transformations palace-origin-transformations timing-lens chart-facts
 npm run test -- retrieve
 npm run test -- llm
 npm run test -- public-reading
@@ -306,6 +306,7 @@ Follows the Cinnabar glossary; covered by `ziwei-glossary.test.ts`.
 
 `src/lib/chart-explanations.ts` + `src/lib/palace-relations.ts` +
 `src/lib/chart-transformations.ts` +
+`src/lib/palace-origin-transformations.ts` +
 `src/lib/timing-lens.ts` +
 `src/components/chart/TimingLens.tsx` +
 `src/components/chart/ChartDisplay.tsx`: local, English reflective guidance for
@@ -329,6 +330,12 @@ interpret one label as a standalone outcome, or create another score. When
 multiple transformations share one palace, only the exact selected
 transformation is pressed even though the palace relationship context is
 shared.
+The selected-palace origin map must resolve the source through the engine's
+`chart.palace()` functional API before calling `mutagedPlaces()`. Keep the
+engine's canonical Lu/Quan/Ke/Ji order, show all four slots, and navigate only
+to engine-returned destination palaces. Missing destinations remain explicit;
+do not reconstruct the heavenly-stem table in browser code, assign good/bad
+meaning, or add a score.
 The timing lens must use the engine-owned Major Limit and yearly objects for
 the selected mid-year date, map both scopes' Life Palace and canonical
 Lu/Quan/Ke/Ji star order back onto the natal palace array, and reuse the same

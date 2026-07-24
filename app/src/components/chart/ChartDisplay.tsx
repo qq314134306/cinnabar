@@ -31,6 +31,10 @@ import {
   type FlankingPalaceSide,
   type PalaceRelationRole,
 } from '@/lib/palace-relations'
+import {
+  collectPalaceOriginTransformations,
+  type PalaceOriginTransformation,
+} from '@/lib/palace-origin-transformations'
 import { TimingLens } from './TimingLens'
 import {
   translateBrightness,
@@ -292,18 +296,18 @@ interface FourTransformationsPanelProps {
   onSelectTransformation: (transformation: NatalTransformation) => void
 }
 
+const TRANSFORMATION_STYLES: Record<NatalTransformationCode, string> = {
+  '禄': 'border-fortune/25 bg-fortune/[0.06] text-fortune',
+  '权': 'border-gold/25 bg-gold/[0.06] text-gold',
+  '科': 'border-star/25 bg-star/[0.06] text-star-light',
+  '忌': 'border-misfortune/25 bg-misfortune/[0.06] text-misfortune',
+}
+
 function FourTransformationsPanel({
   transformations,
   selectedTransformation,
   onSelectTransformation,
 }: FourTransformationsPanelProps) {
-  const transformationStyles: Record<NatalTransformationCode, string> = {
-    '禄': 'border-fortune/25 bg-fortune/[0.06] text-fortune',
-    '权': 'border-gold/25 bg-gold/[0.06] text-gold',
-    '科': 'border-star/25 bg-star/[0.06] text-star-light',
-    '忌': 'border-misfortune/25 bg-misfortune/[0.06] text-misfortune',
-  }
-
   return (
     <section
       aria-labelledby="natal-four-transformations-heading"
@@ -361,7 +365,7 @@ function FourTransformationsPanel({
                 rounded-lg border p-3 text-left transition-colors
                 hover:bg-white/[0.08]
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
-                ${transformationStyles[code]}
+                ${TRANSFORMATION_STYLES[code]}
                 ${isSelected ? 'ring-2 ring-star' : ''}
               `}
             >
@@ -396,6 +400,8 @@ interface PalaceExplanationPanelProps {
     palace: PalaceData
     side: FlankingPalaceSide
   }>
+  originTransformations: PalaceOriginTransformation[]
+  onNavigatePalace: (palaceName: string) => void
   onClose: () => void
 }
 
@@ -403,6 +409,8 @@ function PalaceExplanationPanel({
   palace,
   relatedPalaces,
   flankingPalaces,
+  originTransformations,
+  onNavigatePalace,
   onClose,
 }: PalaceExplanationPanelProps) {
   const palaceExplanation = getPalaceExplanation(palace.name)
@@ -587,6 +595,94 @@ function PalaceExplanationPanel({
           <p className="mt-1 text-xs leading-relaxed text-text-secondary">
             Both neighboring palaces are required for this structural view.
             Cinnabar will not fill missing engine data.
+          </p>
+        )}
+      </section>
+
+      <section
+        aria-labelledby="palace-origin-transformations-heading"
+        className="mt-4 border-t border-white/[0.08] pt-4"
+      >
+        <h4
+          id="palace-origin-transformations-heading"
+          className="text-xs font-medium uppercase tracking-wider text-text-muted"
+        >
+          Palace-origin Four Transformations
+        </h4>
+        {originTransformations.length === 4 ? (
+          <>
+            <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+              The selected palace&apos;s {translateStem(palace.stem)} stem
+              supplies an engine-owned Lu, Quan, Ke, and Ji destination map.
+              This is structural navigation only; it does not judge direction
+              or outcome.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {originTransformations.map((transformation) => {
+                const info = translateMutagen(transformation.code)
+                const targetLabel = transformation.targetPalaceName
+                  ? translatePalaceName(transformation.targetPalaceName)
+                  : null
+
+                return (
+                  <article
+                    key={transformation.code}
+                    data-palace-origin-transformation={transformation.code}
+                    className={`
+                      rounded-lg border p-3
+                      ${TRANSFORMATION_STYLES[transformation.code]}
+                    `}
+                  >
+                    <p className="text-xs font-semibold">
+                      {info?.code ?? transformation.code}
+                    </p>
+                    {targetLabel ? (
+                      <>
+                        <h5 className="mt-1 text-sm font-medium text-text">
+                          {targetLabel}
+                        </h5>
+                        <p className="mt-0.5 text-[10px] text-text-muted">
+                          {translateBranch(
+                            transformation.targetPalaceBranch ?? undefined,
+                          )}
+                        </p>
+                        {transformation.isSamePalace ? (
+                          <span className="mt-2 block text-xs text-text-secondary">
+                            Same palace
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            aria-label={`Open ${info?.code ?? transformation.code} destination in ${targetLabel}`}
+                            onClick={() => onNavigatePalace(
+                              transformation.targetPalaceName ?? '',
+                            )}
+                            className="
+                              mt-2 rounded-md border border-white/[0.08]
+                              px-2 py-1 text-xs text-text-secondary
+                              transition-colors hover:bg-white/[0.08]
+                              hover:text-text focus-visible:outline-none
+                              focus-visible:ring-2 focus-visible:ring-star
+                            "
+                          >
+                            Open target
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <p className="mt-1 text-xs text-text-muted">
+                        Destination unavailable
+                      </p>
+                    )}
+                  </article>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+            This engine palace does not expose a complete origin map. Cinnabar
+            will not reconstruct one from assumptions.
           </p>
         )}
       </section>
@@ -842,6 +938,21 @@ export function ChartDisplay() {
     const palace = palaceData.find((item) => item.branch === flank.branch)
     return palace ? [{ palace, side: flank.side }] : []
   })
+  const rawSelectedPalace = selectedPalaceData
+    ? (
+        typeof chart.palace === 'function'
+          ? chart.palace(
+              selectedPalaceData.name as Parameters<typeof chart.palace>[0],
+            )
+          : chart.palaces.find((palace) => (
+              palace.name === selectedPalaceData.name
+              && palace.earthlyBranch === selectedPalaceData.branch
+            ))
+      )
+    : null
+  const originTransformations = collectPalaceOriginTransformations(
+    rawSelectedPalace,
+  )
   const grid: (PalaceData | null)[][] = Array(4).fill(null).map(() => Array(4).fill(null))
 
   palaceData.forEach((p) => {
@@ -928,6 +1039,11 @@ export function ChartDisplay() {
           palace={selectedPalaceData}
           relatedPalaces={relatedPalaces}
           flankingPalaces={flankingPalaces}
+          originTransformations={originTransformations}
+          onNavigatePalace={(palaceName) => {
+            setSelectedTransformation(null)
+            setSelectedPalace(palaceName)
+          }}
           onClose={() => {
             setSelectedTransformation(null)
             setSelectedPalace(null)

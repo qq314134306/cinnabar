@@ -39,7 +39,10 @@
   supportive/difficult label. A natal Four
   Transformations index also maps Lu, Quan, Ke, and Ji to their engine-owned
   stars and palaces; choosing one opens that palace and its four-palace
-  context without treating a label as a standalone verdict. A local Major
+  context without treating a label as a standalone verdict. Selecting a
+  palace also shows where that palace's heavenly stem sends Lu, Quan, Ke, and
+  Ji, using `iztro`'s functional-palace result and keeping unresolved
+  destinations unavailable. A local Major
   Limit & Year Lens can switch among the age 1–100 model years, overlay the
   active 10-year Major Limit, annual Life Palace, and both transformation
   layers, then navigate any mapped item back to its natal palace and

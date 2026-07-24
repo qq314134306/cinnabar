@@ -145,6 +145,7 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   `app/src/lib/chart-explanations.ts` +
   `app/src/lib/palace-relations.ts` +
   `app/src/lib/chart-transformations.ts` +
+  `app/src/lib/palace-origin-transformations.ts` +
   `app/src/components/chart/TimingLens.tsx` +
   `app/src/lib/timing-lens.ts` - lazy local chart viewer and its
   presentation-only reflective guide. Palace cards are accessible toggle
@@ -157,7 +158,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   or inferring that they help or hinder the focus. Its natal Four
   Transformations index extracts major/minor star ownership in canonical
   Lu/Quan/Ke/Ji order and opens the owning palace plus the same relationship
-  view without generating a separate score. Its timing lens uses the engine's
+  view without generating a separate score. The selected-palace panel resolves
+  its source with `chart.palace()` and normalizes the functional palace's
+  `mutagedPlaces()` result into four destination links; missing engine results
+  stay unavailable instead of being reconstructed from a copied stem table.
+  Its timing lens uses the engine's
   Major Limit and annual overlays for one selected model year, maps both Life
   Palace positions and both Four Transformations layers back to natal palaces,
   and exposes those palaces through the same relationship view without AI or

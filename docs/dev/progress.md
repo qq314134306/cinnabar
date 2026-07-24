@@ -41,6 +41,31 @@
 
 ## Recently Completed
 
+- Added a provider-independent palace-origin Four Transformations map to each
+  selected natal palace, using
+  [qingnang.cc's public Zi Wei Dou Shu overview](https://www.qingnang.cc/wiki/ziwei/jichu/ziwei-doushu)
+  as a structural product benchmark and
+  [iztro's documented functional-palace capability](https://github.com/SylarLong/iztro)
+  as the calculation authority. The panel keeps canonical Lu/Quan/Ke/Ji order,
+  shows the engine-returned destination palace and branch, marks same-palace
+  transformations, and opens an available destination in the existing palace,
+  San Fang Si Zheng, and flanking context. It resolves the source with
+  `chart.palace()` before calling `mutagedPlaces()`; a real-chart regression
+  caught and prevented the raw-array path that left first-use destinations
+  unresolved. Missing targets remain unavailable, and no copied stem table,
+  score, supportive/difficult label, prediction, AI, account, or network work
+  is added. Pure and rendered coverage includes canonical ordering, missing and
+  same-palace results, engine failures, a real iztro chart, and destination
+  navigation. The complete app passes 74 test files / 641 tests, lint, and the
+  strict production build. ChartDisplay remains lazy at 46.56 kB raw /
+  13.67 kB gzip, with every JavaScript chunk below 500 kB. A real
+  1905-pixel-wide Chrome preview confirmed the default Life Palace map
+  Lu→Spouse, Quan→Career, Ke→Property, Ji→Children; Lu navigation opened the
+  Spouse Palace with exactly one focus, one opposite, and two trines. The same
+  pass found no visitor-email field, exit-intent prompt, document-level
+  horizontal overflow, browser warning, or browser error. The connected Chrome
+  surface did not provide a mobile viewport override, so this pass makes no new
+  mobile-layout acceptance claim.
 - Retired visitor email collection now that account authentication owns the
   site's intentional email entry. The candidate removes the reading opt-in,
   desktop exit-intent prompt, Soul Card email unlock, `EmailCapture`,
