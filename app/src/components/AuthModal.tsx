@@ -14,7 +14,7 @@ import {
 } from 'react'
 import { useAuthStore, type OAuthProvider } from '@/stores'
 import { EMAIL_OTP_VERIFICATION_ERROR_MESSAGE } from '@/lib/supabase'
-import { isValidEmail } from '@/lib/subscribe'
+import { isValidEmail } from '@/lib/email'
 import { SocialSignInButton } from '@/components/SocialSignInButton'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'

@@ -74,12 +74,14 @@ hosted run and sanitized database artifact before treating the gate as
 operational.
 
 The authenticated Vercel team is on Hobby, whose direct `api/` runtime permits
-at most 12 deployable Functions. `api/auth.ts` is the single routed auth
+at most 12 deployable Functions. The candidate currently uses 11 after retiring
+the public subscription route. `api/auth.ts` is the single routed auth
 Function; `vercel.json` rewrites every one-segment `/api/auth/:route` path to
 it, and underscore-prefixed `_auth-route-*.ts` files contain the non-routed
 handlers. Keep all public URLs and exact-origin checks unchanged. Run
 `tests/vercel-function-budget.test.ts` whenever adding or moving an API entry
-point; it locks the complete deployable set to the 12-function budget.
+point; it locks the complete 11-function deployable set within the 12-function
+budget.
 `interpret.ts`, all Future Report/PayPal provider-facing handlers, and
 `cron/paypal-reconciliation.ts` are Node Functions because their streaming or
 bounded long-running work can exceed Edge's first-response window. Keep their
@@ -87,8 +89,10 @@ route-specific limits in `vercel.json`; interpretation alone opts into
 platform request cancellation because payment mutations must not be terminated
 only because a browser disconnects.
 
-Production and Preview currently expose only the existing Supabase, Make, and
-DeepSeek variable names. The deployment still lacks `APP_ORIGIN`, `AUTH_MODE`,
+Production and Preview still expose the observed Supabase, DeepSeek, and
+obsolete Make variable names. The candidate no longer reads
+`MAKE_WEBHOOK_URL`; remove that Vercel setting only through a reviewed
+deployment/configuration change. The deployment still lacks `APP_ORIGIN`, `AUTH_MODE`,
 `SESSION_ENCRYPTION_KEY`, `ENABLE_PUBLIC_AI_READINGS`,
 `VITE_ENABLE_PUBLIC_AI_READINGS`,
 `PUBLIC_AI_QUOTA_HMAC_KEY`, `PUBLIC_AI_DAILY_IP_LIMIT`, and
@@ -160,30 +164,18 @@ all three generation entries and `streamReading` rejects before `fetch`.
 Candidate CI must keep both `ENABLE_PUBLIC_AI_READINGS=false` and
 `VITE_ENABLE_PUBLIC_AI_READINGS=false`.
 
-`api/subscribe.ts`: Vercel Edge Function for email capture (shared by
-EmailCapture and the Soul Card unlock). The only place `MAKE_WEBHOOK_URL` is
-read; it forwards `{email, source, created_at}` to Make with body-size and
-per-IP rate limits. Set `MAKE_WEBHOOK_URL` in the Vercel project env.
-
-`src/components/EmailCapture.tsx` + `EmailCapture.test.ts`: reusable,
-source-tagged email opt-in. Invalid and request-error states are announced and
-linked to the input, submitting state is busy/disabled and rejects duplicates,
-and success is a status that invokes analytics plus the optional unlock
-callback exactly once.
-
 `src/components/SoulCard.tsx` + `SoulCard.test.ts` +
 `src/lib/soul-card.ts`: deterministic chart-derived card with optimistic
-share/email teaser unlock. Local PNG export is single-flight, always removes
+share-action teaser unlock. It must not collect a visitor email or restore the
+retired subscription path. Local PNG export is single-flight, always removes
 its temporary anchor, and exposes fixed announced retry copy without raw
 exceptions or browser alerts. Clipboard success is announced; clipboard
 failure provides the canonical site address for manual copying. Clear the
 temporary copied state timer on replacement and unmount.
 
-`src/components/ExitIntentModal.tsx` + `ExitIntentModal.test.ts`: best-effort
-once-per-session desktop exit-intent wrapper. It is a labeled modal dialog,
-moves focus inside, traps Tab, closes on Escape or the true backdrop, restores
-prior focus, and clears its delayed-success timer on unmount. Unavailable
-session storage must not break the dialog.
+`src/lib/email.ts` + `email.test.ts`: shared syntax validation for email
+addresses entered explicitly in account authentication. It is not a marketing
+subscription helper and performs no network request.
 
 `api/_supabase-admin.ts`: SERVER-ONLY Supabase service-role client. The
 underscore keeps it out of Vercel routing; it must never be imported from
@@ -553,12 +545,6 @@ received during a flight must produce one trailing revalidation.
 
 `tests/`: Tests that sit outside `src`, including workflow contract tests.
 
-`api/subscribe.ts` + `tests/subscribe-api.test.ts`: Strict same-origin public
-email relay, exact input contract, bounded body/IP bucket, safe Make webhook
-configuration, redirect denial, and active request/webhook deadlines. Its
-per-IP, overflow, and isolate-global windows form only a warm-isolate abuse
-brake; never describe them as a persistent quota.
-
 `src/lib/compatibility-score.ts` +
 `src/components/match/MatchAnalysis.tsx` + their tests: Compatibility always
 offers a symmetric, deterministic local four-dimension snapshot without an
@@ -666,11 +652,10 @@ ciphertext makes concurrency tests flaky and invalid.
 - Compatibility streaming must invalidate before abort and guard token, error,
   and completion commits by controller, exact request key, and both input
   identities. It has no cache or analytics.
-- The public subscribe route must retain exact same-origin JSON/schema/source
-  checks, the streamed byte cap, strict single-XFF handling, bounded
-  warm-isolate buckets, safe webhook URL rules, active request-linked
-  deadlines, Make-owned host allowlisting, redirect denial, response-body
-  cancellation, stable no-store errors, and PII-free logs.
+- Do not reintroduce visitor email capture, exit-intent signup, reading opt-in,
+  Soul Card email unlock, `/api/subscribe`, or a marketing webhook without a
+  new explicit product/privacy decision. Account email remains authentication
+  input only.
 - API type errors must be fixed at their source. Do not exclude `api/` from the
   root TypeScript graph, weaken `strict`, or use broad casts to make the build
   pass.
@@ -717,10 +702,6 @@ ciphertext makes concurrency tests flaky and invalid.
   `npm run test -- src/components/SoulCard.test.ts`; inspect one real exported
   PNG when capture styling or content changes, then lint and the complete root
   build.
-- Subscription change: run `npm run test -- tests/subscribe-api.test.ts`, lint,
-  and the complete root build. A mocked webhook and warm-isolate limiter remain
-  local contract evidence, not deployed delivery or distributed-rate proof.
-
 The current lockfile baseline has zero known vulnerabilities at the moderate
 audit threshold. That is point-in-time evidence, not a permanent property of
 the dependency graph; CI reruns the audit for every candidate.

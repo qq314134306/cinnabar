@@ -36,7 +36,6 @@ describe('Vercel Hobby function budget', () => {
       'future-report-order.ts',
       'interpret.ts',
       'paypal-webhook.ts',
-      'subscribe.ts',
     ])
   })
 

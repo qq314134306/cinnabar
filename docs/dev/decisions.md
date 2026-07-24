@@ -1169,3 +1169,26 @@ its four-card invariant, or receive an automatic supportive, difficult,
 strength, score, event, or outcome label. Both engine-owned neighboring
 palaces must resolve before the section is shown; an unknown branch or partial
 engine result remains explicitly unavailable instead of being inferred.
+
+## D050 - Visitor Email Capture Is Retired
+
+Cinnabar uses an email address only when a user explicitly enters it in the
+account authentication flow. The visitor subscription form, reading opt-in,
+desktop exit-intent prompt, Soul Card email unlock, `POST /api/subscribe`,
+client subscription helper, Make forwarding dependency, and
+`email_capture` analytics event are removed together. The Soul Card keeps its
+provider-independent share-action unlock; authentication keeps a side-effect-
+free syntax validator.
+
+This decision supersedes D022 as a current implementation contract. Its relay
+design remains historical context, not an active endpoint specification. It
+also reduces the candidate from the 12 deployable functions recorded in D024
+to 11 within the same Hobby limit. The inspected production commit may continue
+to serve the old route and retain `MAKE_WEBHOOK_URL` until this candidate is
+deliberately deployed; repository code and local verification are not evidence
+that the production route or configuration has already disappeared.
+
+Do not reintroduce marketing email collection merely because an obsolete
+provider variable still exists. A future mailing-list feature requires a new
+explicit product/privacy decision, consent language, retention/erasure design,
+and deployment proof separate from login.

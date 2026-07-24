@@ -18,7 +18,9 @@
 - Vercel currently has these environment-variable names in both Production and
   Preview: `SUPABASE_SECRET_KEY`, `VITE_SUPABASE_PUBLISHABLE_KEY`,
   `VITE_SUPABASE_URL`, `MAKE_WEBHOOK_URL`, and `DEEPSEEK_API_KEY`. Values were
-  not copied or exposed.
+  not copied or exposed. `MAKE_WEBHOOK_URL` is obsolete for the candidate after
+  visitor-subscription retirement, but remains an observed deployed setting
+  until a separate reviewed configuration change removes it.
 - `APP_ORIGIN`, `AUTH_MODE`, `SESSION_ENCRYPTION_KEY`, both public-AI enable
   flags, and the quota variables are not configured in Vercel. The absent `AUTH_MODE`
   leaves the runtime on its code-level `legacy` fallback; public AI remains
@@ -39,6 +41,20 @@
 
 ## Recently Completed
 
+- Retired visitor email collection now that account authentication owns the
+  site's intentional email entry. The candidate removes the reading opt-in,
+  desktop exit-intent prompt, Soul Card email unlock, `EmailCapture`,
+  `/api/subscribe`, its Make forwarding/client chain, and the
+  `email_capture` analytics event. Soul Card sharing remains local and can
+  still reveal its teaser; login retains a side-effect-free email syntax
+  validator. The deployable API set falls from 12 to 11 functions within the
+  Hobby limit, and `MAKE_WEBHOOK_URL` is no longer read by candidate code.
+  Focused UI/auth/function-budget coverage passes 33 tests; the complete app
+  passes 73 test files / 634 tests, lint, and the strict production build.
+  AIInterpretation decreases to 43.49 kB raw / 15.98 kB gzip, and every
+  JavaScript chunk remains below 500 kB. This is candidate evidence only: the
+  inspected production commit still serves the old subscription function and
+  retains its variable name until a deliberate deployment/configuration change.
 - Added a provider-independent flanking-palace context to every selected natal
   palace, using
   [qingnang.cc's public San Fang Si Zheng and flanking-palace article](https://www.qingnang.cc/wiki/ziwei/jichu/sanfang-sizheng)

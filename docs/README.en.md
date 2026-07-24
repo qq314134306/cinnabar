@@ -116,7 +116,6 @@ configuration and must never contain a service-role key or other secret.
 | Supabase public config | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Public project URL and publishable key used by browser and server auth clients. |
 | Supabase server access | `SUPABASE_SECRET_KEY` | Server-only service-role credential. |
 | Opaque auth | `APP_ORIGIN`, `AUTH_MODE`, `SESSION_ENCRYPTION_KEY` | `APP_ORIGIN` must be an exact origin. Keep `AUTH_MODE=legacy` until the documented database and preview proofs pass; the encryption key is required for `dual`/`opaque`. |
-| Email capture | `MAKE_WEBHOOK_URL` | Optional server-only Make webhook. |
 | Dormant Future Report | `ENABLE_FUTURE_REPORT_PAYMENTS`, `VITE_ENABLE_FUTURE_REPORT_PAYMENTS`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_MERCHANT_ID`, `PAYPAL_ENV`, `VITE_PAYPAL_CLIENT_ID`, `PAYPAL_WEBHOOK_ID`, `CRON_SECRET` | Keep both enable flags false unless the complete release checklist is satisfied. |
 
 The Supabase schema and ordered migrations live under `supabase/migrations/`.

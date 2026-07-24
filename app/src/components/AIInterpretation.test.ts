@@ -39,10 +39,6 @@ vi.mock('@/components/SoulCard', () => ({
   SoulCard: () => null,
 }))
 
-vi.mock('@/components/EmailCapture', () => ({
-  EmailCapture: () => null,
-}))
-
 vi.mock('@/components/LocalChartSnapshot', () => ({
   LocalChartSnapshot: () => createElement(
     'div',

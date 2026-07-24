@@ -30,10 +30,6 @@ vi.mock('qrcode', () => ({
   },
 }))
 
-vi.mock('@/components/EmailCapture', () => ({
-  EmailCapture: () => null,
-}))
-
 const CHART = {
   fiveElementsClass: '土五局',
   palaces: [

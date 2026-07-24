@@ -9,7 +9,6 @@ import { BirthForm } from '@/components/BirthForm'
 import { LazySurface } from '@/components/LazySurface'
 import { KLineIcon } from '@/components/icons/KLineIcon'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
-import { ExitIntentModal } from '@/components/ExitIntentModal'
 import { AuthControl } from '@/components/AuthControl'
 import {
   useChartStore,
@@ -382,9 +381,6 @@ export default function App() {
         <p>For entertainment &amp; self-discovery only. Not professional advice.</p>
         <p>Chart engine based on the open-source ziwei project (GPLv3).</p>
       </footer>
-
-      {/* Exit-intent email capture (once per session, desktop leave signal) */}
-      <ExitIntentModal />
 
       <Analytics />
     </div>

@@ -38,20 +38,17 @@ npm run test -- sync-zwknows
 actionlint .github/workflows/sync-zwknows.yml
 ```
 
-For cross-tab authentication, Compatibility streaming, or public subscription
-boundary edits, run the focused regressions before the full suite:
+For cross-tab authentication or Compatibility streaming edits, run the
+focused regressions before the full suite:
 
 ```powershell
 npm run test -- src/stores/auth.test.ts src/components/AuthControl.test.ts
 npm run test -- src/components/match/MatchAnalysis.test.ts
-npm run test -- tests/subscribe-api.test.ts
 ```
 
-The subscription tests are deterministic repository evidence only. Its
-in-memory limiter is per warm isolate, and a mocked webhook does not prove
-Vercel forwarding metadata or Make delivery. Retain exact same-origin headers,
-the streamed cap, Make-owned host allowlist, redirect denial, and active
-request/webhook deadlines when changing the route.
+The visitor-subscription route has been retired. Login email belongs only to
+the authentication flow; do not restore a public marketing-email endpoint
+without a new explicit product/privacy decision.
 
 ## Candidate Verification Gate
 
@@ -441,7 +438,8 @@ scoped to both Production and Preview:
 - `SUPABASE_SECRET_KEY`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 - `VITE_SUPABASE_URL`
-- `MAKE_WEBHOOK_URL`
+- `MAKE_WEBHOOK_URL` (obsolete for the candidate after visitor subscription
+  retirement; the inspected deployment still has the name)
 - `DEEPSEEK_API_KEY`
 
 The following required or staged settings were not configured:

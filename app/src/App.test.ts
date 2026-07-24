@@ -64,9 +64,6 @@ vi.mock('@/components/OpenSourceLinks', () => ({
   GitHubLinkButton: () => null,
   OpenSourceFooterLinks: () => null,
 }))
-vi.mock('@/components/ExitIntentModal', () => ({
-  ExitIntentModal: () => null,
-}))
 vi.mock('@/components/AuthControl', () => ({
   AuthControl: () => null,
 }))

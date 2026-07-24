@@ -217,18 +217,12 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/vercel.json` + `app/api/auth.ts` +
   `app/tests/vercel-function-budget.test.ts` - preserves every public
   `/api/auth/*` URL while routing the nine auth handlers through one deployable
-  Function. The contract pins the complete API entrypoint set to the 12-Function
-  Hobby budget. The handlers remain underscore-prefixed and non-routed.
+  Function. After retirement of the public subscription route, the contract
+  pins 11 API entrypoints within the 12-Function Hobby budget. The handlers
+  remain underscore-prefixed and non-routed.
 - `app/vercel.json` + `app/api/csp-report.ts` - Vercel security headers and the
   bounded, sanitized CSP violation collector. The policy remains report-only
   until real third-party browser flows establish an enforcement allowlist.
-- `app/api/subscribe.ts` + `app/tests/subscribe-api.test.ts` - strict
-  same-origin public email relay and its boundary suite. The API owns the exact
-  JSON/source/email contract, streamed byte cap, single-XFF validation,
-  bounded per-IP/overflow/isolate-global abuse brake, Make-owned webhook host
-  allowlist, redirect denial, request/body deadlines, and stable no-store
-  errors. It is the only reader of
-  `MAKE_WEBHOOK_URL`; its in-memory limiter is not a distributed quota.
 - `app/src/lib/compatibility-score.ts` +
   `app/src/components/match/MatchAnalysis.tsx` + their tests - always-available
   deterministic local Compatibility snapshot across communication, shared
@@ -377,21 +371,15 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   parsing, and cookie/Bearer identity conflicts. Provider `429`, non-auth
   errors, malformed responses, network failure, abort, and timeout remain
   retryable `503` states without opaque revocation.
-- `app/src/lib/subscribe.ts` - client POST helper for `/api/subscribe`;
-  normalizes email, understands the stable nested error shape, and forwards an
-  optional abort signal.
-- `app/src/components/EmailCapture.tsx` + `EmailCapture.test.ts` - reusable,
-  source-tagged email opt-in with input-linked announced errors, busy/disabled
-  duplicate-submit protection, and an announced success/unlock state.
+- `app/src/lib/email.ts` + `email.test.ts` - side-effect-free email syntax
+  validation used only by account authentication. Visitor subscription and
+  marketing-email collection are not part of the current product.
 - `app/src/components/SoulCard.tsx` + `SoulCard.test.ts` +
   `app/src/lib/soul-card.ts` - shareable, deterministic chart-derived Soul
-  Card with optimistic share/email teaser unlock. Image export is single-flight
+  Card with optimistic share-action teaser unlock and no visitor email field.
+  Image export is single-flight
   and retryable with unconditional temporary-anchor cleanup; copy success is
   announced and copy failure exposes the canonical address for manual use.
-- `app/src/components/ExitIntentModal.tsx` + `ExitIntentModal.test.ts` -
-  best-effort once-per-session desktop email prompt with labeled modal
-  semantics, Escape/backdrop dismissal, contained Tab focus, prior-focus
-  restoration, and bounded delayed-success cleanup.
 - `app/src/components/FutureReportPaywall.tsx` - pricing tiers, checkout, and paid report display below the free reading.
 - `app/src/components/LocalChartSnapshot.tsx` - deterministic current-model-year
   chart summary shown regardless of the public-AI flag. It derives an English

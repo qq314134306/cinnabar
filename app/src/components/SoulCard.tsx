@@ -3,7 +3,7 @@
    already-computed chart (Life Palace star + element + keywords).
    Exported as an image via html2canvas, with a small QR to the site.
    Sits on the results page with a locked "hidden strength" teaser
-   that unlocks optimistically on share or email capture.
+   that unlocks optimistically on a share action.
    ============================================================ */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -13,7 +13,6 @@ import { useChartStore } from '@/stores'
 import { deriveSoulCard, elementArticle, identityLine, type SoulCardData } from '@/lib/soul-card'
 import { analytics } from '@/lib/analytics'
 import { Button } from '@/components/ui'
-import { EmailCapture } from '@/components/EmailCapture'
 
 const FONT_DISPLAY = "'Cormorant Garamond', 'Georgia', serif"
 const FONT_BODY = "'Inter', system-ui, sans-serif"
@@ -313,7 +312,7 @@ export function SoulCard() {
         </p>
         {!unlocked && (
           <p className="mt-3 text-xs text-text-muted">
-            Share your card or drop your email below to reveal it.
+            Share your card to reveal it.
           </p>
         )}
       </div>
@@ -372,17 +371,6 @@ export function SoulCard() {
             We couldn't copy the link. Copy this address manually: {SITE_URL}
           </p>
         )}
-
-        {/* Or unlock via email */}
-        <div className="mt-4 pt-4 border-t border-white/[0.06]">
-          <EmailCapture
-            source="soul_card"
-            title="Prefer email? Unlock it instantly."
-            subtitle="We'll send occasional self-discovery notes — nothing more."
-            ctaLabel="Unlock"
-            onSuccess={() => setUnlocked(true)}
-          />
-        </div>
       </div>
     </div>
   )

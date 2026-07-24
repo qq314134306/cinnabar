@@ -92,10 +92,6 @@ export const analytics = {
   shareClick: (platform: string): void =>
     sendGtag('event', 'share_click', { platform }),
 
-  /** An email was successfully captured. */
-  emailCapture: (source: string): void =>
-    sendGtag('event', 'email_capture', { source }),
-
   /** An authenticated user opened the credit wallet. Sends no account data. */
   viewWallet: (): void => sendGtag('event', 'view_wallet'),
 }

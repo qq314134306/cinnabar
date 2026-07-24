@@ -24,7 +24,6 @@ import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 import { Button } from '@/components/ui'
 import { FutureReportPaywall } from '@/components/FutureReportPaywall'
 import { SoulCard } from '@/components/SoulCard'
-import { EmailCapture } from '@/components/EmailCapture'
 import { LocalChartSnapshot } from '@/components/LocalChartSnapshot'
 import { analytics } from '@/lib/analytics'
 
@@ -417,20 +416,9 @@ export function AIInterpretation() {
           )}
 
           {!animating && (
-            <>
-              <p className="mt-6 pt-4 border-t border-white/[0.06] text-xs text-text-muted not-italic font-sans">
-                {DISCLAIMER}
-              </p>
-
-              {/* Low-key inbox opt-in inside the reading panel */}
-              <div className="mt-4 not-italic font-sans">
-                <EmailCapture
-                  source="reading"
-                  title="Want new self-discovery notes as your chart's cycles turn?"
-                  ctaLabel="Keep me posted"
-                />
-              </div>
-            </>
+            <p className="mt-6 pt-4 border-t border-white/[0.06] text-xs text-text-muted not-italic font-sans">
+              {DISCLAIMER}
+            </p>
           )}
         </div>
       )}
