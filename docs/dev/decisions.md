@@ -188,8 +188,13 @@ separate from `credit_ledger`; Future Reports do not spend or recharge credits.
 Recovery is additionally scoped to a server-produced SHA-256 fingerprint of
 the canonical birth/chart identity;
 the account's latest unrelated report must never appear on a newly cast chart.
-Owner/token snapshots guard every async commit, and an account change remounts
-the paywall and clears the legacy in-memory paid-content cache.
+Owner/session and browser chart/persona request snapshots guard every async
+access, checkout, and generation commit. An account or chart-request change
+remounts the paywall, closes checkout handles, and prevents stale work from
+re-entering the in-memory paid-content cache. From the synchronous start of
+server capture through its verified success or failure, a global reference-
+counted gate rejects chart replacement, chart clearing, and persona mutation;
+the purchase must become recoverable before its request identity may change.
 
 The database owns the monotonic payment/generation state machine, terminal
 `refunded`/`disputed` states, atomic generation claim, three-attempt retry quota
@@ -1034,3 +1039,47 @@ and full people are rejected so correction cannot silently apply to one side.
 New clients never emit the legacy shape. AI preflight and streaming preserve
 server-owned `ReadingApiError` copy plus controlled birthplace-validation copy;
 all unknown browser/runtime failures use one fixed retry message.
+
+## D045 - Birth-Time Finding Is a Local Evidence Shortlist
+
+The public qingnang.cc 寻时定盘 flow is a product benchmark for question
+progression and candidate narrowing, not a source of code, visual design, or
+accuracy claims. Cinnabar's first slice lives inside the existing approximate-
+time sensitivity panel and loads only after an explicit secondary action. It
+does not add a primary navigation item, provider, account, payment, or
+persistence dependency.
+
+The candidate set is exactly 13 civil entries: a distinct 00:00–00:59 early
+Rat entry, the eleven intervening traditional blocks, and a distinct
+23:00–23:59 late Rat entry. The user must provide an exact match from the local
+birthplace index. Every civil candidate independently applies true solar time
+before chart generation. Candidates that resolve to the same engine date and
+time index are one equivalent chart group and cannot be separated by event
+scoring.
+
+The optional rough-time recollection is bounded to ±2 evidence points. The
+question engine considers only elapsed adult years, chooses at most five
+different-domain three-year windows, and allows Yes, No, Not sure, or Prefer
+not to answer. Not sure and skip contribute zero. For local responsiveness,
+each displayed three-year window uses its middle year as the annual chart
+probe. The only permitted event signal is a transparent structural activation:
+annual Life Palace on a domain palace, current Major Limit on a domain palace,
+and at least one annual Four Transformation star located in a domain palace.
+Signals are ranked only across the current candidate groups with ties
+preserved. They are heuristic consistency evidence, not learned probabilities,
+traditional validation, or scientific accuracy. Candidate and annual-fact
+calculation runs in cancellable main-thread batches so closing the flow can
+take effect between batches.
+
+Yes contributes signal ×2 and No contributes signal ×−1 because remembered
+events are stronger evidence than remembered absence. Early stopping requires
+three scored answers, three domains, and a four-point leader margin. Results
+show at most three unambiguous groups plus every non-zero contribution. A tie
+that crosses the third-place cutoff is disclosed as one complete, non-
+applicable tier rather than arbitrarily truncated. Fewer than three scored
+domains or a leader margin below two is explicitly a no-clear-separation
+outcome and exposes no candidate apply action. Applying a candidate is the
+only mutation. It atomically
+replaces `birthInfo` and `chart`, retains `birthTimeReliable=false`, retains
+the candidate's independently resolved time, and clears every chart-derived
+content cache.

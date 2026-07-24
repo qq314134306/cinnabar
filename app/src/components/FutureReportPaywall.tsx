@@ -7,13 +7,14 @@
  * Start Over; report retries reuse the purchase and never recapture payment.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import {
   useAuthStore,
   useChartStore,
   useContentCacheStore,
+  useFutureReportActivityStore,
   useSettingsStore,
 } from '@/stores'
 import {
@@ -67,6 +68,15 @@ const FIVE_YEAR_PER_YEAR = (Number(TIER_PRICES['5-year']) / 5).toFixed(2)
 
 type Status = 'idle' | 'checking' | 'generating' | 'error'
 
+function getCurrentChartContextKey(): string | null {
+  const birthInfo = useChartStore.getState().birthInfo
+  if (!birthInfo) return null
+  return JSON.stringify(buildFutureReportRequestInput(
+    birthInfo,
+    useSettingsStore.getState().persona,
+  ))
+}
+
 const MarkdownComponents = {
   h1: ({ children }: { children?: React.ReactNode }) => (
     <h1 className="text-2xl font-bold text-gold mt-6 mb-3 first:mt-0">{children}</h1>
@@ -100,6 +110,13 @@ export function FutureReportPaywall() {
       : null
   ))
   const previousAuthIdentity = useRef<string | null>(authIdentity)
+  const birthInfo = useChartStore((state) => state.birthInfo)
+  const persona = useSettingsStore((state) => state.persona)
+  const chartContextKey = useMemo(() => (
+    futureReportPaymentsEnabled && birthInfo
+      ? JSON.stringify(buildFutureReportRequestInput(birthInfo, persona))
+      : null
+  ), [birthInfo, persona])
 
   useEffect(() => {
     if (previousAuthIdentity.current !== authIdentity) {
@@ -110,13 +127,26 @@ export function FutureReportPaywall() {
     }
   }, [authIdentity])
 
-  if (!futureReportPaymentsEnabled) return null
-  return <EnabledFutureReportPaywall key={authIdentity ?? 'signed-out'} />
+  if (!futureReportPaymentsEnabled || !chartContextKey) return null
+  return (
+    <EnabledFutureReportPaywall
+      key={`${authIdentity ?? 'signed-out'}:${chartContextKey}`}
+      chartContextKey={chartContextKey}
+    />
+  )
 }
 
-function EnabledFutureReportPaywall() {
+export function EnabledFutureReportPaywall({
+  chartContextKey,
+}: {
+  chartContextKey: string
+}) {
   const { futureReport, setFutureReport } = useContentCacheStore()
   const { user, csrfToken, sessionVersion, initialized } = useAuthStore()
+  const beginCapture = useFutureReportActivityStore(
+    (state) => state.beginCapture,
+  )
+  const endCapture = useFutureReportActivityStore((state) => state.endCapture)
 
   const [status, setStatus] = useState<Status>('idle')
   const [purchase, setPurchase] = useState<FutureReportPurchase | null>(null)
@@ -139,7 +169,16 @@ function EnabledFutureReportPaywall() {
       : null
   }, [])
 
+  const chartContextMatches = useCallback((expected: string): boolean => (
+    getCurrentChartContextKey() === expected
+  ), [])
+
   const buildReportInput = useCallback((): FutureReportRequestInput => {
+    if (!chartContextMatches(chartContextKey)) {
+      throw new Error(
+        'The chart changed before payment verification. Review the new chart and try again.',
+      )
+    }
     const { chart, birthInfo } = useChartStore.getState()
     if (!chart || !birthInfo) {
       throw new Error('Your chart session expired before payment. Recast it and try again.')
@@ -148,15 +187,19 @@ function EnabledFutureReportPaywall() {
       birthInfo,
       useSettingsStore.getState().persona,
     )
-  }, [])
+  }, [chartContextKey, chartContextMatches])
 
   const cacheReport = useCallback(
     (
       expectedAuth: FutureReportAuthContext,
+      expectedChartContext: string,
       paidPurchase: FutureReportPurchase,
       text: string,
     ): boolean => {
-      if (!authContextMatches(expectedAuth, getAuthContext())) return false
+      if (
+        !authContextMatches(expectedAuth, getAuthContext())
+        || !chartContextMatches(expectedChartContext)
+      ) return false
       setPurchase({ ...paidPurchase, report: text, generationStatus: 'completed' })
       setFutureReport({
         tier: paidPurchase.tier,
@@ -165,12 +208,13 @@ function EnabledFutureReportPaywall() {
       })
       return true
     },
-    [getAuthContext, setFutureReport],
+    [chartContextMatches, getAuthContext, setFutureReport],
   )
 
   const recoverAccess = useCallback(async () => {
     const expectedAuth = getAuthContext()
     if (!expectedAuth) return
+    const expectedChartContext = chartContextKey
 
     setStatus('checking')
     setReportError(null)
@@ -186,16 +230,27 @@ function EnabledFutureReportPaywall() {
         ),
         expectedAuth.csrfToken,
       )
-      if (!authContextMatches(expectedAuth, getAuthContext())) return
+      if (
+        !authContextMatches(expectedAuth, getAuthContext())
+        || !chartContextMatches(expectedChartContext)
+      ) return
       setCurrentChartFingerprint(recovered.chartFingerprint)
       setPurchase(recovered.purchase)
       if (recovered.purchase?.report) {
-        cacheReport(expectedAuth, recovered.purchase, recovered.purchase.report)
+        cacheReport(
+          expectedAuth,
+          expectedChartContext,
+          recovered.purchase,
+          recovered.purchase.report,
+        )
         setNotice('Your paid Future Report was restored from your account.')
       }
       setStatus('idle')
     } catch (error) {
-      if (!authContextMatches(expectedAuth, getAuthContext())) return
+      if (
+        !authContextMatches(expectedAuth, getAuthContext())
+        || !chartContextMatches(expectedChartContext)
+      ) return
       setStatus('error')
       setReportError(
         error instanceof Error
@@ -203,10 +258,18 @@ function EnabledFutureReportPaywall() {
           : 'We could not check your purchase history. Please try again.',
       )
     }
-  }, [cacheReport, getAuthContext])
+  }, [
+    cacheReport,
+    chartContextKey,
+    chartContextMatches,
+    getAuthContext,
+  ])
 
   const runGeneration = useCallback(
-    async (paidPurchase: FutureReportPurchase) => {
+    async (
+      paidPurchase: FutureReportPurchase,
+      expectedChartContext = chartContextKey,
+    ) => {
       const expectedAuth = getAuthContext()
       if (!expectedAuth) {
         setStatus('error')
@@ -222,11 +285,19 @@ function EnabledFutureReportPaywall() {
           paidPurchase.purchaseId,
           expectedAuth.csrfToken,
         )
-        if (cacheReport(expectedAuth, paidPurchase, report)) {
+        if (cacheReport(
+          expectedAuth,
+          expectedChartContext,
+          paidPurchase,
+          report,
+        )) {
           setStatus('idle')
         }
       } catch (error) {
-        if (!authContextMatches(expectedAuth, getAuthContext())) return
+        if (
+          !authContextMatches(expectedAuth, getAuthContext())
+          || !chartContextMatches(expectedChartContext)
+        ) return
         setStatus('error')
         setReportError(
           error instanceof Error
@@ -235,7 +306,12 @@ function EnabledFutureReportPaywall() {
         )
       }
     },
-    [cacheReport, getAuthContext],
+    [
+      cacheReport,
+      chartContextKey,
+      chartContextMatches,
+      getAuthContext,
+    ],
   )
 
   useEffect(() => {
@@ -253,6 +329,7 @@ function EnabledFutureReportPaywall() {
       csrfToken,
       sessionVersion,
     }
+    const expectedChartContext = chartContextKey
     const { chart, birthInfo } = useChartStore.getState()
     if (!chart || !birthInfo) return
     const reportInput = buildFutureReportRequestInput(
@@ -265,7 +342,11 @@ function EnabledFutureReportPaywall() {
       expectedAuth.csrfToken,
     )
       .then((recovered) => {
-        if (cancelled || !authContextMatches(expectedAuth, getAuthContext())) return null
+        if (
+          cancelled
+          || !authContextMatches(expectedAuth, getAuthContext())
+          || !chartContextMatches(expectedChartContext)
+        ) return null
         setCurrentChartFingerprint(recovered.chartFingerprint)
         return {
           recovered: recovered.purchase,
@@ -276,18 +357,28 @@ function EnabledFutureReportPaywall() {
         if (
           cancelled ||
           !recovered ||
-          !authContextMatches(expectedAuth, getAuthContext())
+          !authContextMatches(expectedAuth, getAuthContext()) ||
+          !chartContextMatches(expectedChartContext)
         ) return
         setPurchase(recovered.recovered)
         if (recovered.recovered?.report) {
-          cacheReport(expectedAuth, recovered.recovered, recovered.recovered.report)
+          cacheReport(
+            expectedAuth,
+            expectedChartContext,
+            recovered.recovered,
+            recovered.recovered.report,
+          )
           setNotice('Your paid Future Report was restored from your account.')
         }
         setReportError(null)
         setStatus('idle')
       })
       .catch((error: unknown) => {
-        if (cancelled || !authContextMatches(expectedAuth, getAuthContext())) return
+        if (
+          cancelled
+          || !authContextMatches(expectedAuth, getAuthContext())
+          || !chartContextMatches(expectedChartContext)
+        ) return
         setStatus('error')
         setReportError(
           error instanceof Error
@@ -296,7 +387,11 @@ function EnabledFutureReportPaywall() {
         )
       })
       .finally(() => {
-        if (!cancelled && authContextMatches(expectedAuth, getAuthContext())) {
+        if (
+          !cancelled
+          && authContextMatches(expectedAuth, getAuthContext())
+          && chartContextMatches(expectedChartContext)
+        ) {
           setAccessCheckedFor(expectedAuth)
         }
       })
@@ -306,6 +401,8 @@ function EnabledFutureReportPaywall() {
     }
   }, [
     cacheReport,
+    chartContextKey,
+    chartContextMatches,
     csrfToken,
     getAuthContext,
     initialized,
@@ -343,6 +440,7 @@ function EnabledFutureReportPaywall() {
       csrfToken,
       sessionVersion,
     }
+    const checkoutChartContext = chartContextKey
 
     async function mount(tier: ForecastTier) {
       try {
@@ -355,10 +453,13 @@ function EnabledFutureReportPaywall() {
           onInitiate: () => {
             analytics.beginCheckout(tier, Number(TIER_PRICES[tier]))
           },
+          onCaptureStart: beginCapture,
+          onCaptureEnd: endCapture,
           onApprove: (verifiedPurchase) => {
             if (
               cancelled ||
-              !authContextMatches(checkoutAuth, getAuthContext())
+              !authContextMatches(checkoutAuth, getAuthContext()) ||
+              !chartContextMatches(checkoutChartContext)
             ) return
             setPurchase(verifiedPurchase)
             setCurrentChartFingerprint(verifiedPurchase.chartFingerprint)
@@ -368,14 +469,20 @@ function EnabledFutureReportPaywall() {
               value: verifiedPurchase.amountMinor / 100,
               transactionId: verifiedPurchase.orderId,
             })
-            void runGeneration(verifiedPurchase)
+            void runGeneration(verifiedPurchase, checkoutChartContext)
           },
           onCancel: () => {
-            if (!authContextMatches(checkoutAuth, getAuthContext())) return
+            if (
+              !authContextMatches(checkoutAuth, getAuthContext())
+              || !chartContextMatches(checkoutChartContext)
+            ) return
             setNotice('Checkout cancelled — no charge was made. You can try again anytime.')
           },
           onError: (error) => {
-            if (!authContextMatches(checkoutAuth, getAuthContext())) return
+            if (
+              !authContextMatches(checkoutAuth, getAuthContext())
+              || !chartContextMatches(checkoutChartContext)
+            ) return
             setStatus('error')
             setReportError(
               `${error.message || 'Payment could not be confirmed.'} If you approved PayPal, use “Restore purchase” before trying a new checkout.`,
@@ -405,7 +512,11 @@ function EnabledFutureReportPaywall() {
     }
   }, [
     buildReportInput,
+    beginCapture,
+    chartContextKey,
+    chartContextMatches,
     getAuthContext,
+    endCapture,
     activePurchase,
     checkingAccess,
     runGeneration,
@@ -481,7 +592,10 @@ function EnabledFutureReportPaywall() {
                 <Button
                   size="sm"
                   variant="gold"
-                  onClick={() => void runGeneration(activePurchase)}
+                  onClick={() => void runGeneration(
+                    activePurchase,
+                    chartContextKey,
+                  )}
                 >
                   Generate / Retry report
                 </Button>

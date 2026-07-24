@@ -5,7 +5,11 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useChartStore, useSettingsStore } from '@/stores'
+import {
+  useChartStore,
+  useFutureReportActivityStore,
+  useSettingsStore,
+} from '@/stores'
 import type { BirthInfo, Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
 import { getShichenOptions, hourToShichen } from '@/lib/shichen'
@@ -318,6 +322,9 @@ async function resolveCompatibilityPerson(
 
 export function MatchAnalysis() {
   const { persona, setPersona } = useSettingsStore()
+  const capturePending = useFutureReportActivityStore(
+    (state) => state.captureCount > 0,
+  )
   const currentBirthInfo = useChartStore((state) => (
     state.chart && state.birthInfo ? state.birthInfo : null
   ))
@@ -603,7 +610,10 @@ export function MatchAnalysis() {
                     <button
                       key={p}
                       onClick={() => setPersona(p)}
-                      disabled={loading}
+                      disabled={loading || capturePending}
+                      title={capturePending
+                        ? 'Finish PayPal payment verification before changing the reading style.'
+                        : undefined}
                       className={`
                         px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200
                         disabled:cursor-not-allowed disabled:opacity-50

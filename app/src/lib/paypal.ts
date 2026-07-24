@@ -343,6 +343,8 @@ export interface PayPalCheckoutOptions {
   buildReportInput: () => FutureReportRequestInput
     | Promise<FutureReportRequestInput>
   onInitiate?: () => void
+  onCaptureStart?: () => void
+  onCaptureEnd?: () => void
   onApprove: (purchase: FutureReportPurchase) => void
   onError: (error: Error) => void
   onCancel?: () => void
@@ -370,11 +372,15 @@ export async function renderPayPalButtons(
       )
     },
     onApprove: async (data, actions) => {
+      let captureStarted = false
       try {
         if (!data.orderID) throw new Error('PayPal returned no order ID.')
+        const reportInput = await options.buildReportInput()
+        options.onCaptureStart?.()
+        captureStarted = true
         const purchase = await captureFutureReportOrder(
           data.orderID,
-          await options.buildReportInput(),
+          reportInput,
           requireAuthContext(options.getAuthContext).csrfToken,
         )
         clearCheckoutAttempt(options.userId, options.tier)
@@ -387,6 +393,8 @@ export async function renderPayPalButtons(
         options.onError(
           error instanceof Error ? error : new Error('Payment verification failed.'),
         )
+      } finally {
+        if (captureStarted) options.onCaptureEnd?.()
       }
     },
     onCancel: () => {

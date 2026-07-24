@@ -3,7 +3,11 @@
 import { createElement } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useChartStore, useSettingsStore } from '@/stores'
+import {
+  useChartStore,
+  useFutureReportActivityStore,
+  useSettingsStore,
+} from '@/stores'
 import { generateChart, type BirthInfo } from '@/lib/astro'
 import { buildCompatibilityReadingRequest } from '@/lib/reading-contract'
 import * as compatibilityScore from '@/lib/compatibility-score'
@@ -64,6 +68,7 @@ beforeEach(() => {
   mocks.streamReading.mockReset()
   useSettingsStore.setState({ persona: 'scholar' })
   useChartStore.setState({ birthInfo: null, chart: null })
+  useFutureReportActivityStore.setState({ captureCount: 0 })
 })
 
 afterEach(() => {
@@ -74,6 +79,18 @@ afterEach(() => {
 })
 
 describe('MatchAnalysis public AI gate', () => {
+  it('disables persona changes while PayPal capture is pending', () => {
+    useFutureReportActivityStore.getState().beginCapture()
+    render(createElement(MatchAnalysis))
+
+    const sageButton = screen.getByRole('button', { name: 'The Old Sage' }) as
+      HTMLButtonElement
+    expect(sageButton.disabled).toBe(true)
+    expect(sageButton.title).toContain('Finish PayPal payment verification')
+    fireEvent.click(sageButton)
+    expect(useSettingsStore.getState().persona).toBe('scholar')
+  })
+
   it('prefills Person A and resolves its true solar time again for comparison', async () => {
     const currentBirthInfo: BirthInfo = {
       year: 1986,

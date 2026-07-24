@@ -331,6 +331,23 @@ remain correct. The comparison is passive: it summarizes Life Palace stars,
 Body Palace branch, and element class without replacing the canonical chart or
 claiming rectification. A comparison failure must stay local and retryable.
 
+`src/lib/birth-time-finder.ts` +
+`src/components/chart/BirthTimeFinder.tsx`: an explicitly opened, separately
+lazy provider-independent shortlist for approximate times. Keep exactly 13
+civil candidates, including separate 00:00 and 23:00 Rat entries. Require an
+exact bundled birthplace and independently resolve every candidate with true
+solar time before chart generation. Group identical resolved
+date/time-index inputs as equivalent. Questions are deterministic, adult,
+past-event, skippable, non-sensitive, and limited to five. Scoring may use only
+annual Life Palace placement, Major Limit palace, and the natal-palace
+locations of annual Four Transformations; do not reuse the timeline's
+dimension scores or any random value as event evidence. Show points and their
+ledger, never probabilities, accuracy, minute confidence, or a "correct time"
+claim. Applying a civil candidate must be explicit, keep
+`birthTimeReliable=false`, atomically replace chart plus birth input, and clear
+all chart-derived caches. No request, analytics, persistence, account, AI, or
+payment dependency belongs in this flow.
+
 `src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI
 prompts, including `buildYearlyChartFacts` (year-by-year Liu Nian facts via
 `chart.horoscope()`) for the paid Future Report.
@@ -384,7 +401,13 @@ PayPal capture.
 `src/components/FutureReportPaywall.tsx`: Pricing tiers (1-Year/5-Year),
 account-gated PayPal checkout, server purchase recovery, no-recapture report
 retry, and the purchased report view rendered below the free reading in
-`AIInterpretation.tsx`.
+`AIInterpretation.tsx`. Its local state, checkout handles, and every async
+access/generation commit are scoped to both the signed-in owner/session and
+the exact browser chart/persona request identity. A chart or persona change
+must remount the paywall and stale work must never repopulate cleared content.
+While server capture is pending, the global capture gate must reject every
+chart set/replace/clear and persona change until PayPal verification finishes;
+do not unlock merely because the paywall component unmounted.
 
 `src/components/LocalChartSnapshot.tsx`: deterministic, current-model-year
 chart summary rendered whenever a natal chart exists, regardless of the public

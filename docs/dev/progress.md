@@ -39,6 +39,41 @@
 
 ## Recently Completed
 
+- Added the first provider-independent 13-candidate birth-time shortlist inside
+  the approximate-time sensitivity panel, using qingnang.cc's public
+  寻时定盘 progression as a product benchmark without copying its design or
+  accuracy framing. The separately lazy flow requires an exact bundled
+  birthplace; independently true-solar-resolves early Rat, eleven intervening
+  blocks, and late Rat; groups candidates that become the same engine chart;
+  and asks at most five skippable, non-sensitive adult past-event questions.
+  The deterministic model uses only annual Life Palace placement, Major Limit
+  palace, and the natal-palace locations of annual Four Transformations.
+  Results show evidence points and every non-zero contribution. A no-clear
+  outcome exposes no arbitrary apply action, while a third-place score tie is
+  disclosed as a complete tier instead of being truncated by sort order.
+  Candidate-specific corrected clock, correction minutes, and crossed date
+  remain visible even when several civil entries share one engine chart.
+  Candidate and annual-fact work yields to the main thread in cancellable
+  batches, and question/result transitions move keyboard focus predictably.
+  The flow makes no probability or minute-level claim.
+  Applying a candidate is explicit, preserves `birthTimeReliable=false`,
+  atomically replaces chart plus birth input, and clears chart-derived caches.
+  Paid-report access, checkout, and generation are also invalidated by the
+  exact chart/persona request identity when an applied candidate replaces the
+  chart, preventing an old asynchronous result from re-entering the cleared
+  cache. Once payment capture begins, chart replacement, Start Over, and
+  persona changes remain locked until verification finishes so a successful
+  purchase cannot be silently detached mid-capture. The complete app passes
+  71 test files / 692 tests, lint, the strict
+  production build, and the dependency audit with zero known vulnerabilities.
+  The finder is an 18.42 kB raw / 6.64 kB gzip lazy chunk; ChartDisplay remains
+  27.30 kB raw / 9.09 kB gzip, and every JavaScript chunk remains below 500
+  kB. A real desktop production preview prepared all Chengdu candidates in
+  about 1.3 seconds, asked five questions, displayed a transparent ranked
+  ledger, applied Dragon Hour as a Rabbit-Hour solar-resolved approximate
+  chart, rejected a prefix-only birthplace, and showed no document-level
+  horizontal overflow. The plain preview's expected Vercel Analytics load log
+  is not a product error.
 - Made Compatibility use the same true-solar-time boundary as the natal chart.
   Person A now prefills from the saved chart without trusting stored derived
   time data, and either person can keep a birthplace plus explicitly enable
@@ -924,15 +959,13 @@ hosted run or artifact exists yet.
 
 ## Next Useful Work
 
-- Build a provider-independent birth-time shortlist inside the existing
-  sensitivity check, using qingnang.cc's public 寻时定盘 flow as a product
-  benchmark rather than a copied design. Generate the full 13 civil-time
-  candidates (including early and late Rat Hour), require an exact local
-  birthplace, independently resolve true solar time before scoring, ask a
-  bounded set of non-sensitive past-event questions, expose the evidence
-  ledger, and return a top-three or no-clear-separation result. Never replace
-  the saved chart until the user explicitly chooses a candidate, and do not
-  claim minute-level or statistically validated certainty.
+- Before expanding birth-time finding beyond five questions or its current
+  structural evidence model, test the wording, understood confidence boundary,
+  and usefulness with at least five people who genuinely lack an exact birth
+  time. Treat event recall and the one-year probe inside each displayed
+  three-year window as known limitations; do not add sensitive events, AI
+  prose, persistence, probabilities, or a paid upgrade without a new reviewed
+  decision.
 - Expand `/learn/<slug>` only with an owner-approved topic or supplied outline;
   keep each page static, script-free, 400-800 English words, linked in the
   sitemap, and within the established claim boundary. Prove the first

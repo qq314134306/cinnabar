@@ -33,6 +33,9 @@ vi.mock('@/stores', () => {
     useAuthStore: (selector: (state: { init: () => void }) => unknown) => (
       selector({ init: mocks.initAuth })
     ),
+    useFutureReportActivityStore: (
+      selector: (state: { captureCount: number }) => unknown,
+    ) => selector({ captureCount: 0 }),
   }
 })
 vi.mock('@/components/BirthForm', () => ({

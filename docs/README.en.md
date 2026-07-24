@@ -20,7 +20,12 @@
 - **Your Chart** — casts a 12-palace Zi Wei Dou Shu chart with `iztro`, local
   birthplace matching, and true solar time correction. An explicitly
   approximate time receives a local comparison of the neighboring traditional
-  two-hour windows without claiming to identify the correct birth time. Once
+  two-hour windows. It can also open an optional local shortlist across all 13
+  civil-time entries, including early and late Rat Hour. Every entry is
+  independently solar-resolved before up to five skippable past-event
+  questions produce evidence points, an evidence ledger, and at most three
+  leading possibilities. Equivalent resolved charts remain tied; the tool does
+  not claim to identify an exact or correct birth time. Once
   cast, the chart also shows a deterministic current-model-year snapshot with
   an overall score and Career, Wealth, Relationships, and Well-being
   dimensions. These local features need no AI request, account, API, or

@@ -30,26 +30,68 @@ import {
 } from '@/lib/supabase'
 
 /* ------------------------------------------------------------
+   Future Report capture activity
+   ------------------------------------------------------------ */
+
+interface FutureReportActivityState {
+  captureCount: number
+  beginCapture: () => void
+  endCapture: () => void
+}
+
+export const useFutureReportActivityStore =
+  create<FutureReportActivityState>()((set) => ({
+    captureCount: 0,
+    beginCapture: () => set((state) => ({
+      captureCount: state.captureCount + 1,
+    })),
+    endCapture: () => set((state) => ({
+      captureCount: Math.max(0, state.captureCount - 1),
+    })),
+  }))
+
+function canMutateChart(): boolean {
+  return useFutureReportActivityStore.getState().captureCount === 0
+}
+
+/* ------------------------------------------------------------
    Chart state
    ------------------------------------------------------------ */
 
 interface ChartState {
   birthInfo: BirthInfo | null
   chart: FunctionalAstrolabe | null
-  setBirthInfo: (info: BirthInfo) => void
-  setChart: (chart: FunctionalAstrolabe) => void
-  clear: () => void
+  setBirthInfo: (info: BirthInfo) => boolean
+  setChart: (chart: FunctionalAstrolabe) => boolean
+  replaceChart: (info: BirthInfo, chart: FunctionalAstrolabe) => boolean
+  clear: () => boolean
 }
 
 export const useChartStore = create<ChartState>()((set) => ({
   birthInfo: null,
   chart: null,
-  setBirthInfo: (info) => set({ birthInfo: info }),
-  setChart: (chart) => set({ chart }),
+  setBirthInfo: (info) => {
+    if (!canMutateChart()) return false
+    set({ birthInfo: info })
+    return true
+  },
+  setChart: (chart) => {
+    if (!canMutateChart()) return false
+    set({ chart })
+    return true
+  },
+  replaceChart: (birthInfo, chart) => {
+    if (!canMutateChart()) return false
+    set({ birthInfo, chart })
+    useContentCacheStore.getState().clearAll()
+    return true
+  },
   clear: () => {
+    if (!canMutateChart()) return false
     set({ birthInfo: null, chart: null })
     // Also clear cached AI content
     useContentCacheStore.getState().clearAll()
+    return true
   },
 }))
 
@@ -151,14 +193,18 @@ export const useContentCacheStore = create<ContentCacheState>()((set) => ({
 
 interface SettingsState {
   persona: Persona
-  setPersona: (persona: Persona) => void
+  setPersona: (persona: Persona) => boolean
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       persona: 'scholar',
-      setPersona: (persona) => set({ persona }),
+      setPersona: (persona) => {
+        if (!canMutateChart()) return false
+        set({ persona })
+        return true
+      },
     }),
     {
       name: 'cinnabar-settings',

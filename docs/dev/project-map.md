@@ -151,6 +151,15 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   explicitly approximate birth times. It shifts wall-clock time across real
   dates, resolves each candidate independently, and summarizes core structural
   differences without mutating the selected chart.
+- `app/src/components/chart/BirthTimeFinder.tsx` +
+  `app/src/lib/birth-time-finder.ts` - separately lazy, provider-independent
+  13-candidate birth-time shortlist. It exact-matches one local birthplace,
+  independently true-solar-resolves early Rat, eleven standard blocks, and
+  late Rat, groups equivalent resolved charts, asks at most five skippable
+  non-sensitive past-event questions, and exposes deterministic evidence
+  points plus their ledger. Only an explicit candidate action atomically
+  replaces the chart, preserves approximate status, and clears chart-derived
+  caches.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates (free reading, compatibility, paid Future Report).
 - `app/src/lib/paypal.ts` - PayPal Smart Payment Buttons adapter; passes tier +

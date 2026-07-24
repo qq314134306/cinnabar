@@ -25,7 +25,7 @@ const GENDER_OPTIONS = [
 ]
 
 export function BirthForm() {
-  const { setBirthInfo, setChart } = useChartStore()
+  const { replaceChart } = useChartStore()
 
   const [year, setYear] = useState(1990)
   const [month, setMonth] = useState(1)
@@ -126,8 +126,11 @@ export function BirthForm() {
       const { generateChart } = await import('@/lib/astro')
       const chart = generateChart(birthInfo)
 
-      setBirthInfo(birthInfo)
-      setChart(chart)
+      if (!replaceChart(birthInfo, chart)) {
+        setErrorMessage(
+          'PayPal is verifying a payment. Finish that verification before casting another chart.',
+        )
+      }
     } catch (error) {
       console.error('Chart generation failed:', error)
       setErrorMessage(

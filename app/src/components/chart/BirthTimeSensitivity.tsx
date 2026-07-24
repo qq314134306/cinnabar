@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react'
-import { useChartStore } from '@/stores'
+import { lazy, useCallback, useMemo, useRef, useState } from 'react'
+import { useChartStore, useFutureReportActivityStore } from '@/stores'
+import { LazySurface } from '@/components/LazySurface'
 import {
   buildBirthTimeSensitivity,
   type BirthTimeScenarioPosition,
 } from '@/lib/birth-time-sensitivity'
+import type { BirthTimeCandidate } from '@/lib/birth-time-finder'
 import { hourToShichen } from '@/lib/shichen'
 import {
   describeStarLabel,
@@ -25,13 +27,24 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
   timeZone: 'UTC',
 })
 
+const BirthTimeFinder = lazy(async () => {
+  const module = await import('./BirthTimeFinder')
+  return { default: module.BirthTimeFinder }
+})
+
 function formatDate(year: number, month: number, day: number): string {
   return DATE_FORMATTER.format(new Date(Date.UTC(year, month - 1, day)))
 }
 
 export function BirthTimeSensitivity() {
-  const { chart, birthInfo } = useChartStore()
+  const { chart, birthInfo, replaceChart } = useChartStore()
   const [retryVersion, setRetryVersion] = useState(0)
+  const [finderOpen, setFinderOpen] = useState(false)
+  const [appliedStatus, setAppliedStatus] = useState<string | null>(null)
+  const finderButtonRef = useRef<HTMLButtonElement | null>(null)
+  const capturePending = useFutureReportActivityStore(
+    (state) => state.captureCount > 0,
+  )
 
   const buildState = useMemo(() => {
     if (!chart || !birthInfo || birthInfo.birthTimeReliable !== false) {
@@ -48,6 +61,25 @@ export function BirthTimeSensitivity() {
       return { result: null, failed: true, attempt: retryVersion }
     }
   }, [birthInfo, chart, retryVersion])
+
+  const closeFinder = useCallback(() => {
+    setFinderOpen(false)
+    window.setTimeout(() => finderButtonRef.current?.focus(), 0)
+  }, [])
+
+  const applyCandidate = useCallback((candidate: BirthTimeCandidate) => {
+    if (!replaceChart(candidate.birthInfo, candidate.chart)) {
+      setAppliedStatus(
+        'PayPal is verifying a payment. Finish that verification before changing the chart.',
+      )
+      return
+    }
+    setAppliedStatus(
+      `Chart updated to ${candidate.block.label}. The birth time remains marked approximate.`,
+    )
+    setFinderOpen(false)
+    window.setTimeout(() => finderButtonRef.current?.focus(), 0)
+  }, [replaceChart])
 
   if (!chart || !birthInfo || birthInfo.birthTimeReliable !== false) {
     return null
@@ -196,6 +228,59 @@ export function BirthTimeSensitivity() {
               ? 'The neighboring windows change at least one core chart structure. Treat each as a possibility; this comparison does not determine the correct birth time.'
               : 'The neighboring windows keep the displayed core structure stable. Other chart details may still differ; this comparison does not determine the correct birth time.'}
           </p>
+
+          <div className="mt-4">
+            <button
+              ref={finderButtonRef}
+              type="button"
+              aria-expanded={finderOpen}
+              aria-controls="birth-time-finder"
+              disabled={capturePending}
+              title={capturePending
+                ? 'Finish PayPal payment verification before changing the chart.'
+                : undefined}
+              onClick={() => {
+                if (finderOpen) {
+                  closeFinder()
+                } else {
+                  setAppliedStatus(null)
+                  setFinderOpen(true)
+                }
+              }}
+              className="rounded-lg border border-star/30 bg-star/[0.08] px-4 py-2 text-sm font-medium text-star-light transition-colors hover:bg-star/[0.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {finderOpen
+                ? 'Hide life-event comparison'
+                : 'Explore all time blocks with life events'}
+            </button>
+            <p className="mt-2 text-xs leading-relaxed text-text-muted">
+              Compare all 13 civil-time entries with optional rough recall and
+              up to five past-event questions. Everything stays on this device.
+            </p>
+          </div>
+
+          {appliedStatus && (
+            <p
+              role="status"
+              className="mt-3 rounded-lg border border-fortune/20 bg-fortune/[0.08] px-3 py-2 text-sm text-text-secondary"
+            >
+              {appliedStatus}
+            </p>
+          )}
+
+          {finderOpen && (
+            <LazySurface
+              label="the birth-time shortlist"
+              loadingLabel="Loading the birth-time shortlist…"
+              variant="panel"
+            >
+              <BirthTimeFinder
+                birthInfo={birthInfo}
+                onApply={applyCandidate}
+                onClose={closeFinder}
+              />
+            </LazySurface>
+          )}
         </>
       ) : null}
     </section>

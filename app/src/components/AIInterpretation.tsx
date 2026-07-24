@@ -7,7 +7,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
+import {
+  useChartStore,
+  useSettingsStore,
+  useContentCacheStore,
+  useFutureReportActivityStore,
+} from '@/stores'
 import { DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
 import { ReadingApiError, streamReading } from '@/lib/llm'
 import {
@@ -85,6 +90,9 @@ const MarkdownComponents = {
 export function AIInterpretation() {
   const { chart, birthInfo } = useChartStore()
   const { persona, setPersona } = useSettingsStore()
+  const capturePending = useFutureReportActivityStore(
+    (state) => state.captureCount > 0,
+  )
   const publicAiEnabled = isPublicAiReadingEnabled()
   const {
     aiInterpretation,
@@ -331,7 +339,10 @@ export function AIInterpretation() {
               <button
                 key={p}
                 onClick={() => setPersona(p)}
-                disabled={loading}
+                disabled={loading || capturePending}
+                title={capturePending
+                  ? 'Finish PayPal payment verification before changing the reading style.'
+                  : undefined}
                 className={`
                   px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200
                   disabled:cursor-not-allowed disabled:opacity-50

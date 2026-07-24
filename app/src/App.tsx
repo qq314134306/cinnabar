@@ -11,7 +11,11 @@ import { KLineIcon } from '@/components/icons/KLineIcon'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
 import { ExitIntentModal } from '@/components/ExitIntentModal'
 import { AuthControl } from '@/components/AuthControl'
-import { useChartStore, useAuthStore } from '@/stores'
+import {
+  useChartStore,
+  useAuthStore,
+  useFutureReportActivityStore,
+} from '@/stores'
 import { trackPageView } from '@/lib/analytics'
 
 const AIInterpretation = lazy(async () => {
@@ -68,6 +72,9 @@ const TAB_ROUTES: Record<TabType, { path: string; title: string }> = {
 
 export default function App() {
   const { chart } = useChartStore()
+  const capturePending = useFutureReportActivityStore(
+    (state) => state.captureCount > 0,
+  )
   const initAuth = useAuthStore((s) => s.init)
   const [activeTab, setActiveTab] = useState<TabType>('chart')
 
@@ -273,11 +280,16 @@ export default function App() {
                 <div className="text-center">
                   <button
                     onClick={() => useChartStore.getState().clear()}
+                    disabled={capturePending}
+                    title={capturePending
+                      ? 'Finish PayPal payment verification before starting over.'
+                      : undefined}
                     className="
                       inline-flex items-center gap-2 px-4 py-2 rounded-lg
                       text-sm text-text-muted
                       hover:text-text hover:bg-white/[0.04]
                       transition-all duration-200
+                      disabled:cursor-not-allowed disabled:opacity-50
                     "
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
