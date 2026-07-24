@@ -500,7 +500,15 @@ Done trims and commits it, and both the control and state enforce the
 240-character export-safe boundary. PNG export is single-flight, removes its
 temporary download anchor even if the click throws, and exposes an
 input-independent announced retry state instead of a blocking browser alert.
-Starting a retry clears the stale error.
+Starting a retry clears the stale error. Browsers that pass an exact
+`navigator.canShare({files})` capability check also expose native image
+sharing; unsupported browsers keep download as the only action. Because canvas
+capture may outlive Web Share's transient user activation, a first
+`NotAllowedError` retains the generated `File` only in component memory and
+offers a second immediate share-sheet action. A changed visible quote or chart
+identity invalidates that prepared file. User cancellation stays quiet; every
+other device/browser failure uses fixed announced copy and leaves download
+available. Never auto-open the OS share sheet in browser acceptance.
 
 `tests/api-typecheck.test.ts`: Contract coverage that keeps
 `tsconfig.api.json` in the root build graph, keeps strict API type checking

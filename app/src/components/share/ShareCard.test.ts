@@ -16,6 +16,9 @@ import { ShareCard } from './ShareCard'
 const mocks = vi.hoisted(() => ({
   html2canvas: vi.fn(),
   toDataURL: vi.fn(() => 'data:image/png;base64,share-card'),
+  toBlob: vi.fn((callback: BlobCallback) => {
+    callback(new Blob(['share-card'], { type: 'image/png' }))
+  }),
 }))
 
 vi.mock('html2canvas', () => ({
@@ -43,10 +46,25 @@ const CHART = {
 beforeEach(() => {
   mocks.html2canvas.mockReset()
   mocks.toDataURL.mockClear()
-  mocks.html2canvas.mockResolvedValue({ toDataURL: mocks.toDataURL })
+  mocks.toBlob.mockReset()
+  mocks.toBlob.mockImplementation((callback: BlobCallback) => {
+    callback(new Blob(['share-card'], { type: 'image/png' }))
+  })
+  mocks.html2canvas.mockResolvedValue({
+    toDataURL: mocks.toDataURL,
+    toBlob: mocks.toBlob,
+  })
   Object.defineProperty(document, 'fonts', {
     configurable: true,
     value: { ready: Promise.resolve() },
+  })
+  Object.defineProperty(navigator, 'share', {
+    configurable: true,
+    value: undefined,
+  })
+  Object.defineProperty(navigator, 'canShare', {
+    configurable: true,
+    value: undefined,
   })
   useChartStore.setState({ chart: CHART, birthInfo: BIRTH_INFO })
   useContentCacheStore.setState({ aiInterpretation: null })
@@ -66,6 +84,7 @@ describe('ShareCard', () => {
     expect(screen.getByText(
       '"Your chart holds the map. How you walk it is yours to choose."',
     )).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Share Image' })).toBeNull()
   })
 
   it('uses an available AI narrative as an optional quote source', () => {
@@ -185,6 +204,140 @@ describe('ShareCard', () => {
     const anchor = click.mock.instances[0] as HTMLAnchorElement
     expect(anchor.download).toBe('cinnabar-reading-geng-wu.png')
     expect(anchor.href).toContain('data:image/png;base64,share-card')
+  })
+
+  it('shares a generated PNG through the native device share sheet', async () => {
+    const share = vi.fn().mockResolvedValue(undefined)
+    const canShare = vi.fn().mockReturnValue(true)
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: share,
+    })
+    Object.defineProperty(navigator, 'canShare', {
+      configurable: true,
+      value: canShare,
+    })
+    render(createElement(ShareCard))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Share Image' }))
+
+    await waitFor(() => {
+      expect(share).toHaveBeenCalledOnce()
+    })
+    expect(mocks.html2canvas).toHaveBeenCalledOnce()
+    expect(mocks.toBlob).toHaveBeenCalledWith(
+      expect.any(Function),
+      'image/png',
+    )
+    const shareData = share.mock.calls[0][0] as ShareData
+    expect(shareData.title).toBe('My Cinnabar chart')
+    expect(shareData.files).toHaveLength(1)
+    expect(shareData.files?.[0]).toBeInstanceOf(File)
+    expect(shareData.files?.[0]?.name).toBe(
+      'cinnabar-reading-geng-wu.png',
+    )
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('retains a prepared image when async capture outlives user activation', async () => {
+    const share = vi.fn()
+      .mockRejectedValueOnce(Object.assign(new Error('activation expired'), {
+        name: 'NotAllowedError',
+      }))
+      .mockResolvedValueOnce(undefined)
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: share,
+    })
+    Object.defineProperty(navigator, 'canShare', {
+      configurable: true,
+      value: vi.fn().mockReturnValue(true),
+    })
+    render(createElement(ShareCard))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Share Image' }))
+
+    expect((await screen.findByRole('status')).textContent).toContain(
+      'Your image is ready.',
+    )
+    const openShareSheet = screen.getByRole('button', {
+      name: 'Open Share Sheet',
+    })
+    expect(openShareSheet.getAttribute('aria-describedby')).toBe(
+      'share-card-share-feedback',
+    )
+
+    fireEvent.click(openShareSheet)
+
+    await waitFor(() => {
+      expect(share).toHaveBeenCalledTimes(2)
+    })
+    expect(mocks.html2canvas).toHaveBeenCalledOnce()
+    expect(screen.queryByRole('status')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Share Image' })).toBeTruthy()
+  })
+
+  it('discards a prepared share image when the visible quote changes', async () => {
+    const share = vi.fn().mockRejectedValue(
+      Object.assign(new Error('activation expired'), {
+        name: 'NotAllowedError',
+      }),
+    )
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: share,
+    })
+    Object.defineProperty(navigator, 'canShare', {
+      configurable: true,
+      value: vi.fn().mockReturnValue(true),
+    })
+    render(createElement(ShareCard))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Share Image' }))
+    expect(await screen.findByRole('status')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', {
+      name: '✎ Customize the quote',
+    }))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Custom quote' }), {
+      target: {
+        value: 'A changed quote needs a newly rendered share image.',
+      },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('status')).toBeNull()
+    })
+    expect(screen.getByRole('button', { name: 'Share Image' })).toBeTruthy()
+    expect(mocks.html2canvas).toHaveBeenCalledOnce()
+  })
+
+  it('contains native share failures without exposing browser details', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const share = vi.fn().mockRejectedValue(
+      new Error('private device integration detail'),
+    )
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: share,
+    })
+    Object.defineProperty(navigator, 'canShare', {
+      configurable: true,
+      value: vi.fn().mockReturnValue(true),
+    })
+    render(createElement(ShareCard))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Share Image' }))
+
+    const error = await screen.findByRole('alert')
+    expect(error.textContent).toContain(
+      "We couldn't share this image. Save it or try again.",
+    )
+    expect(error.textContent).not.toContain('private device integration detail')
+    expect(screen.getByRole('button', {
+      name: 'Save Share Image',
+    })).toBeTruthy()
   })
 
   it('contains duplicate exports while one image is being generated', async () => {

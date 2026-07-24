@@ -238,7 +238,10 @@ in observation mode during preview and production browser verification. Review
 the sanitized `/api/csp-report` telemetry for GA4, Supabase, DeepSeek, and the
 complete PayPal sandbox button/create/capture/recovery flow before preparing an
 enforcing policy. A local test/build pass alone is not authorization to replace
-the report-only header.
+the report-only header. `Permissions-Policy` explicitly allows `web-share` only
+for the same origin. In Preview, verify that a file-capable browser exposes
+Share Image while an unsupported browser retains Save Share Image; do not open
+or complete the operating-system share sheet merely to prove button presence.
 
 Opaque sessions require migration
 `20260723040000_opaque_auth_sessions.sql`; server-owned PKCE login additionally

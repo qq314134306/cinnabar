@@ -21,6 +21,7 @@ describe('security headers contract', () => {
     expect(headers['X-Frame-Options']).toBe('DENY')
     expect(headers['Referrer-Policy']).toBe('strict-origin-when-cross-origin')
     expect(headers['Permissions-Policy']).toContain('camera=()')
+    expect(headers['Permissions-Policy']).toContain('web-share=(self)')
     expect(headers['Strict-Transport-Security']).toBe('max-age=31536000')
   })
 

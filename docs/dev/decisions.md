@@ -931,3 +931,26 @@ Consequence: learning traffic can reach useful, crawlable content without
 loading React, account, AI, analytics, or payment code. Vite copying the file
 and a local routing contract prove the artifact and configuration only; an
 isolated Vercel Preview must prove the extensionless rewrite before release.
+
+## D041 - Native Share Is Progressive and Activation-Aware
+
+Share Card keeps local PNG download as the universal delivery path. A native
+Share Image action appears only when the browser exposes both Web Share
+methods and `navigator.canShare` accepts a PNG `File`; the deployment
+Permissions Policy limits `web-share` to the same origin. The application does
+not upload the image, contact a share target itself, or add analytics.
+
+The W3C Web Share contract requires transient user activation for
+`navigator.share()`, while html2canvas rendering is asynchronous. The first
+click therefore renders the PNG and attempts the share directly. If that
+attempt alone returns `NotAllowedError`, the generated file remains only in
+component memory and the next click calls the share sheet immediately without
+recapturing. A second denial becomes a fixed fallback error. User cancellation
+(`AbortError`) stays quiet and retains the prepared file for a voluntary retry;
+all other failures expose fixed copy and leave download enabled.
+
+Prepared files are owned by the exact visible quote, chart identity, elements,
+stars, and pattern. Any such content change discards the file so a later share
+cannot send stale card content. Both save and share use one imperative
+single-flight guard. Browser acceptance verifies capability-based visibility,
+layout, overflow, and logs but does not open the operating-system share sheet.

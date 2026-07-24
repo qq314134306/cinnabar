@@ -39,6 +39,21 @@
 
 ## Recently Completed
 
+- Completed the Share Card's mobile delivery loop without adding an account,
+  API, or remote upload. Browsers that prove PNG file sharing through
+  `navigator.canShare` now receive a native Share Image action; all others keep
+  the existing local download. The first click attempts direct sharing, while
+  an expired Web Share activation retains the already-rendered file in memory
+  and turns the second click into an immediate share-sheet action. Card-content
+  changes discard prepared files, cancellation is quiet, unexpected browser
+  errors use fixed announced copy, and download remains available. Vercel's
+  Permissions Policy now explicitly allows same-origin `web-share`. A real
+  production preview showed both actions at desktop and 390-by-844, with no
+  document overflow or browser warning/error logs; the OS share sheet was not
+  opened during acceptance. The complete app passes 64 test files / 632 tests,
+  lint, the strict production build, and the moderate audit with zero known
+  vulnerabilities. The lazy ShareCard chunk remains small at 11.02 kB raw /
+  3.92 kB gzip, and every JavaScript chunk remains below 500 kB.
 - Added the first provider-independent `/learn/<slug>` growth surface without
   opening an account, AI, or payment dependency. The script-free “What Is Zi
   Wei Dou Shu?” page contains 400-800 words of structured English copy, its own
