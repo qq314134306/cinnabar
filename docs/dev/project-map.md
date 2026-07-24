@@ -96,6 +96,12 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   synchronous; the iztro engine and ChartDisplay load after submission.
   Optional AI narrative, Life Timeline, Compatibility, and the populated Share
   Card are further lazy chunks with announced loading fallbacks.
+- `app/public/learn/*.html` + `app/tests/learn-pages.test.ts` - script-free
+  public learning articles with self-owned SEO metadata, structured English
+  copy, a compliant disclaimer, and a CTA into the local chart. Vercel maps
+  one-segment `/learn/:slug` URLs to the corresponding static `.html` file;
+  `public/sitemap.xml` and `robots.txt` provide crawler discovery without
+  adding content to the SPA entry bundle.
 - `app/src/lib/shichen.ts` - engine-independent traditional two-hour labels and
   select options. BirthForm imports this instead of loading iztro merely to
   render its hour control.

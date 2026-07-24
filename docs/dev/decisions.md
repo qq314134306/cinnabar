@@ -910,3 +910,24 @@ absence of document-level horizontal overflow, and an empty browser
 warning/error log. Because `vite preview` does not serve Vercel `api/`
 functions, any authentication-unavailable state in that harness is not
 provider proof and does not replace an isolated Vercel Preview.
+
+## D040 - Learning Pages Are Static Product Entrances
+
+The first SEO learning surface is a real static HTML artifact rather than a
+client-rendered SPA tab. Vercel rewrites a one-segment `/learn/:slug` request
+to the matching `public/learn/:slug.html` file, so the public URL remains
+extensionless while title, description, canonical, Open Graph, headings, and
+article copy exist in the initial document. Unknown slugs resolve to missing
+static files rather than the chart application.
+
+Each article is English, 400-800 words, script-free, mobile-first, and linked
+from `public/sitemap.xml`. It has one H1, structured subheadings, a CTA to the
+free local chart, and the entertainment/self-discovery disclaimer. Public copy
+must stay reflective and cannot use the disallowed deterministic claim
+vocabulary. The SPA footer may provide a simple internal Learn link, but this
+work does not choose the final visual direction.
+
+Consequence: learning traffic can reach useful, crawlable content without
+loading React, account, AI, analytics, or payment code. Vite copying the file
+and a local routing contract prove the artifact and configuration only; an
+isolated Vercel Preview must prove the extensionless rewrite before release.

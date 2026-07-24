@@ -50,6 +50,16 @@ describe('Vercel Hobby function budget', () => {
     })
   })
 
+  it('serves one-segment learning slugs from static HTML files', () => {
+    const config = JSON.parse(
+      readFileSync(resolve(__dirname, '../vercel.json'), 'utf8'),
+    )
+    expect(config.rewrites).toContainEqual({
+      source: '/learn/:slug',
+      destination: '/learn/:slug.html',
+    })
+  })
+
   it('uses Node runtimes for work that can exceed the Edge first-response window', () => {
     const config = JSON.parse(
       readFileSync(resolve(__dirname, '../vercel.json'), 'utf8'),

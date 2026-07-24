@@ -122,6 +122,17 @@ no horizontal page overflow or browser warning/error log. A plain Vite preview
 does not host `api/` and therefore cannot prove authentication or other server
 routes.
 
+`public/learn/*.html` + `tests/learn-pages.test.ts`: script-free, indexable
+learning articles that add provider-independent discovery paths without
+entering the SPA bundle. Vercel rewrites one-segment `/learn/:slug` requests to
+the matching static HTML file; each article owns its canonical URL, title,
+description, Open Graph fields, one H1, structured headings, a root-chart CTA,
+and the entertainment/self-discovery disclaimer. Keep public article copy in
+English, 400-800 words, and within the approved non-deterministic claim
+vocabulary. Update `public/sitemap.xml` with every article. A local Vite
+fallback is not proof of the Vercel rewrite; verify the extensionless URL in an
+isolated Preview before promotion.
+
 `src/components/LazySurface.tsx` + `LazySurface.test.ts`: shared containment
 for every `React.lazy` product region. Pending imports expose an announced
 status. Import or render failure replaces only that region with an announced

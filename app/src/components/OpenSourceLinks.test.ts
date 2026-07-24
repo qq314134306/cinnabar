@@ -23,9 +23,13 @@ describe('OpenSourceLinks', () => {
     ).toHaveProperty('href', CANONICAL_REPOSITORY)
   })
 
-  it('points the footer repository and license links at the canonical source', () => {
+  it('links the footer to learning content and the canonical source', () => {
     render(createElement(OpenSourceFooterLinks))
 
+    expect(screen.getByRole('link', { name: 'Learn' })).toHaveProperty(
+      'href',
+      'http://localhost:3000/learn/what-is-zi-wei-dou-shu',
+    )
     expect(screen.getByRole('link', { name: 'GitHub' })).toHaveProperty(
       'href',
       CANONICAL_REPOSITORY,

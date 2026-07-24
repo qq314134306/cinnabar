@@ -39,6 +39,19 @@
 
 ## Recently Completed
 
+- Added the first provider-independent `/learn/<slug>` growth surface without
+  opening an account, AI, or payment dependency. The script-free “What Is Zi
+  Wei Dou Shu?” page contains 400-800 words of structured English copy, its own
+  canonical/title/description/Open Graph metadata, a free-chart CTA, and the
+  required entertainment/self-discovery boundary. The app footer provides the
+  internal link; sitemap and robots files provide crawler discovery. A Vercel
+  rewrite preserves the clean public URL while the source remains a true
+  static HTML artifact. Focused contracts pin the route, metadata, structure,
+  word range, approved claim vocabulary, CTA, disclaimer, and discovery files.
+  The complete app now passes 64 test files / 628 tests, lint, the strict
+  TypeScript production build, and the moderate dependency audit with zero
+  known vulnerabilities; the built article is a 9.76 kB static file and adds
+  nothing to the JavaScript chunks.
 - Accepted the provider-independent core against the real 2026-07-24
   production Vite build. Desktop navigation cast the default blank-place chart,
   rendered the deterministic snapshot, built the focused Life Timeline and
@@ -839,6 +852,10 @@ hosted run or artifact exists yet.
 
 ## Next Useful Work
 
+- Expand `/learn/<slug>` only with an owner-approved topic or supplied outline;
+  keep each page static, script-free, 400-800 English words, linked in the
+  sitemap, and within the established claim boundary. Prove the first
+  extensionless route in an isolated Vercel Preview before calling it live.
 - Treat the next approved candidate as a provider-independent core release:
   keep both public-AI and Future Report payment flags false, run the hosted
   candidate gates, then repeat the accepted chart/timeline/compatibility/share

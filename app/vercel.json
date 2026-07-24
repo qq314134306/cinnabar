@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/learn/:slug",
+      "destination": "/learn/:slug.html"
+    },
+    {
       "source": "/api/auth/:route",
       "destination": "/api/auth?__cinnabar_auth_route=:route"
     }

@@ -424,6 +424,14 @@ The historical `ruijayfeng/zwknows` mirror and its write credential are not
 part of the current deployment path. Do not recreate a mirror dependency to
 trigger Vercel.
 
+Static learning pages live at `app/public/learn/<slug>.html`. The Vercel
+configuration rewrites one-segment `/learn/:slug` requests to those artifacts,
+while `public/sitemap.xml` advertises their extensionless canonical URLs. The
+local contract verifies routing and page structure, but release evidence must
+request the clean URL from an isolated Preview, confirm an HTML response with
+the matching canonical, then verify the root CTA and sitemap URL before
+promotion.
+
 Authenticated Vercel inspection found these configured variable names, each
 scoped to both Production and Preview:
 

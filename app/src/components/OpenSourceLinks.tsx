@@ -42,6 +42,13 @@ export function OpenSourceFooterLinks() {
   return (
     <span className="inline-flex items-center gap-2">
       <a
+        href="/learn/what-is-zi-wei-dou-shu"
+        className="text-text-secondary hover:text-text transition-colors"
+      >
+        Learn
+      </a>
+      <span className="text-text-muted/60">/</span>
+      <a
         href={GITHUB_REPOSITORY_URL}
         target="_blank"
         rel="noreferrer"
