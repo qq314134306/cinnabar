@@ -954,3 +954,25 @@ stars, and pattern. Any such content change discards the file so a later share
 cannot send stale card content. Both save and share use one imperative
 single-flight guard. Browser acceptance verifies capability-based visibility,
 layout, overflow, and logs but does not open the operating-system share sheet.
+
+## D042 - Chart Explanation Is Local and Selection-Owned
+
+The natal chart's palace cards are semantic toggle buttons, not passive
+containers with pointer-only handlers. At most one palace owns the explanation
+panel below the grid. Selecting another palace replaces the content, selecting
+the same palace closes it, and the explicit Close action clears the selection.
+The selected button exposes pressed and controlled-region state.
+
+English explanations for the twelve canonical palaces, the Friends-palace
+engine alias, and fourteen major stars live in a presentation-only local
+module keyed by iztro's internal zh-CN labels. They are not copied from the
+older Chinese deterministic knowledge base and do not call AI, an account, or
+a provider. Unsupported labels receive no fabricated explanation; a palace
+without a major star receives explicit context rather than being presented as
+missing or defective.
+
+Every explanation is a reflective lens with a balancing prompt. The UI states
+that one palace or star never defines an outcome, and domain-sensitive palaces
+must not become medical diagnosis, financial advice, relationship prediction,
+career guarantee, or other deterministic claim. This feature belongs to the
+already-lazy ChartDisplay chunk so it cannot add work to the landing path.

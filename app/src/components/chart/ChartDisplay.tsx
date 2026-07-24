@@ -14,6 +14,10 @@ import { useState } from 'react'
 import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 import {
+  getMajorStarExplanation,
+  getPalaceExplanation,
+} from '@/lib/chart-explanations'
+import {
   translateBrightness,
   translateFiveElementsClass,
   translateGanZhi,
@@ -159,16 +163,23 @@ function PalaceCard({
   boshi12, changsheng12, isLife, isBody, isSelected, onClick
 }: PalaceCardProps) {
   const decadalRange = decadal?.range ? `${decadal.range[0]}-${decadal.range[1]}` : ''
+  const displayName = translatePalaceName(name)
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
+      aria-label={`Explain ${displayName}`}
+      aria-pressed={isSelected}
+      aria-controls={isSelected ? 'selected-palace-explanation' : undefined}
       className={`
-        group relative p-1.5 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col
+        group relative p-1.5 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col text-left
         bg-white/[0.03] backdrop-blur-sm
         border border-white/[0.06] rounded-xl
         transition-all duration-300 cursor-pointer
         hover:bg-white/[0.06] hover:border-white/[0.12]
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
+        focus-visible:ring-offset-2 focus-visible:ring-offset-night
         ${isLife ? 'ring-1 ring-gold/50 bg-gold/[0.03]' : ''}
         ${isBody ? 'ring-1 ring-star/50 bg-star/[0.03]' : ''}
         ${isSelected ? 'ring-2 ring-star' : ''}
@@ -187,7 +198,7 @@ function PalaceCard({
             ${isBody ? 'bg-star/20 text-star-light' : ''}
             ${!isLife && !isBody ? 'text-text-secondary' : ''}
           `}>
-            {translatePalaceName(name)}
+            {displayName}
           </span>
         </div>
       </div>
@@ -222,7 +233,126 @@ function PalaceCard({
         <span>{translateStarLabel(changsheng12)}</span>
         <span>{translateStarLabel(boshi12)}</span>
       </div>
-    </div>
+    </button>
+  )
+}
+
+/* ------------------------------------------------------------
+   Selected-palace explanation
+   ------------------------------------------------------------ */
+
+interface PalaceExplanationPanelProps {
+  palace: PalaceData
+  onClose: () => void
+}
+
+function PalaceExplanationPanel({
+  palace,
+  onClose,
+}: PalaceExplanationPanelProps) {
+  const palaceExplanation = getPalaceExplanation(palace.name)
+  const majorStarExplanations = palace.majorStars.flatMap((star) => {
+    const explanation = getMajorStarExplanation(star.name)
+    return explanation ? [{ star, explanation }] : []
+  })
+
+  return (
+    <section
+      id="selected-palace-explanation"
+      aria-labelledby="selected-palace-heading"
+      className="
+        mt-3 p-4 lg:p-5 rounded-xl border border-star/20
+        bg-gradient-to-br from-star/[0.10] to-white/[0.03]
+      "
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.18em] text-star-light/70">
+            Reflective guide
+          </p>
+          <h3
+            id="selected-palace-heading"
+            className="mt-1 text-base lg:text-lg font-semibold text-text"
+          >
+            About the {translatePalaceName(palace.name)}
+          </h3>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close palace explanation"
+          className="
+            shrink-0 rounded-lg border border-white/10 px-2.5 py-1.5
+            text-xs text-text-secondary transition-colors
+            hover:border-white/20 hover:bg-white/[0.06] hover:text-text
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
+          "
+        >
+          Close
+        </button>
+      </div>
+
+      {palaceExplanation ? (
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <p className="text-sm leading-relaxed text-text-secondary">
+            {palaceExplanation.summary}
+          </p>
+          <div className="rounded-lg bg-black/10 px-3 py-2.5">
+            <p className="text-[10px] uppercase tracking-wider text-text-muted">
+              Keep in balance
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-text-secondary">
+              {palaceExplanation.watchFor}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+          A local guide for this palace is not available yet.
+        </p>
+      )}
+
+      <div className="mt-4 border-t border-white/[0.08] pt-4">
+        <h4 className="text-xs font-medium uppercase tracking-wider text-text-muted">
+          Major stars in this palace
+        </h4>
+        {majorStarExplanations.length > 0 ? (
+          <div className="mt-2 grid gap-2 lg:grid-cols-2">
+            {majorStarExplanations.map(({ star, explanation }) => (
+              <article
+                key={star.name}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.03] p-3"
+              >
+                <h5 className="text-sm font-medium text-gold">
+                  {translateStarLabel(star.name)}
+                </h5>
+                <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+                  {explanation.summary}
+                </p>
+                <p className="mt-1.5 text-xs leading-relaxed text-text-muted">
+                  <span className="font-medium text-text-secondary">Keep in balance:</span>{' '}
+                  {explanation.watchFor}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : palace.majorStars.length === 0 ? (
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            This palace has no major star. Read its supporting stars and related
+            palaces as context rather than treating the space as empty.
+          </p>
+        ) : (
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            Detailed local notes are not available for this major-star label yet.
+          </p>
+        )}
+      </div>
+
+      <p className="mt-4 text-xs leading-relaxed text-text-muted">
+        Use this as a reflective starting point. One palace or star never
+        defines an outcome.
+      </p>
+    </section>
   )
 }
 
@@ -374,6 +504,9 @@ export function ChartDisplay() {
   if (!chart || !birthInfo) return null
 
   const palaceData = parsePalaces(chart)
+  const selectedPalaceData = palaceData.find(
+    (palace) => palace.name === selectedPalace,
+  ) ?? null
   const grid: (PalaceData | null)[][] = Array(4).fill(null).map(() => Array(4).fill(null))
 
   palaceData.forEach((p) => {
@@ -391,7 +524,9 @@ export function ChartDisplay() {
         key={key}
         {...palace}
         isSelected={selectedPalace === palace.name}
-        onClick={() => setSelectedPalace(selectedPalace === palace.name ? null : palace.name)}
+        onClick={() => setSelectedPalace((current) => (
+          current === palace.name ? null : palace.name
+        ))}
       />
     )
   }
@@ -426,6 +561,13 @@ export function ChartDisplay() {
         {/* Row 3 */}
         {grid[3].map((p, c) => renderPalace(p, `3-${c}`))}
       </div>
+
+      {selectedPalaceData && (
+        <PalaceExplanationPanel
+          palace={selectedPalaceData}
+          onClose={() => setSelectedPalace(null)}
+        />
+      )}
 
       {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-white/[0.06] text-[10px]">

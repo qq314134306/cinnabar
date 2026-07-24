@@ -139,6 +139,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   index.
 - `app/src/components/OpenSourceLinks.tsx` - GitHub repository and license links for open source attribution.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
+- `app/src/components/chart/ChartDisplay.tsx` +
+  `app/src/lib/chart-explanations.ts` - lazy local chart viewer and its
+  presentation-only reflective guide. Palace cards are accessible toggle
+  buttons; one selected palace exposes English palace and major-star context
+  without AI, accounts, or remote data.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts.
 - `app/src/lib/ai-prompts.ts` - base system prompt, personas, reading templates (free reading, compatibility, paid Future Report).
 - `app/src/lib/paypal.ts` - PayPal Smart Payment Buttons adapter; passes tier +

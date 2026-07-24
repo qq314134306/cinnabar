@@ -39,6 +39,22 @@
 
 ## Recently Completed
 
+- Finished the chart's previously inert palace selection as a useful local
+  reading surface. All palace cards are now keyboard-focusable toggle buttons
+  with selection state and a shared explanatory panel. The panel covers the
+  twelve canonical palaces, the Friends-palace engine alias, all fourteen major
+  stars, and the no-major-star case in fixed English reflective language. It
+  invents nothing for unknown engine labels and explicitly rejects single-
+  symbol outcomes plus medical, financial, relationship, and career promises.
+  Focused rendered and coverage tests protect opening, replacement, closing,
+  semantic state, empty-palace copy, English-only content, and complete local
+  coverage. The complete app passes 66 test files / 639 tests, lint, the strict
+  production build, and the moderate audit with zero known vulnerabilities.
+  ChartDisplay remains lazy and is 19.64 kB raw / 6.69 kB gzip; every
+  JavaScript chunk remains below 500 kB. A real desktop production preview cast
+  the default chart, opened Life Palace, replaced it with Wealth Palace, and
+  closed the guide with no stale selected state or document-level horizontal
+  overflow.
 - Completed the Share Card's mobile delivery loop without adding an account,
   API, or remote upload. Browsers that prove PNG file sharing through
   `navigator.canShare` now receive a native Share Image action; all others keep
