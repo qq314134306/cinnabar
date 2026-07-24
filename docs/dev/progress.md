@@ -46,7 +46,11 @@
   LifeKLine chunk fell from 842.58 kB / 272.38 kB gzip to
   351.80 kB / 105.52 kB gzip, while the deferred ScoreRadar is
   489.92 kB / 167.10 kB gzip. Every generated JavaScript chunk is now below
-  500 kB, so the production build emits no large-chunk warning.
+  500 kB, so the production build emits no large-chunk warning. Production-
+  preview resource inspection found LifeKLine but no ScoreRadar request or
+  canvas before Build; afterward ScoreRadar loaded, one ECharts canvas and the
+  year selector rendered, the lifespan disclaimer remained visible, and the
+  browser warning/error log stayed empty.
 - Added local failure containment to every lazy product region. ChartDisplay,
   optional AI narrative, Life Timeline, Compatibility, and the populated Share
   Card now share an announced pending state plus an error boundary that keeps
