@@ -96,6 +96,26 @@ const RESULT: BaziCompatibilityResult = {
       label: 'Six Break · Liu Po',
     },
   ],
+  branchPunishmentContacts: [
+    {
+      personAScope: 'month',
+      personABranch: '寅',
+      personBScope: 'month',
+      personBBranch: '巳',
+      kind: 'threePunishment',
+      direction: 'personAToB',
+      label: 'Ungrateful Punishment · Yin-Si-Shen',
+    },
+    {
+      personAScope: 'day',
+      personABranch: '寅',
+      personBScope: 'year',
+      personBBranch: '申',
+      kind: 'threePunishment',
+      direction: 'personBToA',
+      label: 'Ungrateful Punishment · Yin-Si-Shen',
+    },
+  ],
   stemContacts: [
     {
       personAScope: 'year',
@@ -209,6 +229,19 @@ describe('BaZiCompatibility', () => {
     expect(screen.getByText('A Year · Wu ↔ B Hour · Wei')).toBeTruthy()
     expect(screen.getByText('A Month · Yin ↔ B Month · Si')).toBeTruthy()
     expect(screen.getByText('Six Harm · Liu Hai')).toBeTruthy()
+    expect(screen.getByRole('heading', {
+      name: 'Four-Pillar punishment contacts',
+    })).toBeTruthy()
+    expect(container.querySelectorAll('[data-bazi-branch-punishment]')).toHaveLength(2)
+    expect(container.querySelectorAll(
+      '[data-bazi-branch-punishment-direction="personAToB"]',
+    )).toHaveLength(1)
+    expect(container.querySelectorAll(
+      '[data-bazi-branch-punishment-direction="personBToA"]',
+    )).toHaveLength(1)
+    expect(screen.getByText('A Month · Yin → B Month · Si')).toBeTruthy()
+    expect(screen.getByText('B Year · Shen → A Day · Yin')).toBeTruthy()
+    expect(screen.getAllByText('Ungrateful Punishment · Yin-Si-Shen')).toHaveLength(2)
     expect(screen.getAllByText('Year')).toHaveLength(2)
     expect(screen.getAllByText('Hour')).toHaveLength(2)
     expect(screen.getByText(/no score, fate claim/)).toBeTruthy()
@@ -241,6 +274,16 @@ describe('BaZiCompatibility', () => {
 
     expect(screen.getByText(
       'No Five Combination appears across the 16 visible-stem pairings.',
+    )).toBeTruthy()
+  })
+
+  it('shows an explicit empty state when no punishment contact is recognized', () => {
+    render(createElement(BaZiCompatibility, {
+      result: { ...RESULT, branchPunishmentContacts: [] },
+    }))
+
+    expect(screen.getByText(
+      'No canonical punishment contact appears across the 16 pairings.',
     )).toBeTruthy()
   })
 })

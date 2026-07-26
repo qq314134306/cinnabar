@@ -19,6 +19,16 @@ export type BaziDayBranchRelationKind =
 
 export type BaziStemContactKind = 'fiveCombination' | 'unclassified'
 
+export type BaziBranchPunishmentKind =
+  | 'threePunishment'
+  | 'mutualPunishment'
+  | 'selfPunishment'
+
+export type BaziBranchPunishmentDirection =
+  | 'firstToSecond'
+  | 'secondToFirst'
+  | 'mutual'
+
 export interface BaziCompatibilityPerson {
   dayMaster: {
     stem: string
@@ -66,6 +76,23 @@ export interface BaziPillarBranchContact {
   label: string
 }
 
+export interface BaziBranchPunishment {
+  kind: BaziBranchPunishmentKind
+  direction: BaziBranchPunishmentDirection
+  label: string
+  description: string
+}
+
+export interface BaziPillarBranchPunishmentContact {
+  personAScope: BaziPillarScope
+  personABranch: string
+  personBScope: BaziPillarScope
+  personBBranch: string
+  kind: BaziBranchPunishmentKind
+  direction: 'personAToB' | 'personBToA' | 'mutual'
+  label: string
+}
+
 export interface BaziPillarStemRelationship {
   targetScope: BaziPillarScope
   targetStem: string
@@ -99,6 +126,7 @@ export interface BaziCompatibilityResult {
   dayBranchRelation: BaziDayBranchRelation
   dayBranchRelations: BaziDayBranchRelation[]
   branchContacts: BaziPillarBranchContact[]
+  branchPunishmentContacts: BaziPillarBranchPunishmentContact[]
   stemContacts: BaziPillarStemContact[]
   stemRelationships: {
     personAToB: BaziPillarStemRelationship[]
@@ -146,6 +174,21 @@ const SIX_BREAK_PAIRS = new Set([
   orderedPair('寅', '亥'),
   orderedPair('巳', '申'),
 ])
+
+const DIRECTED_PUNISHMENT_PAIRS = new Map([
+  ['寅|巳', 'Ungrateful Punishment · Yin-Si-Shen'],
+  ['巳|申', 'Ungrateful Punishment · Yin-Si-Shen'],
+  ['申|寅', 'Ungrateful Punishment · Yin-Si-Shen'],
+  ['丑|戌', 'Bullying Punishment · Chou-Xu-Wei'],
+  ['戌|未', 'Bullying Punishment · Chou-Xu-Wei'],
+  ['未|丑', 'Bullying Punishment · Chou-Xu-Wei'],
+])
+
+const MUTUAL_PUNISHMENT_PAIRS = new Set([
+  orderedPair('子', '卯'),
+])
+
+const SELF_PUNISHMENT_BRANCHES = new Set(['辰', '午', '酉', '亥'])
 
 const FIVE_COMBINATION_PAIRS = new Set([
   '己|甲',
@@ -302,6 +345,53 @@ export function getBaziStemContact(
   }
 }
 
+export function getBaziBranchPunishment(
+  firstBranch: string,
+  secondBranch: string,
+): BaziBranchPunishment | null {
+  if (firstBranch === secondBranch) {
+    if (!SELF_PUNISHMENT_BRANCHES.has(firstBranch)) return null
+
+    return {
+      kind: 'selfPunishment',
+      direction: 'mutual',
+      label: 'Self Punishment · Zi Xing',
+      description: 'The repeated branch is one of the four canonical Zi Xing branches. This identifies a traditional structure, not self-harm or an outcome.',
+    }
+  }
+
+  if (MUTUAL_PUNISHMENT_PAIRS.has(orderedPair(firstBranch, secondBranch))) {
+    return {
+      kind: 'mutualPunishment',
+      direction: 'mutual',
+      label: 'Mutual Punishment · Zi-Mao',
+      description: 'Zi and Mao form the canonical reciprocal punishment pair. This names the structural contact only, not harm or a predicted conflict.',
+    }
+  }
+
+  const forwardLabel = DIRECTED_PUNISHMENT_PAIRS.get(`${firstBranch}|${secondBranch}`)
+  if (forwardLabel) {
+    return {
+      kind: 'threePunishment',
+      direction: 'firstToSecond',
+      label: forwardLabel,
+      description: 'The two branches occupy one directed step in a canonical three-punishment sequence. This does not claim that the complete three-branch pattern is present.',
+    }
+  }
+
+  const reverseLabel = DIRECTED_PUNISHMENT_PAIRS.get(`${secondBranch}|${firstBranch}`)
+  if (reverseLabel) {
+    return {
+      kind: 'threePunishment',
+      direction: 'secondToFirst',
+      label: reverseLabel,
+      description: 'The two branches occupy one directed step in a canonical three-punishment sequence. This does not claim that the complete three-branch pattern is present.',
+    }
+  }
+
+  return null
+}
+
 function buildPillarBranchContacts(
   personA: BaziCompatibilityPerson,
   personB: BaziCompatibilityPerson,
@@ -327,6 +417,39 @@ function buildPillarBranchContacts(
           label: BRANCH_CONTACT_LABELS[relation.kind],
         })
       }
+    }
+  }
+
+  return contacts
+}
+
+function buildPillarBranchPunishmentContacts(
+  personA: BaziCompatibilityPerson,
+  personB: BaziCompatibilityPerson,
+): BaziPillarBranchPunishmentContact[] {
+  const contacts: BaziPillarBranchPunishmentContact[] = []
+
+  for (const personAPillar of personA.pillars) {
+    for (const personBPillar of personB.pillars) {
+      const punishment = getBaziBranchPunishment(
+        personAPillar.branch,
+        personBPillar.branch,
+      )
+      if (!punishment) continue
+
+      contacts.push({
+        personAScope: personAPillar.scope,
+        personABranch: personAPillar.branch,
+        personBScope: personBPillar.scope,
+        personBBranch: personBPillar.branch,
+        kind: punishment.kind,
+        direction: punishment.direction === 'firstToSecond'
+          ? 'personAToB'
+          : punishment.direction === 'secondToFirst'
+            ? 'personBToA'
+            : 'mutual',
+        label: punishment.label,
+      })
     }
   }
 
@@ -428,6 +551,7 @@ export function buildBaziCompatibility(
       personB.dayPillar.branch,
     ),
     branchContacts: buildPillarBranchContacts(personA, personB),
+    branchPunishmentContacts: buildPillarBranchPunishmentContacts(personA, personB),
     stemContacts: buildPillarStemContacts(personA, personB),
     stemRelationships: {
       personAToB: buildPillarStemRelationships(personA.dayMaster.stem, personB),

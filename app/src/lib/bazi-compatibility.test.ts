@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { BirthInfo } from './astro'
 import {
   buildBaziCompatibility,
+  getBaziBranchPunishment,
   getBaziDayBranchRelation,
   getBaziDayBranchRelations,
   getBaziStemContact,
@@ -84,6 +85,55 @@ describe('getBaziDayBranchRelation', () => {
   })
 })
 
+describe('getBaziBranchPunishment', () => {
+  it('preserves directed three-punishment steps', () => {
+    const directedPairs = [
+      ['寅', '巳'],
+      ['巳', '申'],
+      ['申', '寅'],
+      ['丑', '戌'],
+      ['戌', '未'],
+      ['未', '丑'],
+    ]
+
+    for (const [first, second] of directedPairs) {
+      expect(getBaziBranchPunishment(first, second)).toEqual(
+        expect.objectContaining({
+          kind: 'threePunishment',
+          direction: 'firstToSecond',
+        }),
+      )
+      expect(getBaziBranchPunishment(second, first)).toEqual(
+        expect.objectContaining({
+          kind: 'threePunishment',
+          direction: 'secondToFirst',
+        }),
+      )
+    }
+  })
+
+  it('recognizes reciprocal and self-punishment contacts without inferring others', () => {
+    expect(getBaziBranchPunishment('子', '卯')).toEqual(expect.objectContaining({
+      kind: 'mutualPunishment',
+      direction: 'mutual',
+    }))
+    expect(getBaziBranchPunishment('卯', '子')).toEqual(expect.objectContaining({
+      kind: 'mutualPunishment',
+      direction: 'mutual',
+    }))
+
+    for (const branch of ['辰', '午', '酉', '亥']) {
+      expect(getBaziBranchPunishment(branch, branch)).toEqual(expect.objectContaining({
+        kind: 'selfPunishment',
+        direction: 'mutual',
+      }))
+    }
+
+    expect(getBaziBranchPunishment('子', '子')).toBeNull()
+    expect(getBaziBranchPunishment('子', '寅')).toBeNull()
+  })
+})
+
 describe('getBaziStemContact', () => {
   it('recognizes all five canonical combinations in either direction', () => {
     const pairs = [
@@ -146,6 +196,15 @@ describe('buildBaziCompatibility', () => {
       personBScope: 'hour',
       kind: 'sixHarm',
     }))
+    expect(result?.branchPunishmentContacts.length).toBeLessThanOrEqual(16)
+    expect(result?.branchPunishmentContacts.every((contact) => (
+      contact.direction === 'personAToB'
+      || contact.direction === 'personBToA'
+      || contact.direction === 'mutual'
+    ))).toBe(true)
+    expect(result?.branchPunishmentContacts.every((contact) => (
+      getBaziBranchPunishment(contact.personABranch, contact.personBBranch) !== null
+    ))).toBe(true)
     expect(result?.stemContacts.length).toBeLessThanOrEqual(16)
     expect(result?.stemContacts.every((contact) => (
       getBaziStemContact(contact.personAStem, contact.personBStem).kind

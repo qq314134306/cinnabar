@@ -144,6 +144,21 @@
 
 ## Recently Completed
 
+- Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
+  Compatibility. It preserves the directed Yin→Si→Shen→Yin and
+  Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or
+  Hai self-punishment contacts across all 16 cross-person pillar pairings. The
+  UI renders A→B, B→A, or reciprocal direction and explicitly avoids treating
+  one pair as proof of a complete three-branch pattern. “Punishment” remains a
+  traditional structural name, not evidence of harm, fault, self-harm, or an
+  outcome. No score, weighting, forecast, AI, persistence, account, payment,
+  analytics, or network behavior was added. Focused compatibility coverage
+  passes 39 tests across four files; complete lint, 81 test files / 675 tests,
+  and the production build pass. Local Chrome rendered three punishment
+  contacts for the default pair—one A→B, one B→A, and one reciprocal—while
+  retaining seven additive branch contacts and all eight pillars with no
+  desktop horizontal overflow.
+
 - Upgraded the score-free BaZi Compatibility Earthly Branch classifier from a
   single result to an additive multi-contact model and added all six canonical
   Liu Po pairs: Zi-You, Mao-Wu, Chen-Chou, Wei-Xu, Yin-Hai, and Si-Shen. The
