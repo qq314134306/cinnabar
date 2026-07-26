@@ -59,6 +59,20 @@ describe('database release-proof contract', () => {
     )
   })
 
+  it('does not schema-qualify PostgreSQL special conditional expressions', () => {
+    const migrationSql = candidateMigrations.map((migration) => readFileSync(
+      fileURLToPath(new URL(
+        `../../supabase/migrations/${migration}`,
+        import.meta.url,
+      )),
+      'utf8',
+    )).join('\n')
+
+    expect(migrationSql).not.toMatch(
+      /pg_catalog\.(?:coalesce|greatest|least|nullif)\s*\(/iu,
+    )
+  })
+
   it('pins the seven candidate migrations in timestamp dependency order', () => {
     const actual = readdirSync(migrationsDirectory)
       .filter((name) => name.startsWith('20260723') && name.endsWith('.sql'))

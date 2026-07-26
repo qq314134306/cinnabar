@@ -64,11 +64,14 @@
   database URL, replaces the repository root, truncates each retained line,
   and remains outside the sanitized JSON artifact.
 - Hosted run `30184336242` proved that the bounded diagnostic works and located
-  the first real migration defect: PostgreSQL rejected the credit balance
-  aggregate's untyped integer fallback against a bigint sum. All three credit
-  balance aggregates now use an explicit `0::bigint` fallback, with a contract
-  test pinning the compatible form. That failed run remains non-evidence; a new
-  exact-head Fresh proof is required.
+  the first real migration defect in a credit balance `COALESCE` expression.
+  Run `30184475956` clarified that the blocking issue was the invalid
+  `pg_catalog.coalesce` qualification, not only the fallback type. PostgreSQL
+  treats `COALESCE`, `GREATEST`, and `LEAST` as special SQL expressions rather
+  than schema-qualified functions. The candidate migrations now leave those
+  expressions unqualified, retain the explicit bigint credit fallback, and pin
+  both rules in the release contract test. Both failed runs remain
+  non-evidence; a new exact-head Fresh proof is required.
 - Exercised the release path for the first time through pushed pull request
   #10. The trusted Vercel Preview built and passed a real default-chart and
   Major Luck browser check. Hosted run `30183316408` correctly blocked the

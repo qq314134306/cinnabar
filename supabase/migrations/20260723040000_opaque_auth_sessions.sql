@@ -163,7 +163,7 @@ begin
      and refresh_lease_id is null
   returning true into v_claimed;
 
-  return pg_catalog.coalesce(v_claimed, false);
+  return coalesce(v_claimed, false);
 end;
 $$;
 

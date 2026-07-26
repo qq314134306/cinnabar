@@ -75,9 +75,9 @@ begin
    where q.window_start = v_window_start
      and q.subject_hash = p_ip_subject_hash;
 
-  v_retry_after := pg_catalog.greatest(
+  v_retry_after := greatest(
     1,
-    pg_catalog.least(
+    least(
       86400,
       pg_catalog.ceil(extract(
         epoch from (
@@ -89,8 +89,8 @@ begin
   );
 
   if (
-    pg_catalog.coalesce(v_global_count, 0) >= p_global_limit
-    or pg_catalog.coalesce(v_ip_count, 0) >= p_ip_limit
+    coalesce(v_global_count, 0) >= p_global_limit
+    or coalesce(v_ip_count, 0) >= p_ip_limit
   ) then
     return query select false, v_retry_after;
     return;
