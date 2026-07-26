@@ -111,6 +111,55 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
       </div>
 
       <section
+        aria-labelledby="bazi-stem-relationships-heading"
+        className="mt-3 rounded-lg border border-white/[0.07] p-3"
+      >
+        <h5
+          id="bazi-stem-relationships-heading"
+          className="text-xs font-medium text-text"
+        >
+          Visible-stem Ten Gods map
+        </h5>
+        <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
+          Each person's Day Master reads the other person's four visible
+          pillar stems. The two directions stay separate.
+        </p>
+        <div className="mt-2 grid gap-3 lg:grid-cols-2">
+          {([
+            ['A Day Master reads B', 'B', result.stemRelationships.personAToB],
+            ['B Day Master reads A', 'A', result.stemRelationships.personBToA],
+          ] as const).map(([heading, targetLabel, relationships]) => (
+            <article
+              key={heading}
+              data-bazi-stem-direction={targetLabel === 'B' ? 'personAToB' : 'personBToA'}
+              className="rounded-md bg-white/[0.025] p-2.5"
+            >
+              <p className="text-[10px] font-medium text-text-secondary">
+                {heading}
+              </p>
+              <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+                {relationships.map((relationship) => (
+                  <div
+                    key={relationship.targetScope}
+                    data-bazi-stem-relationship={relationship.relationship}
+                    className="rounded bg-black/10 px-2 py-1.5"
+                  >
+                    <p className="text-[9px] text-text-muted">
+                      {targetLabel} {PILLAR_LABELS[relationship.targetScope]} ·{' '}
+                      {translateStem(relationship.targetStem)}
+                    </p>
+                    <p className="mt-0.5 text-[10px] font-medium text-gold/90">
+                      {relationship.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section
         aria-labelledby="bazi-branch-contacts-heading"
         className="mt-3 rounded-lg border border-white/[0.07] p-3"
       >
@@ -165,8 +214,9 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
 
       <p className="mt-3 border-t border-white/[0.06] pt-3 text-[10px] leading-relaxed text-text-muted">
         Ten Gods are directional: A reading B can differ from B reading A. This
-        panel shows the complete pillars, the two Day Masters, and a limited
-        branch-contact map—no score, fate claim, or relationship advice.
+        panel shows the complete pillars, directional visible-stem
+        relationships, and a limited branch-contact map—no score, fate claim,
+        or relationship advice.
       </p>
     </section>
   )

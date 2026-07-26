@@ -608,7 +608,11 @@ the established Four Pillars and Ten Gods helpers. Keep A-to-B and B-to-A Day
 Master relationships separate because Ten Gods are directional. The UI may
 show both complete ordered Four-Pillar sets and a cross-person branch-contact
 map across the 16 pillar pairings. Relationship synthesis remains limited to
-the two Day Masters and Earthly Branches. The Day Branch summary and the map
+the two Day Masters as Ten Gods reference points and to the named Earthly
+Branch structures. Each Day Master may classify the other person's four
+visible pillar stems, producing four A-to-B and four B-to-A relationships;
+never treat a non-Day-Master stem as a Ten Gods reference. The Day Branch
+summary and the map
 may identify only same branch, the six canonical Liu He pairs, the six
 canonical Liu Chong pairs, or explicitly unclassified; the map omits
 unclassified pairings. They must not alter the

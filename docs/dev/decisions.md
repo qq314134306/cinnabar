@@ -1395,3 +1395,22 @@ This decision does not authorize San He, San Hui, punishments, harms,
 destructions, hidden-stem synthesis, spouse-palace or useful-god judgment,
 timing forecasts, fate claims, relationship advice, AI prose, persistence,
 analytics, account gating, payment, or a network request.
+
+## D059 - Visible-Stem Compatibility Keeps the Day Master as Authority
+
+Cinnabar may show how Person A's Day Master classifies Person B's four visible
+pillar stems and, separately, how Person B's Day Master classifies Person A's
+four visible pillar stems. This produces eight inspectable Ten Gods results,
+each retaining the target Year, Month, Day, or Hour scope and raw stem. It
+reuses the established typed Ten Gods helper and the two already-resolved Four
+Pillars results.
+
+Ten Gods remain Day-Master-relative. A Year, Month, or Hour stem must never be
+promoted to a temporary reference point merely to create a 16-pair stem
+matrix. The A-to-B and B-to-A groups remain visibly separate, and repeated
+labels remain separate observations rather than weighted evidence.
+
+This decision does not authorize hidden-stem synthesis, stem combinations,
+strength or useful-god judgment, favorable/unfavorable labels, a BaZi score,
+timing forecasts, fate claims, relationship advice, AI prose, persistence,
+analytics, account gating, payment, or a network request.

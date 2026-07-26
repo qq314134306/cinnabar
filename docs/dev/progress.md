@@ -103,6 +103,19 @@
 
 ## Recently Completed
 
+- Extended score-free BaZi Compatibility with a visible-stem Ten Gods map.
+  Person A's Day Master classifies Person B's Year, Month, Day, and Hour stems,
+  while Person B's Day Master independently classifies Person A's four stems.
+  The eight results preserve direction and pillar scope; no non-Day-Master stem
+  becomes a reference point. The increment adds no weighting, score,
+  favorable/unfavorable judgment, prediction, AI, persistence, analytics,
+  account, payment, or network request. Focused compatibility coverage passes
+  34 assertions across four files; complete lint, 81 files / 670 tests, and
+  the production build pass. Local Chrome rendered all eight directional
+  relationships, changed Person B from 1992-06-15 to 1992-06-16 and observed
+  both groups recompute, retained five branch contacts and all eight pillars,
+  and found no console warning/error or horizontal overflow at desktop and
+  390×844 mobile widths.
 - Extended the score-free BaZi Compatibility layer with a deterministic
   cross-person Earthly Branch contact map. It evaluates all 16 Four-Pillar
   pairings but exposes only same-branch, canonical Liu He, and canonical Liu
