@@ -1297,3 +1297,30 @@ This decision authorizes structural navigation only. It does not authorize
 strength/weakness or useful-god judgment, favorable/unfavorable labeling,
 event claims, compatibility, prose interpretation, scores, AI, persistence,
 account gating, payment, or any network request.
+
+## D055 - Daily Timing Is a Local Day-Pillar Comparator
+
+Cinnabar may add a Daily Timing navigator inside the existing chart surface.
+It compares the natal Day Master from the exact `resolvedBirthTime` with the
+Day Pillar of a user-selected Gregorian date. The same Four Pillars helper owns
+both calculations, and the resulting visible day stem is mapped through the
+existing typed Ten Gods relationship helper. This keeps calendar boundaries,
+stem profiles, and terminology aligned with the tested BaZi contract.
+
+The selected date uses the browser device's local calendar. The calculation
+passes noon to the calendar engine only to keep it clear of Zi-hour rollover;
+it does not expose or interpret an Hour Pillar for the selected day. The UI may
+show the day GanZhi, Five Element, Yin/Yang polarity, relationship label, and a
+neutral generation/control description. It must disclose that the result is
+structural rather than favorable/unfavorable, predictive, or event-specific.
+
+An unknown birth time locks the result because a later true-solar correction
+could cross the civil-date boundary and change the natal Day Master. An
+approximate but selected time may show the comparison only with an explicit
+provisional note. Calculation failure stays local and returns no partial or
+invented relationship.
+
+This decision authorizes previous/next/date/today navigation only. It does not
+authorize auspiciousness scores, activity recommendations, hour selection,
+event claims, prose divination, AI, persistence, analytics, account gating,
+payment, or a network request.

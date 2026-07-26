@@ -144,8 +144,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/components/chart/ChartDisplay.tsx` +
   `app/src/components/chart/BaZiFourPillars.tsx` +
   `app/src/components/chart/BaZiMajorLuck.tsx` +
+  `app/src/components/chart/DailyTiming.tsx` +
   `app/src/lib/bazi-four-pillars.ts` +
   `app/src/lib/bazi-major-luck.ts` +
+  `app/src/lib/daily-timing.ts` +
   `app/src/lib/chart-explanations.ts` +
   `app/src/lib/palace-relations.ts` +
   `app/src/lib/chart-transformations.ts` +
@@ -165,6 +167,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   derive the gender-dependent direction, start offset, and eight calendar
   cycles. Its calendar engine remains in an on-demand chunk, and its result is
   a structural navigator rather than a lifespan or outcome forecast. This
+  chart surface also owns a local Daily Timing navigator: it derives the
+  selected date's Day Pillar through the same Four Pillars helper, compares its
+  stem with the natal Day Master through the existing typed Ten Gods helper,
+  and exposes only neutral structure. Unknown birth time locks the comparison;
+  an approximate selected time remains explicitly provisional. This
   remains a structural index without strength, weighting, useful-element, or
   outcome judgment. Palace cards are
   accessible toggle buttons;

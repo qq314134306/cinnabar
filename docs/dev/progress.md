@@ -68,6 +68,21 @@
 
 ## Recently Completed
 
+- Added a provider-independent Daily Timing navigator to the lazy chart
+  surface. It compares the selected Gregorian day's Day Pillar with the natal
+  Day Master through the existing Four Pillars and typed Ten Gods helpers,
+  supports previous/next/date/today navigation, uses no network or persistence,
+  and explicitly avoids ratings, predictions, and event claims. Unknown birth
+  time locks the result because a later true-solar correction may cross the
+  natal civil-date boundary; approximate selected times are marked
+  provisional. Lint, 79 test files / 663 tests, and the production build pass.
+  A real local Chrome check cast the default chart, advanced one day from
+  2026-07-25 to 2026-07-26, observed the day pillar and Ten Gods relationship
+  update, found no document overflow or console errors, and confirmed the
+  existing unknown-time flow still withholds the placeholder chart.
+- Normalized CRLF to LF only inside the PayPal SQL contract test's in-memory
+  fixtures. This fixes Windows-local assertions without changing migration SQL
+  or weakening any expected transition string.
 - Merged protected pull request #10 as `a07d963` only after exact candidate
   run `30185910720` passed all four checks. Its inspected 807-byte sanitized
   proof artifact reports `success=true`, all 13 Fresh steps and cleanup as

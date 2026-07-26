@@ -42,7 +42,7 @@ Targeted examples:
 ```powershell
 npm run test -- true-solar-time
 npm run test -- birth-time-sensitivity BirthForm
-npm run test -- bazi-four-pillars BaZiFourPillars ChartDisplay
+npm run test -- bazi-four-pillars BaZiFourPillars daily-timing DailyTiming ChartDisplay
 npm run test -- ChartDisplay TimingLens chart-explanations palace-relations chart-transformations palace-origin-transformations timing-lens chart-facts
 npm run test -- retrieve
 npm run test -- llm
@@ -310,6 +310,8 @@ Follows the Cinnabar glossary; covered by `ziwei-glossary.test.ts`.
 `src/lib/palace-origin-transformations.ts` +
 `src/lib/bazi-four-pillars.ts` +
 `src/components/chart/BaZiFourPillars.tsx` +
+`src/lib/daily-timing.ts` +
+`src/components/chart/DailyTiming.tsx` +
 `src/lib/timing-lens.ts` +
 `src/components/chart/TimingLens.tsx` +
 `src/components/chart/ChartDisplay.tsx`: local, English reflective guidance for
@@ -353,6 +355,14 @@ visibly labeled. An approximate time makes the Hour Pillar and its Ten Gods
 structure provisional; a missing resolved time yields no result. Do not add
 strength/useful-god judgments, hidden-stem weights, luck pillars, predictions,
 AI, persistence, or scores without a new tested product decision.
+Daily Timing must reuse the exact resolved natal Day Master, the existing Four
+Pillars calculation, and the typed Ten Gods helper. The selected civil date
+uses the device-local calendar and noon only to avoid Zi-hour rollover; do not
+interpret a selected-day Hour Pillar. Unknown birth time locks the result
+because true-solar correction can cross the natal date. Approximate selected
+times remain provisional. Keep navigation structural and local: no
+auspiciousness, activity advice, predictions, AI, persistence, account gate,
+payment, analytics, or network request.
 The timing lens must use the engine-owned Major Limit and yearly objects for
 the selected mid-year date, map both scopes' Life Palace and canonical
 Lu/Quan/Ke/Ji star order back onto the natal palace array, and reuse the same

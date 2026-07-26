@@ -8,14 +8,14 @@ const migration = readFileSync(
     import.meta.url,
   )),
   'utf8',
-)
+).replace(/\r\n/g, '\n')
 const sqlBehaviorTest = readFileSync(
   fileURLToPath(new URL(
     '../../supabase/tests/paypal_webhook_reconciliation.sql',
     import.meta.url,
   )),
   'utf8',
-)
+).replace(/\r\n/g, '\n')
 
 describe('PayPal webhook/reconciliation database contract', () => {
   it('deduplicates by event ID and safely retries failed or expired processing', () => {
