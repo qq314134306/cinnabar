@@ -618,7 +618,11 @@ canonical Liu Chong pairs, the six canonical Liu Hai pairs, the six canonical
 Liu Po pairs, or explicitly unclassified; the map omits unclassified pairings.
 The branch classifier is additive because Yin-Hai and Si-Shen are both Liu He
 and Liu Po; never collapse a recognized multi-contact pair back to one label.
-They must not alter the
+Punishment contacts are a separate directional layer: preserve Yin→Si→Shen→Yin
+and Chou→Xu→Wei→Chou, keep Zi-Mao reciprocal, and identify repeated Chen, Wu,
+You, or Hai as self-punishment contacts. A two-branch contact must never be
+presented as proof that a complete three-branch pattern exists. These contacts
+must not alter the
 existing symmetric score, infer other branch systems, assign good/bad meaning,
 or add advice, AI, persistence, analytics, account, payment, or network work.
 If either input time is approximate, mark the entire BaZi layer provisional.

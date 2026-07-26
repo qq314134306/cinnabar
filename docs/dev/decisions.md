@@ -1499,3 +1499,22 @@ This decision does not authorize punishments, San He, San Hui, branch
 transformation, favorable or unfavorable labels, a BaZi score, timing
 forecasts, fate claims, relationship advice, AI prose, persistence, analytics,
 account gating, payment, or a network request.
+
+## D064 - Punishment Contacts Preserve Direction and Pattern Boundaries
+
+Cinnabar may add a separate score-free Earthly Branch punishment-contact map
+to BaZi Compatibility. It recognizes the directed Yin→Si→Shen→Yin and
+Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or
+Hai self-punishment contacts across the 16 cross-person pillar pairings.
+
+Direction is part of the result contract and must be rendered as A→B, B→A, or
+reciprocal. A two-branch directed step must not be described as proof that the
+complete three-branch pattern is present. Self-punishment means only that the
+same canonical branch occurs in the compared positions; it is not a statement
+about self-harm, fault, psychology, or future events.
+
+This layer remains independent from the symmetric Zi Wei score and the
+additive Liu He/Liu Chong/Liu Hai/Liu Po map. It adds no weight, strength or
+transformation judgment, favorable/unfavorable label, prediction, advice, AI,
+persistence, analytics, account requirement, payment, or network request. San
+He, San Hui, and any broader branch synthesis remain outside this decision.

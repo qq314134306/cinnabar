@@ -285,7 +285,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   or strength claim. The branch map uses an additive multi-contact model and
   lists only same-branch, Liu He, Liu Chong, Liu Hai, or Liu Po contacts while
   omitting unclassified pairs. Yin-Hai and Si-Shen retain both their Liu He and
-  Liu Po labels. Liu Hai and Liu Po are named structural contacts rather than
+  Liu Po labels. A separate punishment-contact map retains direction for the
+  Yin-Si-Shen and Chou-Xu-Wei sequences, reciprocity for Zi-Mao, and repeated
+  Chen, Wu, You, or Hai self-punishment contacts across the same 16 pairings.
+  It does not claim a complete three-branch pattern from one directed step.
+  Liu Hai, Liu Po, and punishment are named structural contacts rather than
   adverse forecasts. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.
   The optional uncached AI narrative retains controller/request-key/

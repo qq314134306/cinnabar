@@ -331,6 +331,60 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
         )}
       </section>
 
+      <section
+        aria-labelledby="bazi-branch-punishments-heading"
+        className="mt-3 rounded-lg border border-white/[0.07] p-3"
+      >
+        <h5
+          id="bazi-branch-punishments-heading"
+          className="text-xs font-medium text-text"
+        >
+          Four-Pillar punishment contacts
+        </h5>
+        <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
+          Directed Yin-Si-Shen and Chou-Xu-Wei steps, reciprocal Zi-Mao, and
+          repeated Chen, Wu, You, or Hai contacts across the 16 pillar
+          pairings. “Punishment” is a traditional structural name, not a claim
+          of harm, fault, or outcome.
+        </p>
+        {result.branchPunishmentContacts.length > 0 ? (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {result.branchPunishmentContacts.map((contact) => {
+              const personA = `A ${PILLAR_LABELS[contact.personAScope]} · ${translateBranch(contact.personABranch)}`
+              const personB = `B ${PILLAR_LABELS[contact.personBScope]} · ${translateBranch(contact.personBBranch)}`
+              const contactText = contact.direction === 'personAToB'
+                ? `${personA} → ${personB}`
+                : contact.direction === 'personBToA'
+                  ? `${personB} → ${personA}`
+                  : `${personA} ↔ ${personB}`
+
+              return (
+                <article
+                  key={`${contact.personAScope}-${contact.personBScope}-${contact.kind}-${contact.direction}`}
+                  data-bazi-branch-punishment={contact.kind}
+                  data-bazi-branch-punishment-direction={contact.direction}
+                  className="rounded-md bg-white/[0.025] px-2.5 py-2"
+                >
+                  <p className="text-[10px] text-text-secondary">
+                    {contactText}
+                  </p>
+                  <p className="mt-0.5 text-xs font-medium text-gold/90">
+                    {contact.label}
+                  </p>
+                </article>
+              )
+            })}
+          </div>
+        ) : (
+          <p
+            data-bazi-branch-punishment-empty
+            className="mt-2 text-xs text-text-secondary"
+          >
+            No canonical punishment contact appears across the 16 pairings.
+          </p>
+        )}
+      </section>
+
       {result.provisional && (
         <p role="note" className="mt-3 text-xs leading-relaxed text-gold/80">
           At least one entered birth time is approximate. Because a true-solar
@@ -343,7 +397,8 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
         Ten Gods are directional: A reading B can differ from B reading A. This
         panel shows the complete pillars, directional visible- and hidden-stem
         relationships, canonical visible-stem contacts, and a limited
-        multi-contact branch map—no score, fate claim, or relationship advice.
+        multi-contact branch map with separately directed punishment contacts—no
+        score, fate claim, or relationship advice.
       </p>
     </section>
   )
