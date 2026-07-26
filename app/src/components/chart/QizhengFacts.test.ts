@@ -15,17 +15,17 @@ describe('QizhengFacts', () => {
     const result = adaptAovQizheng(QIZHENG_AOV_V1_FIXTURE, buildQizhengEvidence(BIRTH)!, 'fixture')
     render(createElement(QizhengFacts, { birthInfo: BIRTH, result }))
     expect(screen.getByRole('heading', { name: 'Qi Zheng Si Yu' })).toBeTruthy()
-    expect(screen.getByText(/Beijing · UTC\+8/)).toBeTruthy()
+    expect(screen.getByText(/Beijing · Asia\/Shanghai · UTC\+8/)).toBeTruthy()
     expect(screen.getByText('Zi Qi')).toBeTruthy()
     expect(screen.getByText('Aspects')).toBeTruthy()
     expect(screen.getByText('Twelve palaces')).toBeTruthy()
     expect(screen.getByText(/qizheng\.fact\.v1/)).toBeTruthy()
   })
 
-  it('shows the local fail-closed state instead of generating substitute facts', () => {
+  it('renders the deterministic local provider without an injected fixture', () => {
     render(createElement(QizhengFacts, { birthInfo: BIRTH }))
-    expect(screen.getByText(/No external service or substitute chart was used/)).toBeTruthy()
-    expect(screen.queryByText('Zi Qi')).toBeNull()
+    expect(screen.getByText('Zi Qi')).toBeTruthy()
+    expect(screen.getByText(/cinnabar-local/)).toBeTruthy()
   })
 
   it('does not generate time-derived facts from an approximate time', () => {

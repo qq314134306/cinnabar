@@ -247,9 +247,13 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   comparisons only and never replace the canonical birth input or its caches.
 - `app/src/lib/qizheng-contract.ts` + `qizheng-adapter.ts` +
   `qizheng-local.ts` + `app/src/components/chart/QizhengFacts.tsx` - versioned
-  Qizheng facts and presentation. AOV is anonymous-fixture-only; production
-  accepts the shared resolved time/coordinates/timezone evidence and fails
-  closed until the bundled deterministic provider is complete.
+  Qizheng facts and presentation. AOV is anonymous-fixture-only. Production
+  uses bundled `astronomy-engine` for the seven modern bodies, separate mean
+  lunar node/apogee approximations, and the traditional Zi Qi mean-motion
+  formula. `docs/dev/qizheng-sources.md` records the mansion, Life/Body Palace,
+  aspect, provenance, and license audit.
+  The shared resolved time, coordinates, IANA zone, and DST offset determine
+  UTC, palaces, and aspects; unknown/approximate time remains fail-closed.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts. Its
   natal Four Transformations line reuses the chart's pure transformation index
   so local navigation and prompt grounding share one ownership source. Its

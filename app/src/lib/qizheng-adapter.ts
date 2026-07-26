@@ -23,6 +23,7 @@ export function buildQizhengEvidence(birth: BirthInfo): QizhengEvidence | null {
     latitude: place.latitude,
     longitude: place.longitude,
     timezoneOffsetHours: timezoneOffsetMinutes / 60,
+    timezoneId: place.tz ?? 'Asia/Shanghai',
     locationLabel: place.enName ?? place.name,
   }
 }

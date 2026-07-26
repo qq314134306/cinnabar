@@ -22,7 +22,7 @@ export function QizhengFacts({ birthInfo, result: suppliedResult }: { birthInfo:
             <Fact label="Life palace" value={`House ${result.facts.lifePalace + 1}`} />
             <Fact label="Body palace" value={`House ${result.facts.bodyPalace + 1}`} />
             <Fact label="Life master" value={BODY_LABELS[result.facts.lifeMaster] ?? result.facts.lifeMaster} />
-            <Fact label="Evidence" value={`${result.facts.evidence.locationLabel} · UTC${formatOffset(result.facts.evidence.timezoneOffsetHours)}`} />
+            <Fact label="Evidence" value={`${result.facts.evidence.locationLabel} · ${result.facts.evidence.timezoneId} · UTC${formatOffset(result.facts.evidence.timezoneOffsetHours)}`} />
           </dl>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {result.facts.stars.map((star) => <article key={star.name} className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3"><div className="flex justify-between gap-2"><h4 className="text-xs font-medium text-text">{BODY_LABELS[star.name] ?? star.name}</h4><span className="text-[10px] text-gold/80">{star.kind === '七政' ? 'Seven Governors' : 'Four Residuals'}</span></div><p className="mt-1 text-[10px] text-text-secondary">Mansion {star.mansion} · {star.mansionDegree.toFixed(2)}° · {PALACE_LABELS[star.palace] ?? star.palace}{star.retrograde ? ' · retrograde' : ''}</p><p className="mt-1 text-[10px] text-text-muted">{precisionLabel(star.precisionClass)} · {star.sourceId}</p></article>)}
@@ -42,4 +42,4 @@ function formatOffset(value: number): string { return `${value >= 0 ? '+' : ''}$
 const BODY_LABELS: Record<string, string> = { '太阳': 'Sun', '太阴': 'Moon', '辰星(水)': 'Mercury', '太白(金)': 'Venus', '荧惑(火)': 'Mars', '岁星(木)': 'Jupiter', '镇星(土)': 'Saturn', '罗睺(火余)': 'Rahu', '计都(土余)': 'Ketu', '月孛(水余)': 'Lunar Apogee', '紫炁(木余)': 'Zi Qi', '日': 'Sun' }
 const PALACE_LABELS: Record<string, string> = { '命宫': 'Life Palace', '财帛': 'Wealth Palace', '兄弟': 'Siblings Palace', '田宅': 'Property Palace', '男女': 'Children Palace', '奴仆': 'Friends Palace', '妻妾': 'Partnership Palace', '疾厄': 'Well-being Palace', '迁移': 'Travel Palace', '官禄': 'Career Palace', '福德': 'Inner Life Palace', '相貌': 'Appearance Palace' }
 const ASPECT_LABELS: Record<string, string> = { '同宫': 'Conjunction', '对照': 'Opposition', '四正': 'Square', '三方': 'Trine', '六合': 'Sextile' }
-function precisionLabel(value: string): string { if (value === '传统均速模型') return 'traditional mean-motion model'; if (value.includes('混合')) return 'mixed-model evidence'; return 'modern astronomical calculation' }
+function precisionLabel(value: string): string { if (value === '传统均速模型') return 'traditional mean-motion model'; if (value.includes('混合')) return 'mixed-model evidence'; if (value.includes('月轨')) return 'modern lunar-orbit approximation'; return 'modern astronomical calculation' }

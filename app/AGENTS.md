@@ -571,10 +571,14 @@ reports have been reviewed and payment/browser domains are verified.
 `src/lib/qizheng-contract.ts` + `qizheng-adapter.ts` + `qizheng-local.ts` +
 `src/components/chart/QizhengFacts.tsx`: Qizheng structured foundation. AOV is
 anonymous-fixture-only and must never become a production birth-data path.
-Production reuses saved resolved time/location evidence and fails closed until
-the local provider is complete. Unknown/approximate time emits no Qizheng
-time-derived facts. Preserve source/precision metadata and keep this layer free
-of DeepSeek, synthesis, payments, credits, persistence, and redesign.
+Production reuses saved resolved time/location/IANA-zone/DST evidence. It uses
+pinned `astronomy-engine` for the seven modern bodies, separate modern mean
+lunar node/apogee approximations, and the traditional Zi Qi mean-motion
+formula. Traditional Life/Body Palace rules and unequal mansion distances are
+documented in `../docs/dev/qizheng-sources.md`.
+Unknown/approximate time emits no Qizheng time-derived facts. Preserve source
+and precision metadata and keep this layer free of DeepSeek, synthesis,
+payments, credits, persistence, and redesign.
 
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city

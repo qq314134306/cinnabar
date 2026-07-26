@@ -6,6 +6,7 @@ export interface QizhengEvidence {
   latitude: number
   longitude: number
   timezoneOffsetHours: number
+  timezoneId: string
   locationLabel: string
 }
 

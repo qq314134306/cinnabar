@@ -206,13 +206,21 @@
   boundary against AOV/Mingyu; the external service is not a runtime dependency
   and received no user data.
 
-- Added the first Qizheng structured foundation. The versioned
+- Completed the first local deterministic Qizheng provider. The versioned
   `qizheng.fact.v1` contract retains resolved time/location evidence,
   provenance, aspects, Life/Body Palace, and Twelve Palace facts. AOV/Mingyu
   validated only a fixed anonymous offline fixture; production sends it no user
-  data and has no AOV route. The `cinnabar-local` boundary fails closed until a
-  bundled engine reaches fixture parity. Approximate/unknown time emits no
-  Qizheng facts. Focused coverage passes 7 tests across two files.
+  data and has no AOV route. Production now derives the Sun, Moon, Mercury,
+  Venus, Mars, Jupiter, and Saturn through bundled `astronomy-engine` 2.1.19;
+  mean lunar node/apogee remain separately labeled modern lunar-orbit
+  approximations, while Zi Qi uses the traditional `Qizheng Suan Neipian`
+  mean-motion formula. The same resolved local time, coordinates, IANA zone,
+  and DST offset determine UTC. Traditional Sun/Moon-plus-birth-hour rules
+  determine Life/Body Palace; unequal ancient mansion distances determine the
+  28-mansion facts, followed by Twelve Palaces and fixed-orb aspects. The
+  algorithm and license audit is recorded in `qizheng-sources.md`.
+  Approximate/unknown time still emits no Qizheng facts. Focused
+  local/fixture/UI coverage passes 11 tests.
 
 - Added a deterministic, evidence-first Zi Wei dual-chart layer to local
   Compatibility. It casts both charts independently from the existing
