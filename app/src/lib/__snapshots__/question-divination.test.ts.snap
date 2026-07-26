@@ -1,0 +1,51 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`question divination foundation > pins the anonymous offline golden fixture 1`] = `
+[
+  {
+    "casting": "time-seeded-local-v1",
+    "changedHexagram": 34,
+    "contract": "liuyao.facts.v1",
+    "lines": [
+      6,
+      8,
+      8,
+      8,
+      6,
+      9,
+    ],
+    "movingLine": 1,
+    "primaryHexagram": 33,
+  },
+  {
+    "contract": "qimen.facts.v1",
+    "dun": "yin",
+    "dutyPalace": 6,
+    "hourBranch": "Dog",
+    "ju": 7,
+    "palaceOrder": [
+      6,
+      7,
+      2,
+      9,
+      4,
+      3,
+      8,
+      1,
+    ],
+    "ruleset": "mainline-cn-v1-minimal",
+  },
+  {
+    "contract": "liuren.facts.v1",
+    "heavenPlateOffset": 7,
+    "hourBranch": "Dog",
+    "monthGeneral": "Snake",
+    "ruleset": "cinnabar-liuren-local-v1",
+    "threeTransmissions": [
+      "Monkey",
+      "Rat",
+      "Dragon",
+    ],
+  },
+]
+`;

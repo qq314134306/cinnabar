@@ -1,5 +1,21 @@
 # Decisions
 
+## D065 - Question-Divination Facts Stay Independent and Local
+
+Capture one immutable, versioned question event and derive Liu Yao, Qi Men Dun
+Jia, and Da Liu Ren through three separately versioned fact contracts.
+Production uses a fail-closed local provider only. Remote APIs may review a
+fixed anonymous golden sample out of band but are not a runtime fallback. This
+window does not merge conclusions, generate AI copy, or calculate a score; its
+contracts are stable inputs for the separately owned first-release paid
+three-method synthesis boundary. Structural facts are explicitly free and no
+credit spend or payment code belongs in this PR.
+
+Consequence: any fuller reconstruction or remote-provider adoption needs a new
+explicit contract/provider version, fixtures, failure tests, and a separate
+product decision. It cannot mutate natal BaZi, Zi Wei, Qi Zheng, or birth-time
+modules.
+
 > L2 | Parent: `AGENTS.md`
 
 ## D065 - Evidence Synthesis Is Traceable and Score-Free
