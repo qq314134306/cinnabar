@@ -114,12 +114,15 @@ independent agreement, shared-input agreement, conflict, or insufficient
 evidence; never add voting, weights, probabilities, numeric confidence,
 generated readings, unverified corpus text, or a network request to this layer.
 Claimed independent evidence groups must be disjoint.
-English evidence presentation is entertainment/self-discovery only. Facts come
-from deterministic engines or Skill rules; future DeepSeek prose must remain
-server-only over verified facts and its key must never enter browser code.
+English evidence presentation is entertainment/self-discovery only. Production
+facts come only from local deterministic engines; Skills constrain rules and
+support anonymous development fixtures. External validation is anonymous,
+fixed-fixture-only, fail-closed, and never a production dependency. Server-side
+narrative rendering may consume but never calculate or mutate verified facts.
 Unreliable time cannot yield an Hour Pillar, and birth-time candidates never
-overwrite canonical input. Keep free basic facts separate from paid deep
-interpretation and future credit entitlements.
+overwrite canonical input; persistence requires explicit user save. Keep free
+facts/time-correction/synthesis overview separate from paid future,
+compatibility, and divination interpretation plus future credit entitlements.
 
 `src/main.tsx`: React entry point and app mounting.
 

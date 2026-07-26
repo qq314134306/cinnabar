@@ -103,11 +103,13 @@ describe('evidence contract', () => {
     expect(policy).toEqual({
       audienceLocale: 'en',
       useContext: 'entertainment-and-self-discovery',
-      factAuthority: 'deterministic-engine-and-skill-rules',
-      narrativeBoundary: 'server-only-from-verified-facts',
+      factAuthority: 'local-deterministic-engine',
+      skillRole: 'rule-constraints-and-anonymous-dev-validation',
+      externalValidation: 'anonymous-fixed-fixtures-only-fail-closed',
+      narrativeBoundary: 'server-only-rendering-no-fact-mutation',
       candidateBirthTimePolicy: 'never-overwrite-canonical',
+      profilePersistence: 'explicit-user-save-only',
     })
-    expect(JSON.stringify(makeEvidenceFixture())).not.toContain('DEEPSEEK_API_KEY')
   })
 
   it('never admits an hour-pillar fact from unreliable birth time', () => {
@@ -134,6 +136,6 @@ describe('evidence contract', () => {
 
   it('keeps free facts and paid deep interpretation as separate extensible tiers', () => {
     expect(makeEvidenceFixture('conflict').claims.map((claim) => claim.accessTier))
-      .toEqual(['free-basic-fact', 'paid-deep-interpretation'])
+      .toEqual(['free-basic-fact', 'paid-deep-compatibility'])
   })
 })

@@ -155,10 +155,13 @@
   independence requires disjoint evidence groups. A read-only inspector and
   synthetic MIT fixture exercise the contract without importing a classical
   corpus. The same contract pins English entertainment/self-discovery
-  positioning, deterministic-engine/Skill fact authority, server-only
-  narrative assembly from verified facts, reliable-time-only Hour Pillars,
+  positioning, local deterministic-engine fact authority, Skill-only rule and
+  anonymous fixture validation, server-only narrative assembly that cannot
+  mutate verified facts, anonymous/fixed/fail-closed external validation,
+  reliable-time-only Hour Pillars,
   candidate-only birth-time suggestions that never replace canonical input,
-  and separate free-fact/paid-deep-interpretation access tiers.
+  explicit-save-only profile persistence, and separate extensible free evidence
+  and paid interpretation tiers.
 
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and

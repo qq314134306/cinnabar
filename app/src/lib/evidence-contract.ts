@@ -68,11 +68,21 @@ export interface SystemFact {
   label: string
   value: string
   derivation: string
-  producer: 'deterministic-engine' | 'skill-rule'
+  producer: 'local-deterministic-engine'
   inputReliability: 'verified' | 'approximate' | 'unknown'
   epistemicStatus: 'verified' | 'provisional' | 'candidate-only'
-  accessTier: 'free-basic-fact'
+  accessTier: FreeEvidenceTier
 }
+
+export type FreeEvidenceTier =
+  | 'free-basic-fact'
+  | 'free-time-correction-evidence'
+  | 'free-synthesis-overview'
+
+export type PaidInterpretationTier =
+  | 'paid-future-analysis'
+  | 'paid-deep-compatibility'
+  | 'paid-divination-synthesis'
 
 export interface RuleEvidence {
   id: string
@@ -106,7 +116,7 @@ interface ClaimBase {
   statement: string
   citationIds: string[]
   uncertaintyIds: string[]
-  accessTier: 'free-basic-fact' | 'paid-deep-interpretation'
+  accessTier: FreeEvidenceTier | PaidInterpretationTier
 }
 
 export type EvidenceClaim =
@@ -148,9 +158,12 @@ export interface EvidenceBundle {
   productPolicy: {
     audienceLocale: 'en'
     useContext: 'entertainment-and-self-discovery'
-    factAuthority: 'deterministic-engine-and-skill-rules'
-    narrativeBoundary: 'server-only-from-verified-facts'
+    factAuthority: 'local-deterministic-engine'
+    skillRole: 'rule-constraints-and-anonymous-dev-validation'
+    externalValidation: 'anonymous-fixed-fixtures-only-fail-closed'
+    narrativeBoundary: 'server-only-rendering-no-fact-mutation'
     candidateBirthTimePolicy: 'never-overwrite-canonical'
+    profilePersistence: 'explicit-user-save-only'
   }
   sourceEditions: SourceEdition[]
   citations: Citation[]

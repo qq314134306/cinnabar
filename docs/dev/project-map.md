@@ -102,11 +102,15 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   access metadata; citations retain an exact passage locator. Every claim must
   point to a deterministic system fact or cited rule. Synthesis has four
   exhaustive states and no vote, score, probability, or confidence field.
-  Facts identify deterministic-engine or Skill-rule authority and an access
-  tier. Hour Pillars require verified birth time; birth-time finder output stays
+  Production facts identify local deterministic-engine authority; Skills are
+  limited to rule constraints and anonymous development validation. External
+  validation uses anonymous fixed fixtures, is never a production dependency,
+  and fails closed. Hour Pillars require verified birth time; finder output stays
   candidate-only and cannot replace canonical input. English presentation is
-  limited to entertainment/self-discovery, and any future DeepSeek prose stays
-  server-only over verified facts. Fixtures use synthetic project text rather
+  limited to entertainment/self-discovery, and server-side narrative rendering
+  cannot calculate or mutate verified facts. Free evidence and paid
+  interpretation categories remain separate without adding payment here.
+  Fixtures use synthetic project text rather
   than imported classical material.
 
 - `app/src/App.tsx` + `App.test.ts` - top-level visible-surface navigation.

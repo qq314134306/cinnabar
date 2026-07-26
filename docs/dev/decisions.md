@@ -22,12 +22,17 @@ edition metadata. A large corpus, LLM, or generated conclusion requires a
 separate reviewed decision and tests.
 
 The audience contract is English entertainment and self-discovery, never
-fortune-telling, psychic, or consulting positioning. Deterministic engines and
-Skill rules own facts; DeepSeek may only render verified facts into English on
-the server, and its key remains server-only. Unreliable time cannot produce an
+fortune-telling, psychic, or consulting positioning. Only local deterministic
+engines own production facts; Skills constrain rules and support anonymous
+development validation. External validation accepts anonymous fixed fixtures
+only, is not a production dependency, and fails closed. The narrative layer may
+only render verified facts into English on the server; it cannot calculate or
+mutate pillars, palaces, stars, or divination charts. Unreliable time cannot produce an
 Hour Pillar. Birth-time-finder output remains a candidate and can never replace
-canonical birth time. Free basic facts and paid deep interpretation remain
-separate access tiers so credits can evolve without changing fact authority.
+canonical birth time, and profile persistence requires explicit user save.
+Free basic facts, time-correction evidence, and synthesis overview remain
+separate from paid future, deep compatibility, and divination synthesis tiers
+so credits can evolve without changing fact authority or adding payment here.
 
 ## D001 - True Solar Time Uses Birthplace Matching
 

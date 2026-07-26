@@ -7,9 +7,12 @@ const base: EvidenceBundle = {
   productPolicy: {
     audienceLocale: 'en',
     useContext: 'entertainment-and-self-discovery',
-    factAuthority: 'deterministic-engine-and-skill-rules',
-    narrativeBoundary: 'server-only-from-verified-facts',
+    factAuthority: 'local-deterministic-engine',
+    skillRole: 'rule-constraints-and-anonymous-dev-validation',
+    externalValidation: 'anonymous-fixed-fixtures-only-fail-closed',
+    narrativeBoundary: 'server-only-rendering-no-fact-mutation',
     candidateBirthTimePolicy: 'never-overwrite-canonical',
+    profilePersistence: 'explicit-user-save-only',
   },
   sourceEditions: [
     {
@@ -42,7 +45,7 @@ const base: EvidenceBundle = {
       label: 'Fixture output',
       value: '甲子',
       derivation: 'Literal deterministic fixture input; no calculation or interpretation.',
-      producer: 'deterministic-engine',
+      producer: 'local-deterministic-engine',
       inputReliability: 'verified',
       epistemicStatus: 'verified',
       accessTier: 'free-basic-fact',
@@ -103,7 +106,7 @@ export function makeEvidenceFixture(status: SynthesisStatus = 'independent-agree
       ruleEvidenceIds: ['rule-evidence.traceability'],
       citationIds: ['citation.rule-paragraph'],
       uncertaintyIds: [],
-      accessTier: 'paid-deep-interpretation',
+      accessTier: 'paid-deep-compatibility',
     })
     fixture.conflicts.push({
       id: 'conflict.fixture',
