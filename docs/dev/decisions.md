@@ -1476,3 +1476,26 @@ forecasts, fate claims, relationship advice, AI prose, persistence, analytics,
 account gating, payment, or a network request. Six Break requires a later
 multi-contact model because some canonical pairs overlap already recognized
 structures.
+
+## D063 - Six Break Requires Additive Branch Contacts
+
+Cinnabar may add the six canonical Liu Po pairs to the score-free BaZi
+Compatibility branch map: Zi-You, Mao-Wu, Chen-Chou, Wei-Xu, Yin-Hai, and
+Si-Shen. Classification remains order-independent and every cross-pillar entry
+retains both person labels, pillar scopes, and raw branches.
+
+The branch classifier must return every recognized relationship for a pair.
+Yin-Hai and Si-Shen are both Liu He and Liu Po, so neither label may overwrite
+or hide the other. The existing singular Day Branch relation remains only as a
+rolling-compatible primary view; new UI and map work consumes the complete
+ordered relation list.
+
+“Six Break” names a traditional structure only. It does not mean that a person
+causes damage, that a relationship will fail, or that an adverse event will
+occur. This feature adds no weight and does not alter the symmetric Zi Wei
+compatibility score.
+
+This decision does not authorize punishments, San He, San Hui, branch
+transformation, favorable or unfavorable labels, a BaZi score, timing
+forecasts, fate claims, relationship advice, AI prose, persistence, analytics,
+account gating, payment, or a network request.

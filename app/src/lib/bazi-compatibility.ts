@@ -14,6 +14,7 @@ export type BaziDayBranchRelationKind =
   | 'sixHarmony'
   | 'sixClash'
   | 'sixHarm'
+  | 'sixBreak'
   | 'unclassified'
 
 export type BaziStemContactKind = 'fiveCombination' | 'unclassified'
@@ -96,6 +97,7 @@ export interface BaziCompatibilityResult {
   personAToB: BaziDirectionalRelationship
   personBToA: BaziDirectionalRelationship
   dayBranchRelation: BaziDayBranchRelation
+  dayBranchRelations: BaziDayBranchRelation[]
   branchContacts: BaziPillarBranchContact[]
   stemContacts: BaziPillarStemContact[]
   stemRelationships: {
@@ -136,6 +138,15 @@ const SIX_HARM_PAIRS = new Set([
   orderedPair('酉', '戌'),
 ])
 
+const SIX_BREAK_PAIRS = new Set([
+  orderedPair('子', '酉'),
+  orderedPair('卯', '午'),
+  orderedPair('辰', '丑'),
+  orderedPair('未', '戌'),
+  orderedPair('寅', '亥'),
+  orderedPair('巳', '申'),
+])
+
 const FIVE_COMBINATION_PAIRS = new Set([
   '己|甲',
   '乙|庚',
@@ -149,6 +160,7 @@ const BRANCH_CONTACT_LABELS: Record<BaziPillarBranchContact['kind'], string> = {
   sixHarmony: 'Six Harmony · Liu He',
   sixClash: 'Six Clash · Liu Chong',
   sixHarm: 'Six Harm · Liu Hai',
+  sixBreak: 'Six Break · Liu Po',
 }
 
 const RELATIONSHIP_STRUCTURE: Record<DirectionalTenGod, string> = {
@@ -172,42 +184,59 @@ export function getBaziDayBranchRelation(
   firstBranch: string,
   secondBranch: string,
 ): BaziDayBranchRelation {
+  return getBaziDayBranchRelations(firstBranch, secondBranch)[0]
+}
+
+export function getBaziDayBranchRelations(
+  firstBranch: string,
+  secondBranch: string,
+): BaziDayBranchRelation[] {
   if (firstBranch === secondBranch) {
-    return {
+    return [{
       kind: 'same',
       label: 'Same day branch',
       description: 'Both Day Pillars use the same earthly branch. This marks shared structure, not a compatibility outcome.',
-    }
+    }]
   }
 
   const pair = orderedPair(firstBranch, secondBranch)
+  const relations: BaziDayBranchRelation[] = []
   if (SIX_HARMONY_PAIRS.has(pair)) {
-    return {
+    relations.push({
       kind: 'sixHarmony',
       label: 'Six Harmony · Liu He',
       description: 'The two day branches form one of the six canonical Liu He pairs. It is a named structural contact, not a guarantee of harmony.',
-    }
+    })
   }
   if (SIX_CLASH_PAIRS.has(pair)) {
-    return {
+    relations.push({
       kind: 'sixClash',
       label: 'Six Clash · Liu Chong',
       description: 'The two day branches form one of the six canonical Liu Chong oppositions. It identifies contrast, not a predicted conflict.',
-    }
+    })
   }
   if (SIX_HARM_PAIRS.has(pair)) {
-    return {
+    relations.push({
       kind: 'sixHarm',
       label: 'Six Harm · Liu Hai',
       description: 'The two day branches form one of the six canonical Liu Hai pairs. It names a structural interaction, not harm or an adverse outcome.',
-    }
+    })
+  }
+  if (SIX_BREAK_PAIRS.has(pair)) {
+    relations.push({
+      kind: 'sixBreak',
+      label: 'Six Break · Liu Po',
+      description: 'The two day branches form one of the six canonical Liu Po pairs. It names a structural contact, not damage, failure, or an adverse outcome.',
+    })
   }
 
-  return {
+  if (relations.length > 0) return relations
+
+  return [{
     kind: 'unclassified',
-    label: 'No same / Liu He / Liu Chong / Liu Hai pair',
-    description: 'This day-branch pair is not same-branch, Six Harmony, Six Clash, or Six Harm. Other systems are intentionally not inferred here.',
-  }
+    label: 'No same / Liu He / Liu Chong / Liu Hai / Liu Po pair',
+    description: 'This day-branch pair is not same-branch, Six Harmony, Six Clash, Six Harm, or Six Break. Other systems are intentionally not inferred here.',
+  }]
 }
 
 function buildDirectionalRelationship(
@@ -281,21 +310,23 @@ function buildPillarBranchContacts(
 
   for (const personAPillar of personA.pillars) {
     for (const personBPillar of personB.pillars) {
-      const relation = getBaziDayBranchRelation(
+      const relations = getBaziDayBranchRelations(
         personAPillar.branch,
         personBPillar.branch,
       )
 
-      if (relation.kind === 'unclassified') continue
+      for (const relation of relations) {
+        if (relation.kind === 'unclassified') continue
 
-      contacts.push({
-        personAScope: personAPillar.scope,
-        personABranch: personAPillar.branch,
-        personBScope: personBPillar.scope,
-        personBBranch: personBPillar.branch,
-        kind: relation.kind,
-        label: BRANCH_CONTACT_LABELS[relation.kind],
-      })
+        contacts.push({
+          personAScope: personAPillar.scope,
+          personABranch: personAPillar.branch,
+          personBScope: personBPillar.scope,
+          personBBranch: personBPillar.branch,
+          kind: relation.kind,
+          label: BRANCH_CONTACT_LABELS[relation.kind],
+        })
+      }
     }
   }
 
@@ -389,6 +420,10 @@ export function buildBaziCompatibility(
     personAToB,
     personBToA,
     dayBranchRelation: getBaziDayBranchRelation(
+      personA.dayPillar.branch,
+      personB.dayPillar.branch,
+    ),
+    dayBranchRelations: getBaziDayBranchRelations(
       personA.dayPillar.branch,
       personB.dayPillar.branch,
     ),

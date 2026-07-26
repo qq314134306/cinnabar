@@ -42,6 +42,18 @@ const RESULT: BaziCompatibilityResult = {
     label: 'Six Harmony · Liu He',
     description: 'A named structural contact.',
   },
+  dayBranchRelations: [
+    {
+      kind: 'sixHarmony',
+      label: 'Six Harmony · Liu He',
+      description: 'A named structural contact.',
+    },
+    {
+      kind: 'sixBreak',
+      label: 'Six Break · Liu Po',
+      description: 'A second named structural contact, not an outcome.',
+    },
+  ],
   branchContacts: [
     {
       personAScope: 'year',
@@ -66,6 +78,22 @@ const RESULT: BaziCompatibilityResult = {
       personBBranch: '巳',
       kind: 'sixHarm',
       label: 'Six Harm · Liu Hai',
+    },
+    {
+      personAScope: 'day',
+      personABranch: '寅',
+      personBScope: 'day',
+      personBBranch: '亥',
+      kind: 'sixHarmony',
+      label: 'Six Harmony · Liu He',
+    },
+    {
+      personAScope: 'day',
+      personABranch: '寅',
+      personBScope: 'day',
+      personBBranch: '亥',
+      kind: 'sixBreak',
+      label: 'Six Break · Liu Po',
     },
   ],
   stemContacts: [
@@ -149,7 +177,9 @@ describe('BaZiCompatibility', () => {
     })).toBeTruthy()
     expect(screen.getAllByText('Direct Wealth')).toHaveLength(3)
     expect(screen.getAllByText('Direct Officer')).toHaveLength(2)
-    expect(screen.getAllByText('Six Harmony · Liu He')).toHaveLength(2)
+    expect(screen.getAllByText('Six Harmony · Liu He')).toHaveLength(3)
+    expect(screen.getAllByText('Six Break · Liu Po')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-bazi-day-branch-contact]')).toHaveLength(2)
     expect(container.querySelectorAll('[data-bazi-compatibility-person]')).toHaveLength(2)
     expect(container.querySelectorAll('[data-bazi-pillar]')).toHaveLength(8)
     expect(screen.getByRole('heading', {
@@ -175,7 +205,7 @@ describe('BaZiCompatibility', () => {
     expect(screen.getByRole('heading', {
       name: 'Four-Pillar branch contacts',
     })).toBeTruthy()
-    expect(container.querySelectorAll('[data-bazi-branch-contact]')).toHaveLength(3)
+    expect(container.querySelectorAll('[data-bazi-branch-contact]')).toHaveLength(5)
     expect(screen.getByText('A Year · Wu ↔ B Hour · Wei')).toBeTruthy()
     expect(screen.getByText('A Month · Yin ↔ B Month · Si')).toBeTruthy()
     expect(screen.getByText('Six Harm · Liu Hai')).toBeTruthy()
@@ -200,7 +230,7 @@ describe('BaZiCompatibility', () => {
     }))
 
     expect(screen.getByText(
-      'No same-branch, Liu He, Liu Chong, or Liu Hai contact appears across the 16 pairings.',
+      'No same-branch, Liu He, Liu Chong, Liu Hai, or Liu Po contact appears across the 16 pairings.',
     )).toBeTruthy()
   })
 

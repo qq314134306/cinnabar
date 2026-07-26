@@ -101,12 +101,21 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
           <p className="text-[10px] uppercase tracking-wider text-text-muted">
             Day branch contact
           </p>
-          <p className="mt-1 text-sm font-medium text-gold">
-            {result.dayBranchRelation.label}
-          </p>
-          <p className="mt-1 text-[10px] leading-relaxed text-text-secondary">
-            {result.dayBranchRelation.description}
-          </p>
+          <div className="mt-1 space-y-2">
+            {result.dayBranchRelations.map((relation) => (
+              <div
+                key={relation.kind}
+                data-bazi-day-branch-contact={relation.kind}
+              >
+                <p className="text-sm font-medium text-gold">
+                  {relation.label}
+                </p>
+                <p className="mt-1 text-[10px] leading-relaxed text-text-secondary">
+                  {relation.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </article>
       </div>
 
@@ -288,7 +297,8 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
         </h5>
         <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
           Recognized contacts across all 16 cross-person pillar pairings. Only
-          same branch, Liu He, Liu Chong, and Liu Hai are listed.
+          same branch, Liu He, Liu Chong, Liu Hai, and Liu Po are listed. A
+          branch pair may retain more than one named contact.
         </p>
         {result.branchContacts.length > 0 ? (
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -315,7 +325,7 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
             data-bazi-branch-contact-empty
             className="mt-2 text-xs text-text-secondary"
           >
-            No same-branch, Liu He, Liu Chong, or Liu Hai contact appears
+            No same-branch, Liu He, Liu Chong, Liu Hai, or Liu Po contact appears
             across the 16 pairings.
           </p>
         )}
@@ -333,7 +343,7 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
         Ten Gods are directional: A reading B can differ from B reading A. This
         panel shows the complete pillars, directional visible- and hidden-stem
         relationships, canonical visible-stem contacts, and a limited
-        branch-contact map—no score, fate claim, or relationship advice.
+        multi-contact branch map—no score, fate claim, or relationship advice.
       </p>
     </section>
   )
