@@ -1,5 +1,5 @@
 import type { BaziCompatibilityResult } from '@/lib/bazi-compatibility'
-import { translateGanZhi, translateStem } from '@/lib/ziwei-glossary'
+import { translateBranch, translateGanZhi, translateStem } from '@/lib/ziwei-glossary'
 
 interface BaZiCompatibilityProps {
   result: BaziCompatibilityResult
@@ -110,6 +110,51 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
         </article>
       </div>
 
+      <section
+        aria-labelledby="bazi-branch-contacts-heading"
+        className="mt-3 rounded-lg border border-white/[0.07] p-3"
+      >
+        <h5
+          id="bazi-branch-contacts-heading"
+          className="text-xs font-medium text-text"
+        >
+          Four-Pillar branch contacts
+        </h5>
+        <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
+          Recognized contacts across all 16 cross-person pillar pairings. Only
+          same branch, Liu He, and Liu Chong are listed.
+        </p>
+        {result.branchContacts.length > 0 ? (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {result.branchContacts.map((contact) => (
+              <article
+                key={`${contact.personAScope}-${contact.personBScope}-${contact.kind}`}
+                data-bazi-branch-contact={contact.kind}
+                className="rounded-md bg-white/[0.025] px-2.5 py-2"
+              >
+                <p className="text-[10px] text-text-secondary">
+                  A {PILLAR_LABELS[contact.personAScope]} ·{' '}
+                  {translateBranch(contact.personABranch)} ↔ B{' '}
+                  {PILLAR_LABELS[contact.personBScope]} ·{' '}
+                  {translateBranch(contact.personBBranch)}
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-gold/90">
+                  {contact.label}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p
+            data-bazi-branch-contact-empty
+            className="mt-2 text-xs text-text-secondary"
+          >
+            No same-branch, Liu He, or Liu Chong contact appears across the 16
+            pairings.
+          </p>
+        )}
+      </section>
+
       {result.provisional && (
         <p role="note" className="mt-3 text-xs leading-relaxed text-gold/80">
           At least one entered birth time is approximate. Because a true-solar
@@ -120,8 +165,8 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
 
       <p className="mt-3 border-t border-white/[0.06] pt-3 text-[10px] leading-relaxed text-text-muted">
         Ten Gods are directional: A reading B can differ from B reading A. This
-        panel shows the complete pillars but interprets only the two Day Masters
-        and Day Branch contact—no score, fate claim, or relationship advice.
+        panel shows the complete pillars, the two Day Masters, and a limited
+        branch-contact map—no score, fate claim, or relationship advice.
       </p>
     </section>
   )

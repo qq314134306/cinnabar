@@ -42,6 +42,24 @@ const RESULT: BaziCompatibilityResult = {
     label: 'Six Harmony · Liu He',
     description: 'A named structural contact.',
   },
+  branchContacts: [
+    {
+      personAScope: 'year',
+      personABranch: '午',
+      personBScope: 'hour',
+      personBBranch: '未',
+      kind: 'sixHarmony',
+      label: 'Six Harmony · Liu He',
+    },
+    {
+      personAScope: 'month',
+      personABranch: '寅',
+      personBScope: 'year',
+      personBBranch: '申',
+      kind: 'sixClash',
+      label: 'Six Clash · Liu Chong',
+    },
+  ],
   provisional: false,
 }
 
@@ -56,9 +74,14 @@ describe('BaZiCompatibility', () => {
     })).toBeTruthy()
     expect(screen.getByText('Direct Wealth')).toBeTruthy()
     expect(screen.getByText('Direct Officer')).toBeTruthy()
-    expect(screen.getByText('Six Harmony · Liu He')).toBeTruthy()
+    expect(screen.getAllByText('Six Harmony · Liu He')).toHaveLength(2)
     expect(container.querySelectorAll('[data-bazi-compatibility-person]')).toHaveLength(2)
     expect(container.querySelectorAll('[data-bazi-pillar]')).toHaveLength(8)
+    expect(screen.getByRole('heading', {
+      name: 'Four-Pillar branch contacts',
+    })).toBeTruthy()
+    expect(container.querySelectorAll('[data-bazi-branch-contact]')).toHaveLength(2)
+    expect(screen.getByText('A Year · Wu ↔ B Hour · Wei')).toBeTruthy()
     expect(screen.getAllByText('Year')).toHaveLength(2)
     expect(screen.getAllByText('Hour')).toHaveLength(2)
     expect(screen.getByText(/no score, fate claim/)).toBeTruthy()
@@ -72,5 +95,15 @@ describe('BaZiCompatibility', () => {
     expect(screen.getByRole('note').textContent).toContain(
       'treat this Four Pillar comparison as provisional',
     )
+  })
+
+  it('shows an explicit empty state when no canonical contact is recognized', () => {
+    render(createElement(BaZiCompatibility, {
+      result: { ...RESULT, branchContacts: [] },
+    }))
+
+    expect(screen.getByText(
+      'No same-branch, Liu He, or Liu Chong contact appears across the 16 pairings.',
+    )).toBeTruthy()
   })
 })

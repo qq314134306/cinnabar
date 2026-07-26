@@ -274,8 +274,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   The same resolved pair also feeds a separate score-free BaZi layer. It reuses
   the established Four Pillars and Ten Gods helpers to show both complete
   ordered Four-Pillar sets, directional A-to-B and B-to-A Day Master
-  relationships, and only the named
-  same-branch, Liu He, or Liu Chong Day Branch contacts. This layer never
+  relationships, the named Day Branch contact, and a limited contact map over
+  all 16 cross-person pillar pairings. The map lists only same-branch, Liu He,
+  or Liu Chong contacts and omits unclassified pairs. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership, sends both full allowlisted birth shapes, and is
