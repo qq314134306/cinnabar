@@ -195,6 +195,13 @@ when `failureCode` is set. This prevents an expected non-zero `psql` call inside
 a successfully handled concurrency assertion from leaking through the ambient
 PowerShell `$LASTEXITCODE` into the workflow step.
 
+The cleanup finalizer folds database start, proof, cleanup, and step-list
+outcomes into the signed-by-context JSON contract. The validator then rejects
+any non-success value, missing step, wrong run binding, wrong migration hash,
+or incomplete cleanup. The last Bash gate therefore requires the validator and
+artifact upload outcomes only; it does not independently reinterpret the same
+intermediate outcomes a second time.
+
 CI's `database-proof` job creates its Supabase working directory outside the
 checkout so repository migrations are not auto-applied before the runner checks
 the `Fresh` baseline. It uses the local database's built-in `auth` schema,

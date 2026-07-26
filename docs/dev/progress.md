@@ -97,6 +97,15 @@
   a no-failure pending-cleanup summary, while preserving exit one whenever a
   real `failureCode` exists. The run remains non-evidence because its final
   gates failed; a new exact-head run is required.
+- Hosted run `30185010430` proved the full app verifier and every substantive
+  Fresh database stage, including cleanup, strict finalized-summary validation,
+  and artifact upload. Only the redundant Bash tail gate failed while
+  re-reading intermediate step outcomes already folded into the successfully
+  validated JSON. The tail gate now requires only finalized-summary validation
+  and evidence upload; start, proof, cleanup, ordered steps, run binding, CLI
+  pin, and migration fingerprint remain fail-closed inside that validator. The
+  run itself remains non-evidence because the job conclusion was failure; a new
+  exact-head run is required.
 - Exercised the release path for the first time through pushed pull request
   #10. The trusted Vercel Preview built and passed a real default-chart and
   Major Luck browser check. Hosted run `30183316408` correctly blocked the

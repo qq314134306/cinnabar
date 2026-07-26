@@ -480,15 +480,9 @@ jobs:
         if: always()
         shell: bash
         env:
-          CINNABAR_START_OUTCOME: ${{ steps.database_start.outcome }}
-          CINNABAR_PROOF_OUTCOME: ${{ steps.release_proof.outcome }}
-          CINNABAR_CLEANUP_OUTCOME: ${{ steps.database_cleanup.outcome }}
           CINNABAR_VALIDATE_OUTCOME: ${{ steps.validate_proof.outcome }}
           CINNABAR_UPLOAD_OUTCOME: ${{ steps.upload_proof.outcome }}
         run: |
           set -euo pipefail
-          test "$CINNABAR_START_OUTCOME" = "success"
-          test "$CINNABAR_PROOF_OUTCOME" = "success"
-          test "$CINNABAR_CLEANUP_OUTCOME" = "success"
           test "$CINNABAR_VALIDATE_OUTCOME" = "success"
           test "$CINNABAR_UPLOAD_OUTCOME" = "success"

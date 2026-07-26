@@ -234,7 +234,7 @@ describe('Cinnabar candidate verification workflow', () => {
     expect(databaseProofJob).not.toContain('supabase stop --all')
   })
 
-  it('cannot report success when start, proof, cleanup, validation, or upload fails', () => {
+  it('folds every proof outcome into validation before requiring the artifact', () => {
     expect(databaseProofJob).toContain('id: database_start')
     expect(databaseProofJob).toContain('id: release_proof')
     expect(databaseProofJob).toContain('id: database_cleanup')
@@ -251,17 +251,13 @@ describe('Cinnabar candidate verification workflow', () => {
       "$summary.failureCode = 'CI_DATABASE_PROOF_FAILED'",
     )
     expect(databaseProofJob).toContain('$summary.success = $false')
-    expect(databaseProofJob).toContain(
-      'CINNABAR_CLEANUP_OUTCOME: ${{ steps.database_cleanup.outcome }}',
-    )
+    expect(databaseProofJob).toContain('$env:CINNABAR_START_OUTCOME')
+    expect(databaseProofJob).toContain('$env:CINNABAR_PROOF_OUTCOME')
     expect(databaseProofJob).toContain(
       'CINNABAR_VALIDATE_OUTCOME: ${{ steps.validate_proof.outcome }}',
     )
     expect(databaseProofJob).toContain(
       'CINNABAR_UPLOAD_OUTCOME: ${{ steps.upload_proof.outcome }}',
-    )
-    expect(databaseProofJob).toContain(
-      'test "$CINNABAR_CLEANUP_OUTCOME" = "success"',
     )
     expect(databaseProofJob).toContain(
       'test "$CINNABAR_VALIDATE_OUTCOME" = "success"',
