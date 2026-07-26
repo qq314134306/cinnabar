@@ -1414,3 +1414,25 @@ This decision does not authorize hidden-stem synthesis, stem combinations,
 strength or useful-god judgment, favorable/unfavorable labels, a BaZi score,
 timing forecasts, fate claims, relationship advice, AI prose, persistence,
 analytics, account gating, payment, or a network request.
+
+## D060 - Hidden-Stem Compatibility Is Decomposition, Not Synthesis
+
+Cinnabar may extend the score-free BaZi Compatibility layer by exposing the
+canonical hidden-stem sequence already calculated for each of the other
+person's four Earthly Branches. Person A's Day Master classifies Person B's
+hidden stems and Person B's Day Master separately classifies Person A's hidden
+stems through the established typed Ten Gods helper. Every result retains its
+target pillar scope, target branch, raw stem, and sequence index so the mapping
+remains inspectable and deterministic.
+
+This view is decomposition only. It does not assign hidden-stem percentages,
+seasonal strength, root strength, repeated-signal weight, favorable or
+unfavorable meaning, or combine visible and hidden results into a synthesized
+relationship judgment. The two directions remain visibly separate and the
+Compatibility-owned true-solar-resolved Four Pillars remain the only calendar
+authority.
+
+This decision does not authorize stem combinations, branch transformations,
+strength or useful-god judgment, a BaZi score, timing forecasts, fate claims,
+relationship advice, AI prose, persistence, analytics, account gating,
+payment, or a network request.

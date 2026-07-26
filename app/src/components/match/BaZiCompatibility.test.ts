@@ -11,20 +11,20 @@ const RESULT: BaziCompatibilityResult = {
     dayMaster: { stem: '丙', element: 'Fire', polarity: 'Yang' },
     dayPillar: { stem: '丙', branch: '寅', ganZhi: '丙寅' },
     pillars: [
-      { scope: 'year', stem: '庚', branch: '午', ganZhi: '庚午' },
-      { scope: 'month', stem: '戊', branch: '寅', ganZhi: '戊寅' },
-      { scope: 'day', stem: '丙', branch: '寅', ganZhi: '丙寅' },
-      { scope: 'hour', stem: '甲', branch: '午', ganZhi: '甲午' },
+      { scope: 'year', stem: '庚', branch: '午', ganZhi: '庚午', hiddenStems: ['丁', '己'] },
+      { scope: 'month', stem: '戊', branch: '寅', ganZhi: '戊寅', hiddenStems: ['甲', '丙', '戊'] },
+      { scope: 'day', stem: '丙', branch: '寅', ganZhi: '丙寅', hiddenStems: ['甲', '丙', '戊'] },
+      { scope: 'hour', stem: '甲', branch: '午', ganZhi: '甲午', hiddenStems: ['丁', '己'] },
     ],
   },
   personB: {
     dayMaster: { stem: '辛', element: 'Metal', polarity: 'Yin' },
     dayPillar: { stem: '辛', branch: '亥', ganZhi: '辛亥' },
     pillars: [
-      { scope: 'year', stem: '壬', branch: '申', ganZhi: '壬申' },
-      { scope: 'month', stem: '乙', branch: '巳', ganZhi: '乙巳' },
-      { scope: 'day', stem: '辛', branch: '亥', ganZhi: '辛亥' },
-      { scope: 'hour', stem: '乙', branch: '未', ganZhi: '乙未' },
+      { scope: 'year', stem: '壬', branch: '申', ganZhi: '壬申', hiddenStems: ['庚', '壬', '戊'] },
+      { scope: 'month', stem: '乙', branch: '巳', ganZhi: '乙巳', hiddenStems: ['丙', '庚', '戊'] },
+      { scope: 'day', stem: '辛', branch: '亥', ganZhi: '辛亥', hiddenStems: ['壬', '甲'] },
+      { scope: 'hour', stem: '乙', branch: '未', ganZhi: '乙未', hiddenStems: ['己', '丁', '乙'] },
     ],
   },
   personAToB: {
@@ -74,6 +74,33 @@ const RESULT: BaziCompatibilityResult = {
       { targetScope: 'hour', targetStem: '甲', relationship: 'directWealth', label: 'Direct Wealth' },
     ],
   },
+  hiddenStemRelationships: {
+    personAToB: [
+      { targetScope: 'year', targetBranch: '申', targetStem: '庚', hiddenStemIndex: 0, relationship: 'indirectWealth', label: 'Indirect Wealth' },
+      { targetScope: 'year', targetBranch: '申', targetStem: '壬', hiddenStemIndex: 1, relationship: 'sevenKillings', label: 'Seven Killings' },
+      { targetScope: 'year', targetBranch: '申', targetStem: '戊', hiddenStemIndex: 2, relationship: 'eatingGod', label: 'Eating God' },
+      { targetScope: 'month', targetBranch: '巳', targetStem: '丙', hiddenStemIndex: 0, relationship: 'peer', label: 'Peer' },
+      { targetScope: 'month', targetBranch: '巳', targetStem: '庚', hiddenStemIndex: 1, relationship: 'indirectWealth', label: 'Indirect Wealth' },
+      { targetScope: 'month', targetBranch: '巳', targetStem: '戊', hiddenStemIndex: 2, relationship: 'eatingGod', label: 'Eating God' },
+      { targetScope: 'day', targetBranch: '亥', targetStem: '壬', hiddenStemIndex: 0, relationship: 'sevenKillings', label: 'Seven Killings' },
+      { targetScope: 'day', targetBranch: '亥', targetStem: '甲', hiddenStemIndex: 1, relationship: 'indirectResource', label: 'Indirect Resource' },
+      { targetScope: 'hour', targetBranch: '未', targetStem: '己', hiddenStemIndex: 0, relationship: 'hurtingOfficer', label: 'Hurting Officer' },
+      { targetScope: 'hour', targetBranch: '未', targetStem: '丁', hiddenStemIndex: 1, relationship: 'robWealth', label: 'Rob Wealth' },
+      { targetScope: 'hour', targetBranch: '未', targetStem: '乙', hiddenStemIndex: 2, relationship: 'directResource', label: 'Direct Resource' },
+    ],
+    personBToA: [
+      { targetScope: 'year', targetBranch: '午', targetStem: '丁', hiddenStemIndex: 0, relationship: 'sevenKillings', label: 'Seven Killings' },
+      { targetScope: 'year', targetBranch: '午', targetStem: '己', hiddenStemIndex: 1, relationship: 'indirectResource', label: 'Indirect Resource' },
+      { targetScope: 'month', targetBranch: '寅', targetStem: '甲', hiddenStemIndex: 0, relationship: 'directWealth', label: 'Direct Wealth' },
+      { targetScope: 'month', targetBranch: '寅', targetStem: '丙', hiddenStemIndex: 1, relationship: 'directOfficer', label: 'Direct Officer' },
+      { targetScope: 'month', targetBranch: '寅', targetStem: '戊', hiddenStemIndex: 2, relationship: 'directResource', label: 'Direct Resource' },
+      { targetScope: 'day', targetBranch: '寅', targetStem: '甲', hiddenStemIndex: 0, relationship: 'directWealth', label: 'Direct Wealth' },
+      { targetScope: 'day', targetBranch: '寅', targetStem: '丙', hiddenStemIndex: 1, relationship: 'directOfficer', label: 'Direct Officer' },
+      { targetScope: 'day', targetBranch: '寅', targetStem: '戊', hiddenStemIndex: 2, relationship: 'directResource', label: 'Direct Resource' },
+      { targetScope: 'hour', targetBranch: '午', targetStem: '丁', hiddenStemIndex: 0, relationship: 'sevenKillings', label: 'Seven Killings' },
+      { targetScope: 'hour', targetBranch: '午', targetStem: '己', hiddenStemIndex: 1, relationship: 'indirectResource', label: 'Indirect Resource' },
+    ],
+  },
   provisional: false,
 }
 
@@ -98,6 +125,13 @@ describe('BaZiCompatibility', () => {
     expect(container.querySelectorAll('[data-bazi-stem-relationship]')).toHaveLength(8)
     expect(screen.getByText('B Year · Ren')).toBeTruthy()
     expect(screen.getByText('A Year · Geng')).toBeTruthy()
+    expect(screen.getByRole('heading', {
+      name: 'Hidden-stem Ten Gods map',
+    })).toBeTruthy()
+    expect(container.querySelectorAll('[data-bazi-hidden-stem-direction]')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-bazi-hidden-stem-relationship]')).toHaveLength(21)
+    expect(screen.getByText('B Year · Shen')).toBeTruthy()
+    expect(screen.getByText('A Year · Wu')).toBeTruthy()
     expect(screen.getByRole('heading', {
       name: 'Four-Pillar branch contacts',
     })).toBeTruthy()
