@@ -26,21 +26,42 @@
   leaves the runtime on its code-level `legacy` fallback; public AI remains
   fail-closed. These are configuration gaps, not evidence for enabling either
   feature.
-- Authenticated GitHub inspection found Actions disabled for the repository and
-  no Actions secrets configured. The candidate workflow therefore has no
-  GitHub-hosted run or artifact. Actions must be explicitly enabled before any
-  hosted verification can be claimed.
+- GitHub Actions is enabled. Pull request #10 started the first observed hosted
+  candidate run (`30183316408`) against `80da318`; both jobs failed and are not
+  release evidence. The verify job exposed a new high-severity
+  `brace-expansion` advisory. The Fresh database job uploaded a sanitized
+  failure artifact after the Supabase `postgres` role was denied permission to
+  alter the database object's default marker. Compatible toolchain and marker
+  fixes are being prepared for a new exact-head run.
 - GitHub `main` is not protected. Vercel has Git Fork Protection, Standard
   Deployment Protection, Build Logs protection, and Source protection enabled,
   but no Deployment Checks are configured and automatic custom-production-
   domain assignment is enabled. A verified GitHub check is therefore not yet a
   proven prerequisite for the Production alias.
-- The candidate branch contains work beyond production commit `104de00`. No
-  push, pull request, hosted verification, or deployment of that candidate is
+- The candidate branch is pushed and tracked at
+  `origin/codex/release-hardening`; pull request #10 targets `main`. Its trusted
+  Vercel branch Preview is live and passed the default chart plus eight-cycle
+  Major Luck browser check without console errors or horizontal overflow.
+  Production remains commit `104de00`; no merge or production promotion is
   claimed here.
 
 ## Recently Completed
 
+- Exercised the release path for the first time through pushed pull request
+  #10. The trusted Vercel Preview built and passed a real default-chart and
+  Major Luck browser check. Hosted run `30183316408` correctly blocked the
+  candidate on a newly published `brace-expansion` high-severity advisory and
+  an over-privileged database-marker command. The compatible remediation moves
+  the development toolchain to ESLint 10.8, `@eslint/js` 10.0.1,
+  `typescript-eslint` 8.65, React Hooks 7.1.1, and React Refresh 0.5.3, with a
+  clean `npm ci` and full-tree audit at zero vulnerabilities. Three newly
+  recommended lint rules are explicitly held at the prior candidate baseline
+  so the security update does not silently introduce behavior refactors. The
+  database marker now uses the current `postgres` role's own database-scoped
+  default rather than requiring ownership of the Supabase database. Local
+  lint, 77 files / 656 tests, and the strict production build pass after the
+  changes. A new exact-head hosted run is still required; the failed initial
+  run and its failure artifact are not release evidence.
 - Added an opt-in BaZi Major Luck (Da Yun) navigator beneath the Four Pillars
   companion. It derives gender-dependent forward/reverse direction, the
   minute-aware start offset and start timestamp, and eight ten-year

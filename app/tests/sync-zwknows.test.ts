@@ -140,7 +140,7 @@ describe('Cinnabar candidate verification workflow', () => {
     expect(databaseProofJob).not.toContain('working-directory: supabase')
     expect(databaseProofJob).not.toContain('cd supabase/migrations')
     expect(databaseProofJob).toContain(
-      'alter database postgres set "cinnabar.environment" = \'\'test\'\';',
+      'alter role current_user in database postgres set "cinnabar.environment" = \'\'test\'\';',
     )
     expect(databaseProofJob).toContain(
       '& ./supabase/tests/invoke-release-proof.ps1',

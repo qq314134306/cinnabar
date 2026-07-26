@@ -19,5 +19,14 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // ESLint 10 / react-hooks 7.1 added these to their recommended sets.
+      // Preserve the candidate's previously enforced baseline during the
+      // security-toolchain upgrade; migrate the established state-sync
+      // patterns in a separate, behavior-focused change.
+      'no-useless-assignment': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+    },
   },
 ])

@@ -126,7 +126,8 @@ authorized database owner must first persist an exact non-production marker;
 reconnect after setting it:
 
 ```sql
-alter database postgres set "cinnabar.environment" = 'staging';
+alter role current_user in database postgres
+  set "cinnabar.environment" = 'staging';
 ```
 
 Keep the connection URL in a task-specific environment variable. Invoke the
@@ -186,8 +187,10 @@ CI's `database-proof` job creates its Supabase working directory outside the
 checkout so repository migrations are not auto-applied before the runner checks
 the `Fresh` baseline. It uses the local database's built-in `auth` schema,
 `anon`/`authenticated`/`service_role` roles, `gen_random_uuid()`, and
-`postgres` owner; persists the `cinnabar.environment=test` marker; then
-reconnects through the runner. The pinned CLI version is `2.84.2`. Changing
+`postgres` owner; persists its database-scoped
+`cinnabar.environment=test` role default without requiring ownership of the
+Supabase database itself; then reconnects through the runner. The pinned CLI
+version is `2.84.2`. Changing
 that version, port, owner, marker, or startup model requires rerunning the
 workflow contract and a real Actions proof.
 
@@ -465,19 +468,19 @@ Production, so do not approve or expose an untrusted fork preview. Keep fork
 protection enabled and use a trusted repository branch for the release
 candidate.
 
-GitHub Actions is currently disabled for `qq314134306/cinnabar`, and its Actions
-secret list is empty. Therefore:
+GitHub Actions is enabled for `qq314134306/cinnabar`. Pull request #10 started
+the first observed hosted candidate run (`30183316408`) against commit
+`80da318`. That run proved the trigger and artifact path but did not pass: the
+verify job found a newly published high-severity `brace-expansion` advisory,
+and the database job showed that the local Supabase `postgres` role can persist
+its own database-scoped defaults but cannot alter the database object's
+defaults. The candidate therefore upgrades the compatible ESLint toolchain and
+uses `ALTER ROLE CURRENT_USER IN DATABASE postgres SET` for the non-production
+marker. Neither initial job is release evidence. Both jobs must pass on a new
+exact-head run, and its sanitized `cinnabar-database-proof` artifact must be
+inspected before hosted database proof is accepted.
 
-- no GitHub-hosted candidate run or database-proof artifact currently exists;
-- Actions must be explicitly enabled before manually dispatching or relying on
-  the workflow;
-- after enabling, both `Verify candidate` and
-  `Prove database migrations on fresh Supabase` must pass;
-- the sanitized `cinnabar-database-proof` artifact must be inspected before
-  hosted database proof is accepted.
-
-After Actions is enabled, inspect recent runs without exposing logs that may
-contain sensitive values:
+Inspect recent runs without exposing logs that may contain sensitive values:
 
 ```powershell
 gh run list --repo qq314134306/cinnabar --workflow "Cinnabar candidate verification" --limit 3 --json databaseId,status,conclusion,headSha,url
