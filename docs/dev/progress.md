@@ -45,11 +45,15 @@
   passed, the run binding and migration SHA-256 matched, and Supabase CLI
   `2.84.2` remained pinned. That is the first accepted hosted Fresh proof for
   this candidate; earlier failed runs remain non-evidence.
-- GitHub `main` is not protected. Vercel has Git Fork Protection, Standard
-  Deployment Protection, Build Logs protection, and Source protection enabled,
-  but no Deployment Checks are configured and automatic custom-production-
-  domain assignment is enabled. A verified GitHub check is therefore not yet a
-  proven prerequisite for the Production alias.
+- GitHub `main` is protected: merges require a pull request, an up-to-date
+  branch, `Verify candidate`, and `Prove database migrations on fresh
+  Supabase`; bypass, force pushes, and deletion are disallowed. Vercel has Git
+  Fork Protection, Standard Deployment Protection, Build Logs protection, and
+  Source protection enabled. Its native `Lint` and `Typecheck` Deployment
+  Checks now block Production promotion and will first run on the next
+  deployment. Automatic custom-production-domain assignment remains enabled,
+  so the new Vercel checks still require an observed production-candidate run
+  before the promotion sequence is considered proven.
 - The candidate branch is pushed and tracked at
   `origin/codex/release-hardening`; pull request #10 targets `main`. Its trusted
   Vercel branch Preview is live and passed the default chart plus eight-cycle
@@ -59,6 +63,13 @@
 
 ## Recently Completed
 
+- Protected `main` after exact candidate head `4440e40` passed hosted run
+  `30185445036`: pull requests, up-to-date branches, both candidate workflow
+  jobs, and no bypass are now enforced. Vercel could not import PR-only GitHub
+  checks before those check names exist on the default branch, so native
+  blocking `Lint` and `Typecheck` Deployment Checks were configured instead.
+  Added the compatible `typecheck` package script; both native checks will run
+  for the next deployment and must be observed before Production promotion.
 - Accepted hosted candidate run `30185280458`. The application job passed the
   audit, lint, 77 files / 659 tests, build, and whitespace gates. The Fresh
   database job passed migrations, migrated-state checks, six SQL behavior

@@ -515,10 +515,12 @@ gh run list --repo qq314134306/cinnabar --workflow "Cinnabar candidate verificat
 gh run view <run-id> --repo qq314134306/cinnabar --json status,conclusion,attempt,headSha,url
 ```
 
-Vercel's direct Git integration does not by itself prove that these checks
-passed. Authenticated inspection found no Deployment Checks configured and
-automatic assignment of custom production domains enabled. The Vercel UI can
-import GitHub checks, but that integration has not been configured or proven.
+Vercel's direct Git integration does not by itself prove that the GitHub checks
+passed. `main` is protected by the two GitHub jobs below, and Vercel has native
+blocking `Lint` and `Typecheck` Deployment Checks. Automatic assignment of
+custom production domains remains enabled. The native checks first run on the
+next deployment, so their successful block-and-release behavior must be
+observed before treating the Production alias path as proven.
 
 Use this release order:
 
@@ -527,11 +529,12 @@ Use this release order:
 2. Enable Actions and let both `Verify candidate` and
    `Prove database migrations on fresh Supabase` register and pass for the pull
    request; inspect the sanitized database artifact.
-3. Protect `main`: require a pull request, require both checks, require the
-   branch to be up to date, and disallow force pushes, deletion, and bypass.
-4. Before merge, either import both GitHub checks into Vercel Deployment Checks,
-   or disable automatic custom-production-domain assignment and manually
-   promote the exact verified SHA.
+3. Confirm `main` protection still requires a pull request, both checks, and an
+   up-to-date branch, with force pushes, deletion, and bypass disallowed.
+4. Confirm Vercel's blocking native `Lint` and `Typecheck` Deployment Checks
+   are configured. On the first production candidate, observe both checks pass
+   before Vercel assigns the Production alias; do not infer this from build
+   success alone.
 5. After deployment, verify the production source commit, expected functions,
    runtime logs, and environment scopes in the authenticated Vercel project.
 
