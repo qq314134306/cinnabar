@@ -31,6 +31,13 @@ const concurrency = readFileSync(
   )),
   'utf8',
 )
+const creditLedgerMigration = readFileSync(
+  fileURLToPath(new URL(
+    '../../supabase/migrations/20260723000000_credit_ledger.sql',
+    import.meta.url,
+  )),
+  'utf8',
+)
 
 const candidateMigrations = [
   '20260723000000_credit_ledger.sql',
@@ -43,6 +50,15 @@ const candidateMigrations = [
 ]
 
 describe('database release-proof contract', () => {
+  it('keeps credit balance aggregate fallbacks type-compatible', () => {
+    expect(creditLedgerMigration.match(
+      /coalesce\(pg_catalog\.sum\(amount\), 0::bigint\)/gu,
+    )).toHaveLength(3)
+    expect(creditLedgerMigration).not.toMatch(
+      /coalesce\(pg_catalog\.sum\(amount\), 0\)/u,
+    )
+  })
+
   it('pins the seven candidate migrations in timestamp dependency order', () => {
     const actual = readdirSync(migrationsDirectory)
       .filter((name) => name.startsWith('20260723') && name.endsWith('.sql'))

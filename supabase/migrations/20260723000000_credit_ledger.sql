@@ -76,7 +76,7 @@ revoke all on public.credit_activity from public, anon, authenticated;
 grant select on public.credit_activity to authenticated;
 
 create view public.credit_balances with (security_invoker = true) as
-select pg_catalog.coalesce(pg_catalog.sum(amount), 0)::bigint as balance
+select pg_catalog.coalesce(pg_catalog.sum(amount), 0::bigint) as balance
 from public.credit_ledger;
 revoke all on public.credit_balances from public, anon, authenticated;
 grant select on public.credit_balances to authenticated;
@@ -160,13 +160,13 @@ begin
       raise exception 'business key was already used with different debit data'
         using errcode = '23505';
     end if;
-    select pg_catalog.coalesce(pg_catalog.sum(amount), 0)::bigint into v_balance
+    select pg_catalog.coalesce(pg_catalog.sum(amount), 0::bigint) into v_balance
       from public.credit_ledger where account_id = p_user_id;
     return query select v_existing.id, v_balance, false;
     return;
   end if;
 
-  select pg_catalog.coalesce(pg_catalog.sum(amount), 0)::bigint into v_balance
+  select pg_catalog.coalesce(pg_catalog.sum(amount), 0::bigint) into v_balance
     from public.credit_ledger where account_id = p_user_id;
   if v_balance < p_amount then
     raise exception 'insufficient credits' using errcode = 'P0001';
