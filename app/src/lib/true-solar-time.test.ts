@@ -3,6 +3,7 @@ import birthplaceData from './birthplace-data.json'
 import {
   type Birthplace,
   findBirthplaceInData,
+  isExactBirthplaceMatch,
   resolveBirthTimeAsync,
   shichenNameForTimeIndex,
 } from './true-solar-time'
@@ -43,6 +44,20 @@ describe('findBirthplace', () => {
 
   it('returns null when the birthplace cannot be matched', () => {
     expect(findBirthplaceInData(MARS_BASE, BIRTHPLACE_DATA)).toBeNull()
+  })
+
+  it('distinguishes an exact place name from a tolerant prefix match', () => {
+    const shanghai: Birthplace = {
+      name: '\u4e0a\u6d77\u5e02',
+      city: '\u4e0a\u6d77\u5e02',
+      enName: 'Shanghai',
+      latinKeys: ['shanghai'],
+      longitude: 121.47,
+    }
+
+    expect(isExactBirthplaceMatch('Shanghai', shanghai)).toBe(true)
+    expect(isExactBirthplaceMatch('\u4e0a\u6d77', shanghai)).toBe(true)
+    expect(isExactBirthplaceMatch('Shang', shanghai)).toBe(false)
   })
 })
 

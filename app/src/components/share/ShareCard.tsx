@@ -3,7 +3,7 @@
    Cinnabar seal styling, exported with html2canvas.
    ============================================================ */
 
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { useChartStore, useContentCacheStore } from '@/stores'
 import { Button } from '@/components/ui'
@@ -16,6 +16,55 @@ import { translateFiveElementsClass, translateGanZhi, translateStarLabel } from 
 
 const FONT_DISPLAY = "'Cormorant Garamond', 'Georgia', serif"
 const FONT_BODY = "'Inter', system-ui, sans-serif"
+const FONT_QUOTE = "'Georgia', 'Times New Roman', serif"
+const MAX_CUSTOM_QUOTE_LENGTH = 240
+const SHARE_TITLE = 'My Cinnabar chart'
+const SHARE_TEXT = 'A reflection from my Cinnabar birth chart.'
+
+type ExportAction = 'download' | 'share'
+type ShareFeedback = 'idle' | 'ready' | 'error'
+
+function supportsNativeImageShare(): boolean {
+  if (
+    typeof navigator.share !== 'function'
+    || typeof navigator.canShare !== 'function'
+    || typeof File !== 'function'
+  ) {
+    return false
+  }
+
+  try {
+    return navigator.canShare({
+      files: [new File([], 'cinnabar-reading.png', { type: 'image/png' })],
+    })
+  } catch {
+    return false
+  }
+}
+
+function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob)
+      } else {
+        reject(new Error('Canvas PNG encoding failed'))
+      }
+    }, 'image/png')
+  })
+}
+
+function browserErrorName(error: unknown): string | null {
+  if (
+    typeof error === 'object'
+    && error !== null
+    && 'name' in error
+    && typeof error.name === 'string'
+  ) {
+    return error.name
+  }
+  return null
+}
 
 /* ------------------------------------------------------------
    Sexagenary year (stem-branch) helpers
@@ -31,7 +80,7 @@ function yearToGanZhi(year: number): string {
 }
 
 /* ------------------------------------------------------------
-   Pull a quotable passage from the AI reading
+   Pull a quotable passage from an optional AI narrative
    ------------------------------------------------------------ */
 
 function extractQuote(content: string): string | null {
@@ -89,8 +138,15 @@ export function ShareCard() {
   const { chart, birthInfo } = useChartStore()
   const { aiInterpretation } = useContentCacheStore()
   const cardRef = useRef<HTMLDivElement>(null)
-  const [generating, setGenerating] = useState(false)
+  const exportInFlightRef = useRef(false)
+  const [exportAction, setExportAction] = useState<ExportAction | null>(null)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [preparedShareFile, setPreparedShareFile] = useState<File | null>(null)
+  const [shareFeedback, setShareFeedback] = useState<ShareFeedback>('idle')
+  const [shareError, setShareError] = useState<string | null>(null)
+  const [nativeImageShareAvailable] = useState(supportsNativeImageShare)
   const [customQuote, setCustomQuote] = useState('')
+  const [quoteDraft, setQuoteDraft] = useState('')
   const [isEditing, setIsEditing] = useState(false)
 
   const extractedQuote = aiInterpretation ? extractQuote(aiInterpretation) : null
@@ -101,11 +157,36 @@ export function ShareCard() {
   const stars = chart ? getLifePalaceStars(chart) : ''
   const pattern = chart ? getPatternName(chart) : null
   const fiveElements = chart ? translateFiveElementsClass(chart.fiveElementsClass) : ''
+  const imageFileName =
+    `cinnabar-reading-${ganZhiEn.toLowerCase() || 'chart'}.png`
+
+  useEffect(() => {
+    setPreparedShareFile(null)
+    setShareFeedback('idle')
+    setShareError(null)
+  }, [displayQuote, fiveElements, ganZhiEn, pattern, stars])
+
+  const startEditing = () => {
+    setQuoteDraft(customQuote)
+    setIsEditing(true)
+  }
+
+  const cancelEditing = () => {
+    setQuoteDraft(customQuote)
+    setIsEditing(false)
+  }
+
+  const saveEditing = () => {
+    setCustomQuote(quoteDraft.trim())
+    setIsEditing(false)
+  }
 
   const handleDownload = useCallback(async () => {
-    if (!cardRef.current) return
+    if (!cardRef.current || exportInFlightRef.current) return
 
-    setGenerating(true)
+    exportInFlightRef.current = true
+    setDownloadError(null)
+    setExportAction('download')
     try {
       await document.fonts.ready
 
@@ -119,18 +200,110 @@ export function ShareCard() {
       const dataUrl = canvas.toDataURL('image/png')
 
       const link = document.createElement('a')
-      link.download = `cinnabar-reading-${ganZhiEn.toLowerCase() || 'chart'}.png`
+      link.download = imageFileName
       link.href = dataUrl
       document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      try {
+        link.click()
+      } finally {
+        link.remove()
+      }
     } catch (err) {
       console.error('Image generation failed:', err)
-      alert(`Image generation failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      setDownloadError(
+        "We couldn't create this image. Please try again.",
+      )
     } finally {
-      setGenerating(false)
+      exportInFlightRef.current = false
+      setExportAction(null)
     }
-  }, [ganZhiEn])
+  }, [imageFileName])
+
+  const handleNativeShare = useCallback(async () => {
+    if (
+      !cardRef.current
+      || exportInFlightRef.current
+      || typeof navigator.share !== 'function'
+      || typeof navigator.canShare !== 'function'
+    ) {
+      return
+    }
+
+    exportInFlightRef.current = true
+    setShareFeedback('idle')
+    setShareError(null)
+    setExportAction('share')
+
+    const alreadyPrepared = preparedShareFile !== null
+    let file = preparedShareFile
+    let shareAttempted = false
+
+    try {
+      if (!file) {
+        await document.fonts.ready
+        const canvas = await html2canvas(cardRef.current, {
+          backgroundColor: '#12132b',
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+        })
+        const blob = await canvasToPngBlob(canvas)
+        file = new File([blob], imageFileName, { type: 'image/png' })
+      }
+
+      if (!navigator.canShare({
+        files: [file],
+        title: SHARE_TITLE,
+        text: SHARE_TEXT,
+      })) {
+        setPreparedShareFile(null)
+        setShareFeedback('error')
+        setShareError(
+          "This browser can't share images directly. Save the image instead.",
+        )
+        return
+      }
+
+      shareAttempted = true
+      await navigator.share({
+        files: [file],
+        title: SHARE_TITLE,
+        text: SHARE_TEXT,
+      })
+      setPreparedShareFile(null)
+      setShareFeedback('idle')
+    } catch (err) {
+      const errorName = browserErrorName(err)
+
+      if (errorName === 'AbortError' && shareAttempted) {
+        setPreparedShareFile(file)
+        return
+      }
+
+      if (
+        errorName === 'NotAllowedError'
+        && shareAttempted
+        && file
+        && !alreadyPrepared
+      ) {
+        setPreparedShareFile(file)
+        setShareFeedback('ready')
+        return
+      }
+
+      console.error('Native image sharing failed:', err)
+      setPreparedShareFile(null)
+      setShareFeedback('error')
+      setShareError(
+        errorName === 'NotAllowedError'
+          ? "We couldn't open your share sheet. Save the image instead."
+          : "We couldn't share this image. Save it or try again.",
+      )
+    } finally {
+      exportInFlightRef.current = false
+      setExportAction(null)
+    }
+  }, [imageFileName, preparedShareFile])
 
   if (!chart || !birthInfo) {
     return (
@@ -142,11 +315,14 @@ export function ShareCard() {
   }
 
   return (
-    <div className="space-y-6 max-w-lg mx-auto">
+    <div className="-mx-1 max-w-lg space-y-6 sm:mx-auto">
       {/* Hint */}
       {!extractedQuote && (
         <div className="text-center text-text-muted text-sm px-4">
-          <p>💡 Get your AI reading first and a quote will be pulled from it automatically.</p>
+          <p>
+            💡 Use the default line or customize it below. If an AI narrative is
+            available, its opening is used automatically.
+          </p>
         </div>
       )}
 
@@ -232,11 +408,17 @@ export function ShareCard() {
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div
               style={{
-                fontSize: '19px',
-                lineHeight: '1.8',
+                width: '100%',
+                maxWidth: '288px',
+                fontSize: '18px',
+                lineHeight: '1.6',
                 color: '#F3ECDD',
                 whiteSpace: 'pre-line',
-                fontFamily: FONT_DISPLAY,
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
+                letterSpacing: '0',
+                wordSpacing: '0.08em',
+                fontFamily: FONT_QUOTE,
                 fontStyle: 'italic',
                 textAlign: 'center',
                 padding: '0 16px',
@@ -314,24 +496,37 @@ export function ShareCard() {
         {isEditing ? (
           <div className="space-y-2">
             <textarea
-              value={customQuote}
-              onChange={(e) => setCustomQuote(e.target.value)}
+              aria-label="Custom quote"
+              aria-describedby="share-card-quote-count"
+              maxLength={MAX_CUSTOM_QUOTE_LENGTH}
+              value={quoteDraft}
+              onChange={(e) => setQuoteDraft(
+                e.target.value.slice(0, MAX_CUSTOM_QUOTE_LENGTH),
+              )}
               placeholder="Write your own quote — line breaks are kept..."
               className="w-full h-24 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-text placeholder:text-text-muted focus:outline-none focus:border-gold/30 resize-none"
               style={{ fontFamily: FONT_DISPLAY }}
             />
-            <div className="flex gap-2">
-              <Button size="sm" variant="ghost" onClick={() => setIsEditing(false)}>
-                Cancel
-              </Button>
-              <Button size="sm" onClick={() => setIsEditing(false)}>
-                Done
-              </Button>
+            <div className="flex items-center justify-between gap-3">
+              <p
+                id="share-card-quote-count"
+                className="text-xs text-text-muted"
+              >
+                {quoteDraft.length} / {MAX_CUSTOM_QUOTE_LENGTH}
+              </p>
+              <div className="flex gap-2">
+                <Button size="sm" variant="ghost" onClick={cancelEditing}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={saveEditing}>
+                  Done
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
           <button
-            onClick={() => setIsEditing(true)}
+            onClick={startEditing}
             className="w-full py-2 text-sm text-text-muted hover:text-text-secondary transition-colors"
           >
             ✎ Customize the quote
@@ -339,25 +534,82 @@ export function ShareCard() {
         )}
       </div>
 
-      {/* Download */}
-      <Button
-        onClick={handleDownload}
-        disabled={generating}
-        className="w-full"
-        variant="gold"
+      {/* Local export actions */}
+      <div
+        className={`grid gap-3 ${
+          nativeImageShareAvailable ? 'sm:grid-cols-2' : ''
+        }`}
       >
-        {generating ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="w-4 h-4 border-2 border-night border-t-transparent rounded-full animate-spin" />
-            Generating...
-          </span>
-        ) : (
-          'Save Share Image'
+        <Button
+          onClick={handleDownload}
+          disabled={exportAction !== null}
+          aria-describedby={downloadError ? 'share-card-download-error' : undefined}
+          className="w-full"
+          variant="gold"
+        >
+          {exportAction === 'download' ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="w-4 h-4 border-2 border-night border-t-transparent rounded-full animate-spin" />
+              Generating...
+            </span>
+          ) : (
+            'Save Share Image'
+          )}
+        </Button>
+
+        {nativeImageShareAvailable && (
+          <Button
+            onClick={handleNativeShare}
+            disabled={exportAction !== null}
+            aria-describedby={
+              shareFeedback !== 'idle' ? 'share-card-share-feedback' : undefined
+            }
+            className="w-full"
+            variant="secondary"
+          >
+            {exportAction === 'share'
+              ? 'Preparing...'
+              : preparedShareFile
+                ? 'Open Share Sheet'
+                : 'Share Image'}
+          </Button>
         )}
-      </Button>
+      </div>
+
+      {downloadError && (
+        <p
+          id="share-card-download-error"
+          role="alert"
+          className="rounded-lg border border-misfortune/20 bg-misfortune/10 px-4 py-3 text-center text-sm text-misfortune"
+        >
+          {downloadError}
+        </p>
+      )}
+
+      {shareFeedback === 'ready' && (
+        <p
+          id="share-card-share-feedback"
+          role="status"
+          className="rounded-lg border border-gold/20 bg-gold/10 px-4 py-3 text-center text-sm text-text-secondary"
+        >
+          Your image is ready. Tap Open Share Sheet to choose an app.
+        </p>
+      )}
+
+      {shareFeedback === 'error' && shareError && (
+        <p
+          id="share-card-share-feedback"
+          role="alert"
+          className="rounded-lg border border-misfortune/20 bg-misfortune/10 px-4 py-3 text-center text-sm text-misfortune"
+        >
+          {shareError}
+        </p>
+      )}
 
       <p className="text-center text-text-muted text-xs">
-        Save the image and share it anywhere ✨
+        {nativeImageShareAvailable
+          ? 'Save the image or send it through your device share sheet.'
+          : 'Save the image and share it anywhere.'}
       </p>
     </div>
   )

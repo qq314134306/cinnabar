@@ -1,37 +1,492 @@
-name: Sync zwknows deployment repository
+name: Cinnabar candidate verification
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
-  group: sync-zwknows-main
+  group: candidate-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  sync:
-    if: github.repository == 'ruijayfeng/ziwei'
+  verify:
+    name: Verify candidate
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ENABLE_FUTURE_REPORT_PAYMENTS: 'false'
+      VITE_ENABLE_FUTURE_REPORT_PAYMENTS: 'false'
+      ENABLE_PUBLIC_AI_READINGS: 'false'
+      VITE_ENABLE_PUBLIC_AI_READINGS: 'false'
+      AUTH_MODE: legacy
 
     steps:
-      - name: Check out source repository
+      - name: Check out candidate
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Push main to zwknows
-        env:
-          ZWKNOWS_SYNC_TOKEN: ${{ secrets.ZWKNOWS_SYNC_TOKEN }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Assert payment and public AI feature flags are closed
+        shell: bash
         run: |
-          if [ -z "$ZWKNOWS_SYNC_TOKEN" ]; then
-            echo "ZWKNOWS_SYNC_TOKEN is not configured."
+          test "$ENABLE_FUTURE_REPORT_PAYMENTS" = "false"
+          test "$VITE_ENABLE_FUTURE_REPORT_PAYMENTS" = "false"
+          test "$ENABLE_PUBLIC_AI_READINGS" = "false"
+          test "$VITE_ENABLE_PUBLIC_AI_READINGS" = "false"
+
+      - name: Install locked dependencies
+        working-directory: app
+        run: npm ci
+
+      - name: Audit locked dependencies
+        working-directory: app
+        run: npm audit --audit-level=moderate
+
+      - name: Lint
+        working-directory: app
+        run: npm run lint
+
+      - name: Test
+        working-directory: app
+        run: npm run test
+
+      - name: Build with payments and public AI disabled
+        working-directory: app
+        run: npm run build
+
+      - name: Check candidate whitespace
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            git diff --check "$BASE_SHA...HEAD"
+          elif [ "$GITHUB_EVENT_NAME" = "push" ] &&
+               [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ] &&
+               git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            git diff --check "$BEFORE_SHA...HEAD"
+          else
+            git show --check --format= HEAD
+          fi
+
+  database-proof:
+    name: Prove database migrations on fresh Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out candidate without persisted credentials
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Initialize sanitized proof summary v2
+        shell: pwsh
+        env:
+          CINNABAR_PROOF_SUMMARY: ${{ runner.temp }}/cinnabar-database-proof-summary.json
+          CINNABAR_SOURCE_COMMIT: ${{ github.sha }}
+          CINNABAR_RUN_ID: ${{ github.run_id }}
+          CINNABAR_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          . ./supabase/tests/release-proof-common.ps1
+          $candidateMigrations = @(
+            '20260723000000_credit_ledger.sql',
+            '20260723010000_future_report_payments.sql',
+            '20260723020000_paypal_webhook_reconciliation.sql',
+            '20260723030000_future_report_server_chart.sql',
+            '20260723040000_opaque_auth_sessions.sql',
+            '20260723050000_auth_login_transactions.sql',
+            '20260723060000_public_ai_quota.sql'
+          )
+          $candidateSha256 = Get-CinnabarMigrationSetSha256 `
+            -MigrationsDirectory ./supabase/migrations `
+            -MigrationNames $candidateMigrations
+          $summary = [ordered]@{
+            schemaVersion = 'cinnabar.release-proof.v2'
+            environment = 'test'
+            mode = 'Fresh'
+            executionContext = 'github-actions'
+            sourceCommit = $env:CINNABAR_SOURCE_COMMIT.ToLowerInvariant()
+            runId = $env:CINNABAR_RUN_ID
+            runAttempt = [int]$env:CINNABAR_RUN_ATTEMPT
+            candidateMigrationsSha256 = $candidateSha256
+            supabaseCliVersion = '2.84.2'
+            success = $false
+            failureCode = 'CI_DATABASE_PROOF_NOT_COMPLETED'
+            startedAt = [DateTime]::UtcNow.ToString('o')
+            finishedAt = [DateTime]::UtcNow.ToString('o')
+            steps = @()
+            cleanup = [ordered]@{
+              required = $true
+              status = 'pending'
+              durationMs = $null
+            }
+          } | ConvertTo-Json -Depth 6
+          [System.IO.File]::WriteAllText(
+            $env:CINNABAR_PROOF_SUMMARY,
+            $summary,
+            [System.Text.UTF8Encoding]::new($false)
+          )
+
+      - name: Set up pinned Supabase CLI
+        uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+
+      - name: Install PostgreSQL client
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends postgresql-client
+
+      - name: Start isolated fresh Supabase database
+        id: database_start
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          database_workdir="$RUNNER_TEMP/cinnabar-database-proof"
+          mkdir -p "$database_workdir"
+          cd "$database_workdir"
+          supabase init
+          if ! supabase db start >"$RUNNER_TEMP/supabase-db-start.log" 2>&1; then
+            echo "Isolated Supabase database failed to start."
             exit 1
           fi
 
-          git remote add zwknows-sync "https://x-access-token:${ZWKNOWS_SYNC_TOKEN}@github.com/ruijayfeng/zwknows.git"
-          git fetch zwknows-sync main
-          EXPECTED_ZWKNOWS_HEAD="$(git rev-parse FETCH_HEAD)"
-          git push --force-with-lease=refs/heads/main:${EXPECTED_ZWKNOWS_HEAD} zwknows-sync HEAD:main
+      - name: Mark disposable database and run Fresh release proof
+        id: release_proof
+        if: steps.database_start.outcome == 'success'
+        continue-on-error: true
+        shell: pwsh
+        env:
+          CINNABAR_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+          CINNABAR_PROOF_SUMMARY: ${{ runner.temp }}/cinnabar-database-proof-summary.json
+          CINNABAR_SOURCE_COMMIT: ${{ github.sha }}
+          CINNABAR_RUN_ID: ${{ github.run_id }}
+          CINNABAR_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $actualSupabaseCliVersion = (
+            & supabase --version | Out-String
+          ).Trim()
+          if ($LASTEXITCODE -ne 0 -or
+              $actualSupabaseCliVersion -cne '2.84.2') {
+            throw 'SUPABASE_CLI_VERSION_MISMATCH'
+          }
+
+          $databaseUri = [System.Uri]$env:CINNABAR_DATABASE_URL
+          $userInfo = @($databaseUri.UserInfo -split ':', 2)
+          $env:PGHOST = $databaseUri.Host
+          $env:PGPORT = $databaseUri.Port.ToString()
+          $env:PGDATABASE = $databaseUri.AbsolutePath.TrimStart('/')
+          $env:PGUSER = [System.Uri]::UnescapeDataString($userInfo[0])
+          $env:PGPASSWORD = [System.Uri]::UnescapeDataString($userInfo[1])
+          $env:PGSSLMODE = 'disable'
+          $proofOwner = $env:PGUSER
+          $markerExitCode = 1
+          try {
+            $env:PGUSER = 'supabase_admin'
+            'alter database postgres set "cinnabar.environment" = ''test'';' |
+              & psql -X -q -v ON_ERROR_STOP=1
+            $markerExitCode = $LASTEXITCODE
+          } finally {
+            $env:PGUSER = $proofOwner
+          }
+          if ($markerExitCode -ne 0) {
+            throw 'DATABASE_MARKER_FAILED'
+          }
+
+          & ./supabase/tests/invoke-release-proof.ps1 `
+            -DatabaseUrl $env:CINNABAR_DATABASE_URL `
+            -Environment test `
+            -ExpectedDatabaseName postgres `
+            -Mode Fresh `
+            -ConfirmDisposableDatabase `
+            -SummaryPath $env:CINNABAR_PROOF_SUMMARY `
+            -SourceCommit $env:CINNABAR_SOURCE_COMMIT `
+            -RunId $env:CINNABAR_RUN_ID `
+            -RunAttempt ([int]$env:CINNABAR_RUN_ATTEMPT) `
+            -SupabaseCliVersion $actualSupabaseCliVersion `
+            -CleanupRequired
+          if ($LASTEXITCODE -ne 0) {
+            throw 'DATABASE_RELEASE_PROOF_FAILED'
+          }
+
+      - name: Stop isolated Supabase and finalize cleanup summary
+        id: database_cleanup
+        if: always()
+        continue-on-error: true
+        shell: pwsh
+        env:
+          CINNABAR_PROOF_SUMMARY: ${{ runner.temp }}/cinnabar-database-proof-summary.json
+          CINNABAR_START_OUTCOME: ${{ steps.database_start.outcome }}
+          CINNABAR_PROOF_OUTCOME: ${{ steps.release_proof.outcome }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $databaseWorkdir = Join-Path $env:RUNNER_TEMP 'cinnabar-database-proof'
+          $configPath = Join-Path $databaseWorkdir 'supabase/config.toml'
+          $cleanupTimer = [System.Diagnostics.Stopwatch]::StartNew()
+          $cleanupSucceeded = $true
+          if (Test-Path -LiteralPath $configPath -PathType Leaf) {
+            Push-Location $databaseWorkdir
+            try {
+              & supabase stop --no-backup 2>&1 | Out-String | Out-Null
+              if ($LASTEXITCODE -ne 0) {
+                $cleanupSucceeded = $false
+              }
+            } catch {
+              $cleanupSucceeded = $false
+            } finally {
+              Pop-Location
+            }
+          } elseif ($env:CINNABAR_START_OUTCOME -eq 'success') {
+            $cleanupSucceeded = $false
+          }
+          $cleanupTimer.Stop()
+
+          if (-not (Test-Path -LiteralPath $env:CINNABAR_PROOF_SUMMARY -PathType Leaf)) {
+            throw 'CI_DATABASE_PROOF_SUMMARY_MISSING'
+          }
+          $summary = Get-Content -Raw -LiteralPath $env:CINNABAR_PROOF_SUMMARY |
+            ConvertFrom-Json -AsHashtable
+          $summary.cleanup = [ordered]@{
+            required = $true
+            status = if ($cleanupSucceeded) { 'pass' } else { 'fail' }
+            durationMs = $cleanupTimer.ElapsedMilliseconds
+          }
+          $summary.finishedAt = [DateTime]::UtcNow.ToString('o')
+
+          $allProofStepsPassed = (
+            @($summary.steps).Count -gt 0 -and
+            @($summary.steps | Where-Object { $_.status -cne 'pass' }).Count -eq 0
+          )
+          if (-not $cleanupSucceeded) {
+            $summary.success = $false
+            $summary.failureCode = 'CI_DATABASE_CLEANUP_FAILED'
+          } elseif ($env:CINNABAR_START_OUTCOME -ne 'success') {
+            $summary.success = $false
+            $summary.failureCode = 'CI_DATABASE_START_FAILED'
+          } elseif ($env:CINNABAR_PROOF_OUTCOME -ne 'success') {
+            $summary.success = $false
+            if (-not $summary.failureCode -or
+                $summary.failureCode -in @(
+                  'CI_DATABASE_PROOF_NOT_COMPLETED',
+                  'CI_DATABASE_CLEANUP_NOT_COMPLETED'
+                )) {
+              $summary.failureCode = 'CI_DATABASE_PROOF_FAILED'
+            }
+          } elseif (-not $allProofStepsPassed) {
+            $summary.success = $false
+            $summary.failureCode = 'CI_DATABASE_PROOF_SUMMARY_INCOMPLETE'
+          } else {
+            $summary.success = $true
+            $summary.failureCode = $null
+          }
+          $summaryJson = $summary | ConvertTo-Json -Depth 6
+          [System.IO.File]::WriteAllText(
+            $env:CINNABAR_PROOF_SUMMARY,
+            $summaryJson,
+            [System.Text.UTF8Encoding]::new($false)
+          )
+          if (-not $cleanupSucceeded) {
+            throw 'CI_DATABASE_CLEANUP_FAILED'
+          }
+
+      - name: Validate finalized sanitized database proof
+        id: validate_proof
+        if: always()
+        continue-on-error: true
+        shell: pwsh
+        env:
+          CINNABAR_PROOF_SUMMARY: ${{ runner.temp }}/cinnabar-database-proof-summary.json
+          CINNABAR_SOURCE_COMMIT: ${{ github.sha }}
+          CINNABAR_RUN_ID: ${{ github.run_id }}
+          CINNABAR_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          function Assert-ExactKeys {
+            param(
+              [hashtable]$Value,
+              [string[]]$Expected,
+              [string]$FailureCode
+            )
+            $actualKeys = @($Value.Keys | Sort-Object)
+            $expectedKeys = @($Expected | Sort-Object)
+            if (($actualKeys -join "`n") -cne ($expectedKeys -join "`n")) {
+              throw $FailureCode
+            }
+          }
+          function Test-NonNegativeJsonInteger {
+            param([object]$Value)
+            return (
+              ($Value -is [int] -or $Value -is [long]) -and
+              [long]$Value -ge 0
+            )
+          }
+
+          $summaryText = Get-Content -Raw -LiteralPath $env:CINNABAR_PROOF_SUMMARY
+          if ($summaryText.Length -gt 32768) {
+            throw 'PROOF_SUMMARY_TOO_LARGE'
+          }
+          if ($summaryText -notmatch
+              '"startedAt"\s*:\s*"\d{4}-\d{2}-\d{2}T[^"\r\n]*Z"' -or
+              $summaryText -notmatch
+              '"finishedAt"\s*:\s*"\d{4}-\d{2}-\d{2}T[^"\r\n]*Z"') {
+            throw 'PROOF_SUMMARY_TIMESTAMPS_INVALID'
+          }
+          $summary = $summaryText | ConvertFrom-Json -AsHashtable
+          Assert-ExactKeys $summary @(
+            'schemaVersion',
+            'environment',
+            'mode',
+            'executionContext',
+            'sourceCommit',
+            'runId',
+            'runAttempt',
+            'candidateMigrationsSha256',
+            'supabaseCliVersion',
+            'success',
+            'failureCode',
+            'startedAt',
+            'finishedAt',
+            'steps',
+            'cleanup'
+          ) 'PROOF_SUMMARY_TOP_LEVEL_FIELDS_INVALID'
+          if ($summary.schemaVersion -cne 'cinnabar.release-proof.v2' -or
+              $summary.environment -cne 'test' -or
+              $summary.mode -cne 'Fresh' -or
+              $summary.executionContext -cne 'github-actions') {
+            throw 'PROOF_SUMMARY_CONTEXT_INVALID'
+          }
+          if ($summary.sourceCommit -cne $env:CINNABAR_SOURCE_COMMIT.ToLowerInvariant() -or
+              $summary.sourceCommit -notmatch '^[0-9a-f]{40}$' -or
+              $summary.runId -cne $env:CINNABAR_RUN_ID -or
+              $summary.runId -notmatch '^[1-9][0-9]{0,19}$' -or
+              -not (Test-NonNegativeJsonInteger $summary.runAttempt) -or
+              [long]$summary.runAttempt -lt 1 -or
+              [long]$summary.runAttempt -ne [long]$env:CINNABAR_RUN_ATTEMPT) {
+            throw 'PROOF_SUMMARY_RUN_BINDING_INVALID'
+          }
+
+          . ./supabase/tests/release-proof-common.ps1
+          $candidateMigrations = @(
+            '20260723000000_credit_ledger.sql',
+            '20260723010000_future_report_payments.sql',
+            '20260723020000_paypal_webhook_reconciliation.sql',
+            '20260723030000_future_report_server_chart.sql',
+            '20260723040000_opaque_auth_sessions.sql',
+            '20260723050000_auth_login_transactions.sql',
+            '20260723060000_public_ai_quota.sql'
+          )
+          $expectedCandidateSha256 = Get-CinnabarMigrationSetSha256 `
+            -MigrationsDirectory ./supabase/migrations `
+            -MigrationNames $candidateMigrations
+          if ($summary.candidateMigrationsSha256 -cne $expectedCandidateSha256 -or
+              $summary.candidateMigrationsSha256 -notmatch '^[0-9a-f]{64}$' -or
+              $summary.supabaseCliVersion -cne '2.84.2') {
+            throw 'PROOF_SUMMARY_TOOLCHAIN_BINDING_INVALID'
+          }
+
+          Assert-ExactKeys $summary.cleanup @(
+            'required', 'status', 'durationMs'
+          ) 'PROOF_SUMMARY_CLEANUP_FIELDS_INVALID'
+          if ($summary.cleanup.required -isnot [bool] -or
+              $summary.cleanup.required -cne $true -or
+              $summary.cleanup.status -cne 'pass' -or
+              -not (Test-NonNegativeJsonInteger $summary.cleanup.durationMs)) {
+            throw 'PROOF_SUMMARY_CLEANUP_INVALID'
+          }
+          $expectedSteps = @(
+            'proof-metadata',
+            'target-guard',
+            'supabase-prerequisites',
+            'baseline-state',
+            'migration-transaction',
+            'migrated-state',
+            'sql-test:credit_ledger.sql',
+            'sql-test:future_report_payments.sql',
+            'sql-test:paypal_webhook_reconciliation.sql',
+            'sql-test:opaque_auth_sessions.sql',
+            'sql-test:auth_login_transactions.sql',
+            'sql-test:public_ai_quota.sql',
+            'credit-ledger-concurrency'
+          )
+          if (@($summary.steps).Count -ne $expectedSteps.Count) {
+            throw 'PROOF_SUMMARY_STEP_COUNT_INVALID'
+          }
+          for ($index = 0; $index -lt $expectedSteps.Count; $index++) {
+            $step = $summary.steps[$index]
+            Assert-ExactKeys $step @(
+              'name', 'status', 'durationMs'
+            ) 'PROOF_SUMMARY_STEP_FIELDS_INVALID'
+            if ($step.name -cne $expectedSteps[$index] -or
+                $step.status -cne 'pass' -or
+                -not (Test-NonNegativeJsonInteger $step.durationMs)) {
+              throw 'PROOF_SUMMARY_STEP_INVALID'
+            }
+          }
+          $startedAt = [DateTimeOffset]::MinValue
+          $finishedAt = [DateTimeOffset]::MinValue
+          if (-not [DateTimeOffset]::TryParse(
+              [string]$summary.startedAt,
+              [Globalization.CultureInfo]::InvariantCulture,
+              [Globalization.DateTimeStyles]::RoundtripKind,
+              [ref]$startedAt
+            ) -or
+            -not [DateTimeOffset]::TryParse(
+              [string]$summary.finishedAt,
+              [Globalization.CultureInfo]::InvariantCulture,
+              [Globalization.DateTimeStyles]::RoundtripKind,
+              [ref]$finishedAt
+            ) -or
+            $finishedAt -lt $startedAt) {
+            throw 'PROOF_SUMMARY_TIMESTAMPS_INVALID'
+          }
+          if ($summary.success -isnot [bool] -or
+              $summary.success -cne $true -or
+              $null -ne $summary.failureCode) {
+            throw 'PROOF_SUMMARY_SUCCESS_INVALID'
+          }
+
+      - name: Upload finalized sanitized database proof
+        id: upload_proof
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: cinnabar-database-proof
+          path: ${{ runner.temp }}/cinnabar-database-proof-summary.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Enforce database proof final gate
+        if: always()
+        shell: bash
+        env:
+          CINNABAR_VALIDATE_OUTCOME: ${{ steps.validate_proof.outcome }}
+          CINNABAR_UPLOAD_OUTCOME: ${{ steps.upload_proof.outcome }}
+        run: |
+          set -euo pipefail
+          test "$CINNABAR_VALIDATE_OUTCOME" = "success"
+          test "$CINNABAR_UPLOAD_OUTCOME" = "success"

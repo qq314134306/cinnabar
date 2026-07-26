@@ -1,0 +1,305 @@
+openapi: 3.1.0
+info:
+  title: Cinnabar Credits API
+  version: 2026-07-23.v1
+  description: >-
+    Public credit catalog and authenticated, read-only credit account contract.
+    Credit purchasing, standalone debits, payment capture, and product
+    generation are outside this API.
+servers:
+  - url: /
+paths:
+  /api/credits/catalog:
+    get:
+      operationId: getCreditCatalog
+      summary: Read the public, versioned credit contract
+      responses:
+        "200":
+          description: Current catalog
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/CreditCatalog"
+        "405":
+          $ref: "#/components/responses/MethodNotAllowed"
+  /api/credits/account:
+    get:
+      operationId: getCreditAccount
+      summary: Read the signed-in user's balance and ledger
+      description: >-
+        User identity is derived from the validated opaque HttpOnly session.
+        During legacy/dual rollback only, a validated Supabase Bearer token is
+        accepted when no opaque cookie is present. If dual-mode cookie and
+        Bearer identities conflict, the request is rejected. Request body or
+        query user identifiers are not accepted. Reads have a best-effort 30
+        requests/minute user limit inside each warm Edge isolate. Cold starts
+        and horizontal instances have independent buckets; this is an abuse
+        guard, not a global quota or authorization control.
+      security:
+        - opaqueSession: []
+        - supabaseBearer: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Canonical base-10 integer with no sign or leading zero.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          required: false
+          description: >-
+            Canonical positive PostgreSQL bigint ledger ID, from 1 through
+            9223372036854775807.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 19
+            pattern: "^[1-9][0-9]{0,18}$"
+      responses:
+        "200":
+          description: Owner-scoped account page
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+            X-Request-ID:
+              schema:
+                $ref: "#/components/schemas/RequestId"
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: "#/components/schemas/CreditAccount"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "405":
+          $ref: "#/components/responses/MethodNotAllowed"
+        "409":
+          $ref: "#/components/responses/IdentityConflict"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+components:
+  securitySchemes:
+    opaqueSession:
+      type: apiKey
+      in: cookie
+      name: __Host-cinnabar_sid
+    supabaseBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Transitional legacy/dual rollback only.
+  schemas:
+    CreditCatalog:
+      type: object
+      additionalProperties: false
+      required:
+        - schema_version
+        - catalog_version
+        - registration_grant_credits
+        - credit_expiration
+        - packs
+        - products
+      properties:
+        schema_version:
+          type: integer
+          const: 1
+        catalog_version:
+          type: string
+          const: 2026-07-23.v1
+        registration_grant_credits:
+          type: integer
+          const: 30
+        credit_expiration:
+          type: string
+          const: never
+        packs:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/CreditPack"
+        products:
+          type: array
+          minItems: 2
+          maxItems: 2
+          items:
+            $ref: "#/components/schemas/CreditProduct"
+    CreditPack:
+      type: object
+      additionalProperties: false
+      required: [id, credits, price]
+      properties:
+        id:
+          type: string
+          enum: [credits_100, credits_250, credits_550]
+        credits:
+          type: integer
+          enum: [100, 250, 550]
+        price:
+          type: object
+          additionalProperties: false
+          required: [currency, minor_units, display]
+          properties:
+            currency:
+              type: string
+              const: USD
+            minor_units:
+              type: integer
+              enum: [490, 990, 1990]
+            display:
+              type: string
+              enum: [$4.90, $9.90, $19.90]
+    CreditProduct:
+      type: object
+      additionalProperties: false
+      required: [id, credit_cost]
+      properties:
+        id:
+          type: string
+          enum: [love_pattern, year_flow_snapshot]
+        credit_cost:
+          type: integer
+          enum: [100, 180]
+    CreditAccount:
+      type: object
+      additionalProperties: false
+      required:
+        - catalog_version
+        - credit_expiration
+        - balance
+        - entries
+        - next_cursor
+      properties:
+        catalog_version:
+          type: string
+          const: 2026-07-23.v1
+        credit_expiration:
+          type: string
+          const: never
+        balance:
+          type: integer
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreditLedgerEntry"
+        next_cursor:
+          type: [string, "null"]
+          maxLength: 19
+          pattern: "^[1-9][0-9]{0,18}$"
+          description: Null or a value no greater than 9223372036854775807.
+    CreditLedgerEntry:
+      type: object
+      additionalProperties: false
+      required: [id, amount, type, created_at]
+      properties:
+        id:
+          type: string
+          maxLength: 19
+          pattern: "^[1-9][0-9]{0,18}$"
+          description: Value is no greater than 9223372036854775807.
+        amount:
+          type: integer
+        type:
+          type: string
+          enum: [registration_grant, debit]
+        created_at:
+          type: string
+          format: date-time
+    RequestId:
+      oneOf:
+        - type: string
+          format: uuid
+        - type: string
+          pattern: "^[0-7][0-9A-HJKMNP-TV-Z]{25}$"
+      description: >-
+        A valid caller UUID/ULID is echoed. Any other X-Request-ID is discarded
+        and replaced by a server-generated UUID.
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, request_id]
+          properties:
+            code:
+              type: string
+              enum:
+                - method_not_allowed
+                - invalid_pagination
+                - authentication_required
+                - invalid_session
+                - identity_conflict
+                - service_unavailable
+                - rate_limited
+                - internal_error
+            message:
+              type: string
+            request_id:
+              $ref: "#/components/schemas/RequestId"
+  responses:
+    BadRequest:
+      description: Invalid pagination
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Unauthorized:
+      description: Missing, invalid, or expired application session
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    MethodNotAllowed:
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    IdentityConflict:
+      description: Dual-mode opaque cookie and Bearer identities disagree
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    RateLimited:
+      description: Best-effort warm-isolate request limit exceeded
+      headers:
+        Retry-After:
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    ServiceUnavailable:
+      description: Credits service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"

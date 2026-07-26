@@ -79,6 +79,37 @@ export async function findBirthplaceAsync(input?: string): Promise<Birthplace | 
   return findBirthplaceInData(input, birthplaces)
 }
 
+export function isExactBirthplaceMatch(
+  query: string,
+  place: Birthplace,
+): boolean {
+  if (/[\u3400-\u9fff]/u.test(query)) {
+    const normalized = query.trim().replace(/\s+/gu, '')
+    const candidates = [
+      place.name,
+      place.province,
+      place.city,
+      place.area,
+      [place.province, place.city].filter(Boolean).join(''),
+      [place.city, place.area].filter(Boolean).join(''),
+      [place.province, place.city, place.area].filter(Boolean).join(''),
+    ]
+      .filter((candidate): candidate is string => Boolean(candidate))
+      .map((candidate) => candidate.trim().replace(/\s+/gu, ''))
+
+    return candidates.some((candidate) => (
+      candidate === normalized
+      || stripAdministrativeSuffix(candidate) === stripAdministrativeSuffix(normalized)
+    ))
+  }
+
+  const normalized = normalizeLatin(query)
+  return Boolean(
+    normalized
+    && place.latinKeys?.some((candidate) => candidate === normalized),
+  )
+}
+
 export function findBirthplaceInData(input: string | undefined, birthplaces: Birthplace[]): Birthplace | null {
   const normalized = normalizePlace(input)
   if (!normalized) return null
@@ -130,6 +161,9 @@ function scoreLatinMatch(query: string, place: Birthplace): number {
 }
 
 export async function resolveBirthTimeAsync(input: ResolveBirthTimeInput): Promise<ResolvedBirthTime> {
+  if (!input.enabled || !input.birthplace?.trim()) {
+    return resolveBirthTime({ ...input, birthplaces: [] })
+  }
   const birthplaces = await loadBirthplaceData()
   return resolveBirthTime({ ...input, birthplaces })
 }
@@ -140,7 +174,16 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   const location = findBirthplaceInData(input.birthplace, input.birthplaces ?? [])
   const shouldApply = input.enabled && location !== null
 
-  const baseDate = new Date(input.year, input.month - 1, input.day, input.hour, REPRESENTATIVE_MINUTE)
+  // Treat the entered values as timezone-free wall-clock fields. UTC getters
+  // make the same birth input resolve identically in a browser, Node test, and
+  // a Vercel Edge isolate regardless of the host machine's timezone/DST.
+  const baseDate = new Date(Date.UTC(
+    input.year,
+    input.month - 1,
+    input.day,
+    input.hour,
+    REPRESENTATIVE_MINUTE,
+  ))
   const correctionMinutes = shouldApply
     ? getTrueSolarCorrectionMinutes(input.year, input.month, input.day, input.hour, location)
     : 0
@@ -151,11 +194,11 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
   const correctedShichen = shichenNameForTimeIndex(timeIndex)
 
   return {
-    year: correctedDate.getFullYear(),
-    month: correctedDate.getMonth() + 1,
-    day: correctedDate.getDate(),
-    hour: correctedDate.getHours(),
-    minute: correctedDate.getMinutes(),
+    year: correctedDate.getUTCFullYear(),
+    month: correctedDate.getUTCMonth() + 1,
+    day: correctedDate.getUTCDate(),
+    hour: correctedDate.getUTCHours(),
+    minute: correctedDate.getUTCMinutes(),
     timeIndex,
     originalShichen,
     correctedShichen,
@@ -169,8 +212,15 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
 let birthplaceIndexPromise: Promise<Birthplace[]> | null = null
 
 async function loadBirthplaceData(): Promise<Birthplace[]> {
-  birthplaceIndexPromise ??= buildBirthplaceIndex()
-  return birthplaceIndexPromise
+  const request = birthplaceIndexPromise ??= buildBirthplaceIndex()
+  try {
+    return await request
+  } catch (error) {
+    if (birthplaceIndexPromise === request) {
+      birthplaceIndexPromise = null
+    }
+    throw error
+  }
 }
 
 async function buildBirthplaceIndex(): Promise<Birthplace[]> {
@@ -333,9 +383,9 @@ function offsetAtInstant(tz: string, instantMs: number): number {
 }
 
 function getEquationOfTimeMinutes(year: number, month: number, day: number): number {
-  const date = new Date(year, month - 1, day)
-  const start = new Date(year, 0, 0)
-  const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86_400_000)
+  const date = Date.UTC(year, month - 1, day)
+  const start = Date.UTC(year, 0, 0)
+  const dayOfYear = Math.floor((date - start) / 86_400_000)
   const b = (2 * Math.PI * (dayOfYear - 81)) / 364
 
   return 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b)
@@ -348,7 +398,7 @@ function hourToTimeIndex(hour: number): number {
 }
 
 function dateToTimeIndex(date: Date): number {
-  const hour = date.getHours()
+  const hour = date.getUTCHours()
   if (hour === 23) return 12
   if (hour === 0) return 0
   return Math.floor((hour + 1) / 2)
@@ -356,8 +406,8 @@ function dateToTimeIndex(date: Date): number {
 
 function isDifferentDate(input: ResolveBirthTimeInput, date: Date): boolean {
   return (
-    input.year !== date.getFullYear()
-    || input.month !== date.getMonth() + 1
-    || input.day !== date.getDate()
+    input.year !== date.getUTCFullYear()
+    || input.month !== date.getUTCMonth() + 1
+    || input.day !== date.getUTCDate()
   )
 }

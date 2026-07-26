@@ -1,4 +1,4 @@
-const GITHUB_REPOSITORY_URL = 'https://github.com/ruijayfeng/ziwei'
+const GITHUB_REPOSITORY_URL = 'https://github.com/qq314134306/cinnabar'
 const LICENSE_URL = `${GITHUB_REPOSITORY_URL}/blob/main/LICENSE`
 
 function GitHubIcon({ className = 'h-5 w-5' }: { className?: string }) {
@@ -41,6 +41,13 @@ export function GitHubLinkButton() {
 export function OpenSourceFooterLinks() {
   return (
     <span className="inline-flex items-center gap-2">
+      <a
+        href="/learn/what-is-zi-wei-dou-shu"
+        className="text-text-secondary hover:text-text transition-colors"
+      >
+        Learn
+      </a>
+      <span className="text-text-muted/60">/</span>
       <a
         href={GITHUB_REPOSITORY_URL}
         target="_blank"

@@ -18,28 +18,22 @@ If the task touches deployment, also read `docs/dev/workflow.md`.
 
 Ziwei is a React + TypeScript + Vite Zi Wei Dou Shu charting application. It
 combines chart generation, true solar time correction, birthplace coordinate
-matching, structured knowledge retrieval, AI interpretation, and deployment
-through a mirrored Vercel repository.
+matching, structured knowledge retrieval, AI interpretation, and direct Vercel
+deployment from the canonical GitHub repository.
 
 ## Repository Map
 
 <directory>
 app/ - Web application source, tests, build config, and frontend assets.
 docs/ - User-facing docs, licenses, plans, and development memory.
-01-* / - Domain reference notes for chart calculation.
-02-* / - Domain reference notes for stars.
-03-* / - Domain reference notes for palaces.
-04-* / - Domain reference notes for sihua.
-05-* / - Domain reference notes for pattern judgment.
-06-* / - Domain reference notes for fortune cycles.
-99-* / - Source and reference collection.
-.github/workflows/ - CI and repository synchronization automation.
+supabase/ - Database migrations, auth email templates, and Release Proof tests.
+.github/workflows/ - Candidate verification and database-proof automation.
 </directory>
 
 <config>
 app/package.json - npm scripts and frontend dependencies.
 app/vite.config.ts - Vite build and test configuration.
-.github/workflows/sync-zwknows.yml - Mirrors `ruijayfeng/ziwei/main` to `ruijayfeng/zwknows/main`.
+.github/workflows/sync-zwknows.yml - Legacy-named pure candidate verification and Fresh database proof; it has no deployment or mirror job.
 </config>
 
 ## Commands
@@ -60,7 +54,6 @@ Useful repository checks from root:
 git status --short --branch
 git log --oneline -n 8
 git ls-remote origin refs/heads/main
-git ls-remote zwknows refs/heads/main
 ```
 
 ## Documentation Is Code
@@ -93,10 +86,41 @@ A change is not complete until code, tests, and documentation agree.
 
 ## Current Deployment Model
 
-`ruijayfeng/ziwei` is the source repository. `ruijayfeng/zwknows` is the
-deployment mirror used by Vercel. Pushes to `ziwei/main` trigger a GitHub Actions
-workflow that force-with-lease syncs `zwknows/main` using the
-`ZWKNOWS_SYNC_TOKEN` repository secret.
+`qq314134306/cinnabar` is the canonical source repository.
+Authenticated deployment inspection confirmed that Vercel reads that
+repository's `main` branch directly with `app` as its Root Directory. There is
+no deployment mirror in the current architecture.
+
+The intended release sequence is:
+
+1. Open a candidate pull request in the canonical repository.
+2. Require both the application `verify` job and isolated Fresh
+   `database-proof` job before merge.
+3. Merge the proven candidate into protected `main`; the exact `main` commit
+   starts both the pure verification workflow and Vercel's direct Git build.
+4. Hold production promotion or domain assignment behind Vercel Deployment
+   Checks, or an equivalent staged/manual promotion, until both checks for that
+   exact commit succeed and the sanitized database artifact is inspected.
+
+Vercel deployment is downstream of the candidate gate, not a replacement for
+it. The combination of branch protection and required pull-request checks
+prevents unverified merges, while deployment checks or staged promotion prevent
+the Vercel build and `main` Actions run from racing to production. The canonical
+fork's Actions are currently disabled and its Actions secrets are empty, so
+this candidate gate has no hosted execution evidence yet. The workflow itself
+is pure verification and needs no deployment credential; do not create or
+depend on a mirror PAT.
+
+Workflow configuration and local contract tests are not evidence that the
+hosted GitHub Actions run succeeded. Inspect the hosted run and its sanitized
+database-proof artifact before claiming the gates are operational or a release
+has proof. The current Vercel environment has the existing Supabase, Make, and
+DeepSeek variable names, but still lacks `APP_ORIGIN`, `AUTH_MODE`,
+`SESSION_ENCRYPTION_KEY`, and the complete public-AI enable/quota variable set.
+Never record their values in repository documentation. Keep public AI
+default-off and authentication on its rollback-safe legacy path until their
+separate migration, preview, and provider proofs pass. Future Report payments
+remain the final rollout stage and stay disabled.
 
 [PROTOCOL]: Update this file when the top-level architecture, commands, deployment
 model, or documentation contract changes.

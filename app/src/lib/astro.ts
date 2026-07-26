@@ -13,6 +13,7 @@
 import { astro } from 'iztro'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
 import { resolveBirthTime, type ResolvedBirthTime } from './true-solar-time'
+export { getShichenOptions, hourToShichen } from './shichen'
 
 /* ------------------------------------------------------------
    Global engine configuration
@@ -37,6 +38,10 @@ export interface BirthInfo {
   birthplace?: string
   trueSolarEnabled?: boolean
   resolvedBirthTime?: ResolvedBirthTime
+  /** Approximate times may position a chart but must never be presented as an exact hour pillar. */
+  birthTimeReliable?: boolean
+  /** True when `hour` is a temporary noon position used only to enter the all-block shortlist. */
+  birthTimeUnknown?: boolean
   isLeapMonth?: boolean
   fixLeap?: boolean
 }
@@ -61,34 +66,6 @@ export function generateChart(info: BirthInfo): FunctionalAstrolabe {
   const genderName = gender === 'male' ? '男' : '女'  // iztro accepts zh-CN gender tokens; output language stays zh-CN for internal keys
 
   return astro.bySolar(dateStr, timeIndex, genderName, fixLeap)
-}
-
-/* ------------------------------------------------------------
-   Traditional two-hour periods (shichen), labeled by zodiac animal
-   ------------------------------------------------------------ */
-
-const SHICHEN_ANIMALS = [
-  'Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake',
-  'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig',
-] as const
-
-export function hourToShichen(hour: number): string {
-  const index = Math.floor(((hour + 1) % 24) / 2)
-  return `${SHICHEN_ANIMALS[index]} Hour`
-}
-
-export function getShichenOptions() {
-  return SHICHEN_ANIMALS.map((animal, index) => {
-    const startHour = index === 0 ? 23 : (index * 2 - 1)
-    const endHour = index === 11 ? 22 : index === 0 ? 0 : (index * 2)
-    const range = index === 0
-      ? '23:00–00:59'
-      : `${String(startHour).padStart(2, '0')}:00–${String(endHour).padStart(2, '0')}:59`
-    return {
-      value: index === 0 ? 23 : index * 2,
-      label: `${range} (${animal} Hour)`,
-    }
-  })
 }
 
 /* ------------------------------------------------------------

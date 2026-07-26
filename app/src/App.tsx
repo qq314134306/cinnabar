@@ -3,23 +3,60 @@
    Eastern Astrology, in English.
    ============================================================ */
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { lazy, useEffect, useState, type ReactNode } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { BirthForm } from '@/components/BirthForm'
-import { ChartDisplay } from '@/components/chart'
-import { AIInterpretation } from '@/components/AIInterpretation'
-import { MatchAnalysis } from '@/components/match'
+import { LazySurface } from '@/components/LazySurface'
+import { KLineIcon } from '@/components/icons/KLineIcon'
 import { GitHubLinkButton, OpenSourceFooterLinks } from '@/components/OpenSourceLinks'
-import { ShareCard } from '@/components/share'
-import { ExitIntentModal } from '@/components/ExitIntentModal'
 import { AuthControl } from '@/components/AuthControl'
-import { useChartStore, useAuthStore } from '@/stores'
+import {
+  useChartStore,
+  useAuthStore,
+  useFutureReportActivityStore,
+} from '@/stores'
 import { trackPageView } from '@/lib/analytics'
 
-type TabType = 'chart' | 'match' | 'share'
+const AIInterpretation = lazy(async () => {
+  const module = await import('@/components/AIInterpretation')
+  return { default: module.AIInterpretation }
+})
 
-const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
+const ChartDisplay = lazy(async () => {
+  const module = await import('@/components/chart/ChartDisplay')
+  return { default: module.ChartDisplay }
+})
+
+const LifeKLine = lazy(async () => {
+  const module = await import('@/components/kline/LifeKLine')
+  return { default: module.LifeKLine }
+})
+
+const MatchAnalysis = lazy(async () => {
+  const module = await import('@/components/match/MatchAnalysis')
+  return { default: module.MatchAnalysis }
+})
+
+const ShareCard = lazy(async () => {
+  const module = await import('@/components/share/ShareCard')
+  return { default: module.ShareCard }
+})
+
+type TabType = 'chart' | 'timeline' | 'match' | 'share'
+
+const TABS: Array<{
+  key: TabType
+  label: string
+  mobileLabel?: string
+  icon: ReactNode
+}> = [
   { key: 'chart', label: 'Your Chart', icon: '☰' },
+  {
+    key: 'timeline',
+    label: 'Life Timeline',
+    mobileLabel: 'Timeline',
+    icon: <KLineIcon className="h-4 w-4" />,
+  },
   { key: 'match', label: 'Compatibility', icon: '⚭' },
   { key: 'share', label: 'Share Card', icon: '◈' },
 ]
@@ -27,14 +64,19 @@ const TABS: Array<{ key: TabType; label: string; icon: ReactNode }> = [
 /** Virtual SPA routes reported to GA4 on each tab change. */
 const TAB_ROUTES: Record<TabType, { path: string; title: string }> = {
   chart: { path: '/', title: 'Cinnabar — Your Chart' },
+  timeline: { path: '/life-timeline', title: 'Cinnabar — Life Timeline' },
   match: { path: '/compatibility', title: 'Cinnabar — Compatibility' },
   share: { path: '/share-card', title: 'Cinnabar — Share Card' },
 }
 
 export default function App() {
-  const { chart } = useChartStore()
+  const { chart, birthInfo } = useChartStore()
+  const capturePending = useFutureReportActivityStore(
+    (state) => state.captureCount > 0,
+  )
   const initAuth = useAuthStore((s) => s.init)
   const [activeTab, setActiveTab] = useState<TabType>('chart')
+  const timeSearchRequired = birthInfo?.birthTimeUnknown === true
 
   // Hydrate the Supabase session + bind the auth listener once.
   useEffect(() => {
@@ -45,6 +87,7 @@ export default function App() {
   // router, so tabs are our virtual routes).
   useEffect(() => {
     const route = TAB_ROUTES[activeTab]
+    document.title = route.title
     trackPageView(route.path, route.title)
   }, [activeTab])
 
@@ -102,11 +145,23 @@ export default function App() {
             </div>
 
             {/* Desktop nav */}
-            <nav className="hidden md:flex items-center gap-1">
+            <nav
+              aria-label="Primary"
+              className="hidden md:flex items-center gap-1"
+            >
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
+                  disabled={timeSearchRequired && (
+                    tab.key === 'timeline' || tab.key === 'share'
+                  )}
+                  title={timeSearchRequired && (
+                    tab.key === 'timeline' || tab.key === 'share'
+                  )
+                    ? 'Choose a birth-time block before opening this feature.'
+                    : undefined}
+                  aria-current={activeTab === tab.key ? 'page' : undefined}
                   className={`
                     group relative px-4 py-2 rounded-lg
                     text-sm font-medium transition-all duration-200
@@ -114,6 +169,7 @@ export default function App() {
                       ? 'text-text'
                       : 'text-text-muted hover:text-text-secondary'
                     }
+                    disabled:cursor-not-allowed disabled:opacity-40
                   `}
                 >
                   <span
@@ -126,10 +182,13 @@ export default function App() {
                     `}
                   />
                   <span className="relative flex items-center gap-2">
-                    <span className={`
+                    <span
+                      aria-hidden="true"
+                      className={`
                       inline-flex h-4 w-4 items-center justify-center text-xs transition-all duration-200
                       ${activeTab === tab.key ? 'text-gold' : 'opacity-50 group-hover:opacity-70'}
-                    `}>
+                    `}
+                    >
                       {tab.icon}
                     </span>
                     {tab.label}
@@ -157,6 +216,7 @@ export default function App() {
 
       {/* Mobile bottom nav */}
       <nav
+        aria-label="Mobile"
         className="
           md:hidden fixed bottom-0 left-0 right-0 z-40
           px-4 py-3
@@ -169,6 +229,15 @@ export default function App() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
+              disabled={timeSearchRequired && (
+                tab.key === 'timeline' || tab.key === 'share'
+              )}
+              title={timeSearchRequired && (
+                tab.key === 'timeline' || tab.key === 'share'
+              )
+                ? 'Choose a birth-time block before opening this feature.'
+                : undefined}
+              aria-current={activeTab === tab.key ? 'page' : undefined}
               className={`
                 flex flex-col items-center gap-1 px-4 py-1.5 rounded-lg
                 transition-all duration-200
@@ -176,12 +245,21 @@ export default function App() {
                   ? 'text-gold'
                   : 'text-text-muted'
                 }
+                disabled:cursor-not-allowed disabled:opacity-40
               `}
             >
-              <span className="inline-flex h-5 w-5 items-center justify-center text-base">{tab.icon}</span>
-              <span className="text-xs">{tab.label}</span>
+              <span
+                aria-hidden="true"
+                className="inline-flex h-5 w-5 items-center justify-center text-base"
+              >
+                {tab.icon}
+              </span>
+              <span className="text-xs">{tab.mobileLabel ?? tab.label}</span>
               {activeTab === tab.key && (
-                <span className="absolute -top-1 w-1 h-1 rounded-full bg-gold shadow-[0_0_6px_rgba(212,175,55,0.6)]" />
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-1 w-1 h-1 rounded-full bg-gold shadow-[0_0_6px_rgba(212,175,55,0.6)]"
+                />
               )}
             </button>
           ))}
@@ -189,8 +267,8 @@ export default function App() {
       </nav>
 
       {/* Main content */}
-      <main className="flex-1 px-4 lg:px-12 py-8 pb-24 md:pb-8">
-        <div className="max-w-[1600px] mx-auto">
+      <main className="min-w-0 flex-1 px-4 lg:px-12 py-8 pb-24 md:pb-8">
+        <div className="mx-auto min-w-0 max-w-[1600px]">
           {/* Your Chart tab */}
           {activeTab === 'chart' && (
             !chart ? (
@@ -200,21 +278,36 @@ export default function App() {
             ) : (
               <div className="animate-fade-in space-y-8">
                 <div className="w-full">
-                  <ChartDisplay />
+                  <LazySurface
+                    label="your chart"
+                    loadingLabel="Rendering your chart…"
+                  >
+                    <ChartDisplay />
+                  </LazySurface>
                 </div>
 
                 <div className="w-full max-w-6xl mx-auto">
-                  <AIInterpretation />
+                  <LazySurface
+                    label="chart insights"
+                    loadingLabel="Loading chart insights…"
+                  >
+                    <AIInterpretation />
+                  </LazySurface>
                 </div>
 
                 <div className="text-center">
                   <button
                     onClick={() => useChartStore.getState().clear()}
+                    disabled={capturePending}
+                    title={capturePending
+                      ? 'Finish PayPal payment verification before starting over.'
+                      : undefined}
                     className="
                       inline-flex items-center gap-2 px-4 py-2 rounded-lg
                       text-sm text-text-muted
                       hover:text-text hover:bg-white/[0.04]
                       transition-all duration-200
+                      disabled:cursor-not-allowed disabled:opacity-50
                     "
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,8 +320,25 @@ export default function App() {
             )
           )}
 
+          {/* Life Timeline tab */}
+          {activeTab === 'timeline' && (
+            <LazySurface
+              label="Life Timeline"
+              loadingLabel="Loading Life Timeline…"
+            >
+              <LifeKLine onRequestChart={() => setActiveTab('chart')} />
+            </LazySurface>
+          )}
+
           {/* Compatibility tab */}
-          {activeTab === 'match' && <MatchAnalysis />}
+          {activeTab === 'match' && (
+            <LazySurface
+              label="Compatibility"
+              loadingLabel="Loading Compatibility…"
+            >
+              <MatchAnalysis />
+            </LazySurface>
+          )}
 
           {/* Share Card tab */}
           {activeTab === 'share' && (
@@ -242,7 +352,12 @@ export default function App() {
               </div>
             ) : (
               <div className="max-w-xl mx-auto">
-                <ShareCard />
+                <LazySurface
+                  label="Share Card"
+                  loadingLabel="Loading Share Card…"
+                >
+                  <ShareCard />
+                </LazySurface>
               </div>
             )
           )}
@@ -267,9 +382,6 @@ export default function App() {
         <p>Chart engine based on the open-source ziwei project (GPLv3).</p>
       </footer>
 
-      {/* Exit-intent email capture (once per session, desktop leave signal) */}
-      <ExitIntentModal />
-
       <Analytics />
     </div>
   )
@@ -293,7 +405,7 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
         bg-white/[0.02] border border-white/[0.06]
       "
     >
-      <div className="text-4xl mb-4 opacity-30">☆</div>
+      <div aria-hidden="true" className="text-4xl mb-4 opacity-30">☆</div>
       <p className="text-text-muted mb-4">{message}</p>
       <button
         onClick={action}
@@ -305,7 +417,13 @@ function EmptyState({ message, action, actionLabel }: EmptyStateProps) {
         "
       >
         {actionLabel}
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          aria-hidden="true"
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </button>

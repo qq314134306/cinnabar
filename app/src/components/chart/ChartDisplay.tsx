@@ -13,6 +13,30 @@
 import { useState } from 'react'
 import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
+import { BirthTimeSensitivity } from './BirthTimeSensitivity'
+import { BaZiFourPillars } from './BaZiFourPillars'
+import {
+  getMajorStarExplanation,
+  getPalaceExplanation,
+} from '@/lib/chart-explanations'
+import {
+  collectNatalTransformations,
+  NATAL_TRANSFORMATION_ORDER,
+  type NatalTransformation,
+  type NatalTransformationCode,
+  type NatalTransformationPalaceInput,
+} from '@/lib/chart-transformations'
+import {
+  getFlankingPalaces,
+  getSanFangSiZheng,
+  type FlankingPalaceSide,
+  type PalaceRelationRole,
+} from '@/lib/palace-relations'
+import {
+  collectPalaceOriginTransformations,
+  type PalaceOriginTransformation,
+} from '@/lib/palace-origin-transformations'
+import { TimingLens } from './TimingLens'
 import {
   translateBrightness,
   translateFiveElementsClass,
@@ -151,26 +175,45 @@ function StarTag({ star, showBrightness = true }: StarTagProps) {
 
 interface PalaceCardProps extends PalaceData {
   isSelected?: boolean
+  relation?: PalaceRelationRole
   onClick?: () => void
 }
 
 function PalaceCard({
   name, stem, branch, majorStars, minorStars, adjectiveStars, decadal,
-  boshi12, changsheng12, isLife, isBody, isSelected, onClick
+  boshi12, changsheng12, isLife, isBody, isSelected, relation, onClick
 }: PalaceCardProps) {
   const decadalRange = decadal?.range ? `${decadal.range[0]}-${decadal.range[1]}` : ''
+  const displayName = translatePalaceName(name)
+  const relationLabel = relation === 'focus'
+    ? 'Focus'
+    : relation === 'trine'
+      ? 'Trine'
+      : relation === 'opposite'
+        ? 'Opposite'
+        : null
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
+      data-palace-relation={relation}
+      aria-label={`Explain ${displayName}`}
+      aria-pressed={isSelected}
+      aria-controls={isSelected ? 'selected-palace-explanation' : undefined}
+      aria-describedby={relationLabel ? `palace-relation-${branch}` : undefined}
       className={`
-        group relative p-1.5 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col
+        group relative p-1.5 lg:p-3 h-full min-h-[130px] lg:min-h-[170px] flex flex-col text-left
         bg-white/[0.03] backdrop-blur-sm
         border border-white/[0.06] rounded-xl
         transition-all duration-300 cursor-pointer
         hover:bg-white/[0.06] hover:border-white/[0.12]
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
+        focus-visible:ring-offset-2 focus-visible:ring-offset-night
         ${isLife ? 'ring-1 ring-gold/50 bg-gold/[0.03]' : ''}
         ${isBody ? 'ring-1 ring-star/50 bg-star/[0.03]' : ''}
+        ${relation === 'trine' ? 'ring-1 ring-gold/40 bg-gold/[0.05]' : ''}
+        ${relation === 'opposite' ? 'ring-1 ring-star/40 bg-star/[0.05]' : ''}
         ${isSelected ? 'ring-2 ring-star' : ''}
       `}
     >
@@ -187,10 +230,28 @@ function PalaceCard({
             ${isBody ? 'bg-star/20 text-star-light' : ''}
             ${!isLife && !isBody ? 'text-text-secondary' : ''}
           `}>
-            {translatePalaceName(name)}
+            {displayName}
           </span>
         </div>
       </div>
+
+      {relationLabel && (
+        <span
+          id={`palace-relation-${branch}`}
+          className={`
+          mb-1 w-fit rounded-full border px-1.5 py-0.5 text-[8px]
+          uppercase tracking-wider
+          ${relation === 'focus'
+            ? 'border-star/30 text-star-light'
+            : relation === 'opposite'
+              ? 'border-star/20 text-star-light/80'
+              : 'border-gold/20 text-gold/80'
+          }
+        `}
+        >
+          {relationLabel}
+        </span>
+      )}
 
       {/* Major stars */}
       <div className="flex flex-wrap gap-0.5 mb-1">
@@ -222,7 +283,458 @@ function PalaceCard({
         <span>{translateStarLabel(changsheng12)}</span>
         <span>{translateStarLabel(boshi12)}</span>
       </div>
-    </div>
+    </button>
+  )
+}
+
+/* ------------------------------------------------------------
+   Natal Four Transformations navigation
+   ------------------------------------------------------------ */
+
+interface FourTransformationsPanelProps {
+  transformations: NatalTransformation[]
+  selectedTransformation: NatalTransformationCode | null
+  onSelectTransformation: (transformation: NatalTransformation) => void
+}
+
+const TRANSFORMATION_STYLES: Record<NatalTransformationCode, string> = {
+  '禄': 'border-fortune/25 bg-fortune/[0.06] text-fortune',
+  '权': 'border-gold/25 bg-gold/[0.06] text-gold',
+  '科': 'border-star/25 bg-star/[0.06] text-star-light',
+  '忌': 'border-misfortune/25 bg-misfortune/[0.06] text-misfortune',
+}
+
+function FourTransformationsPanel({
+  transformations,
+  selectedTransformation,
+  onSelectTransformation,
+}: FourTransformationsPanelProps) {
+  return (
+    <section
+      aria-labelledby="natal-four-transformations-heading"
+      className="mt-3 rounded-xl border border-white/[0.07] bg-black/10 p-3 lg:p-4"
+    >
+      <div className="max-w-3xl">
+        <h3
+          id="natal-four-transformations-heading"
+          className="text-sm font-semibold text-text"
+        >
+          Natal Four Transformations
+        </h3>
+        <p className="mt-1 text-xs leading-relaxed text-text-muted">
+          A local index of which natal stars carry Lu, Quan, Ke, and Ji.
+          Choose one to open its palace and four-palace context. These labels
+          organize the chart; none is a standalone verdict.
+        </p>
+      </div>
+
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {NATAL_TRANSFORMATION_ORDER.map((code) => {
+          const info = translateMutagen(code)
+          const entry = transformations.find((item) => item.code === code)
+
+          if (!info || !entry) {
+            return (
+              <div
+                key={code}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3"
+              >
+                <p className="text-xs font-medium text-text-muted">
+                  {info?.code ?? code}
+                </p>
+                <p className="mt-1 text-xs text-text-muted">
+                  Not available in this chart
+                </p>
+              </div>
+            )
+          }
+
+          const palaceLabel = translatePalaceName(entry.palaceName)
+          const isSelected = selectedTransformation === code
+
+          return (
+            <button
+              key={code}
+              type="button"
+              aria-label={`Open ${info.code} transformation in ${palaceLabel}`}
+              aria-pressed={isSelected}
+              aria-controls={isSelected
+                ? 'selected-palace-explanation'
+                : undefined}
+              onClick={() => onSelectTransformation(entry)}
+              className={`
+                rounded-lg border p-3 text-left transition-colors
+                hover:bg-white/[0.08]
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
+                ${TRANSFORMATION_STYLES[code]}
+                ${isSelected ? 'ring-2 ring-star' : ''}
+              `}
+            >
+              <span className="block text-xs font-semibold">
+                {info.code}
+              </span>
+              <span className="mt-1 block text-sm font-medium text-text">
+                {translateStarLabel(entry.starName)}
+              </span>
+              <span className="mt-0.5 block text-xs text-text-secondary">
+                {palaceLabel}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------
+   Selected-palace explanation
+   ------------------------------------------------------------ */
+
+interface PalaceExplanationPanelProps {
+  palace: PalaceData
+  relatedPalaces: Array<{
+    palace: PalaceData
+    role: PalaceRelationRole
+  }>
+  flankingPalaces: Array<{
+    palace: PalaceData
+    side: FlankingPalaceSide
+  }>
+  originTransformations: PalaceOriginTransformation[]
+  onNavigatePalace: (palaceName: string) => void
+  onClose: () => void
+}
+
+function PalaceExplanationPanel({
+  palace,
+  relatedPalaces,
+  flankingPalaces,
+  originTransformations,
+  onNavigatePalace,
+  onClose,
+}: PalaceExplanationPanelProps) {
+  const palaceExplanation = getPalaceExplanation(palace.name)
+  const majorStarExplanations = palace.majorStars.flatMap((star) => {
+    const explanation = getMajorStarExplanation(star.name)
+    return explanation ? [{ star, explanation }] : []
+  })
+
+  return (
+    <section
+      id="selected-palace-explanation"
+      aria-labelledby="selected-palace-heading"
+      className="
+        mt-3 p-4 lg:p-5 rounded-xl border border-star/20
+        bg-gradient-to-br from-star/[0.10] to-white/[0.03]
+      "
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.18em] text-star-light/70">
+            Reflective guide
+          </p>
+          <h3
+            id="selected-palace-heading"
+            className="mt-1 text-base lg:text-lg font-semibold text-text"
+          >
+            About the {translatePalaceName(palace.name)}
+          </h3>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close palace explanation"
+          className="
+            shrink-0 rounded-lg border border-white/10 px-2.5 py-1.5
+            text-xs text-text-secondary transition-colors
+            hover:border-white/20 hover:bg-white/[0.06] hover:text-text
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star
+          "
+        >
+          Close
+        </button>
+      </div>
+
+      {palaceExplanation ? (
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <p className="text-sm leading-relaxed text-text-secondary">
+            {palaceExplanation.summary}
+          </p>
+          <div className="rounded-lg bg-black/10 px-3 py-2.5">
+            <p className="text-[10px] uppercase tracking-wider text-text-muted">
+              Keep in balance
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-text-secondary">
+              {palaceExplanation.watchFor}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+          A local guide for this palace is not available yet.
+        </p>
+      )}
+
+      <section
+        aria-labelledby="san-fang-si-zheng-heading"
+        className="mt-4 border-t border-white/[0.08] pt-4"
+      >
+        <h4
+          id="san-fang-si-zheng-heading"
+          className="text-xs font-medium uppercase tracking-wider text-text-muted"
+        >
+          San Fang Si Zheng · Four-palace view
+        </h4>
+        {relatedPalaces.length === 4 ? (
+          <>
+            <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+              Read the focus palace together with its opposite and two trine
+              palaces. This organizes context; it does not calculate strength
+              or determine an outcome.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedPalaces.map(({ palace: relatedPalace, role }, index) => {
+                const trineNumber = relatedPalaces
+                  .slice(0, index + 1)
+                  .filter((item) => item.role === 'trine')
+                  .length
+                const roleLabel = role === 'focus'
+                  ? 'Focus'
+                  : role === 'opposite'
+                    ? 'Opposite'
+                    : `Trine ${trineNumber}`
+
+                return (
+                  <article
+                    key={relatedPalace.branch}
+                    data-relation-summary={role}
+                    className="rounded-lg border border-white/[0.06] bg-black/10 p-3"
+                  >
+                    <p className="text-[9px] uppercase tracking-wider text-text-muted">
+                      {roleLabel}
+                    </p>
+                    <h5 className="mt-1 text-sm font-medium text-gold">
+                      {translatePalaceName(relatedPalace.name)}
+                    </h5>
+                    <p className="mt-0.5 text-[10px] text-text-muted">
+                      {translateBranch(relatedPalace.branch)}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {relatedPalace.majorStars.length > 0 ? (
+                        relatedPalace.majorStars.map((star) => (
+                          <StarTag key={star.name} star={star} />
+                        ))
+                      ) : (
+                        <span className="text-xs text-text-muted">
+                          No major star
+                        </span>
+                      )}
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+            A four-palace relationship is unavailable for this engine label.
+            Cinnabar will not invent one.
+          </p>
+        )}
+      </section>
+
+      <section
+        aria-labelledby="flanking-palaces-heading"
+        className="mt-4 border-t border-white/[0.08] pt-4"
+      >
+        <h4
+          id="flanking-palaces-heading"
+          className="text-xs font-medium uppercase tracking-wider text-text-muted"
+        >
+          Flanking Palaces · Adjacent context
+        </h4>
+        {flankingPalaces.length === 2 ? (
+          <>
+            <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+              The two neighboring palaces sit immediately beside the focus
+              palace. This shows structural context only; it does not classify
+              the pair as supportive or difficult.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {flankingPalaces.map(({ palace: flankingPalace, side }) => (
+                <article
+                  key={flankingPalace.branch}
+                  data-flanking-summary={side}
+                  className="rounded-lg border border-white/[0.06] bg-black/10 p-3"
+                >
+                  <p className="text-[9px] uppercase tracking-wider text-text-muted">
+                    {side === 'previous' ? 'Previous neighbor' : 'Next neighbor'}
+                  </p>
+                  <h5 className="mt-1 text-sm font-medium text-gold">
+                    {translatePalaceName(flankingPalace.name)}
+                  </h5>
+                  <p className="mt-0.5 text-[10px] text-text-muted">
+                    {translateBranch(flankingPalace.branch)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {flankingPalace.majorStars.length > 0 ? (
+                      flankingPalace.majorStars.map((star) => (
+                        <StarTag key={star.name} star={star} />
+                      ))
+                    ) : (
+                      <span className="text-xs text-text-muted">
+                        No major star
+                      </span>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+            Both neighboring palaces are required for this structural view.
+            Cinnabar will not fill missing engine data.
+          </p>
+        )}
+      </section>
+
+      <section
+        aria-labelledby="palace-origin-transformations-heading"
+        className="mt-4 border-t border-white/[0.08] pt-4"
+      >
+        <h4
+          id="palace-origin-transformations-heading"
+          className="text-xs font-medium uppercase tracking-wider text-text-muted"
+        >
+          Palace-origin Four Transformations
+        </h4>
+        {originTransformations.length === 4 ? (
+          <>
+            <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+              The selected palace&apos;s {translateStem(palace.stem)} stem
+              supplies an engine-owned Lu, Quan, Ke, and Ji star-to-palace
+              map. This is structural navigation only; it does not judge
+              direction or outcome.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {originTransformations.map((transformation) => {
+                const info = translateMutagen(transformation.code)
+                const targetLabel = transformation.targetPalaceName
+                  ? translatePalaceName(transformation.targetPalaceName)
+                  : null
+
+                return (
+                  <article
+                    key={transformation.code}
+                    data-palace-origin-transformation={transformation.code}
+                    className={`
+                      rounded-lg border p-3
+                      ${TRANSFORMATION_STYLES[transformation.code]}
+                    `}
+                  >
+                    <p className="text-xs font-semibold">
+                      {info?.code ?? transformation.code}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-gold">
+                      {transformation.starName
+                        ? translateStarLabel(transformation.starName)
+                        : 'Star unavailable'}
+                    </p>
+                    {targetLabel ? (
+                      <>
+                        <h5 className="mt-1 text-xs font-medium text-text-secondary">
+                          <span className="text-text-muted">Flows to </span>
+                          {targetLabel}
+                        </h5>
+                        <p className="mt-0.5 text-[10px] text-text-muted">
+                          {translateBranch(
+                            transformation.targetPalaceBranch ?? undefined,
+                          )}
+                        </p>
+                        {transformation.isSamePalace ? (
+                          <span className="mt-2 block text-xs text-text-secondary">
+                            Same palace
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            aria-label={`Open ${info?.code ?? transformation.code} destination in ${targetLabel}`}
+                            onClick={() => onNavigatePalace(
+                              transformation.targetPalaceName ?? '',
+                            )}
+                            className="
+                              mt-2 rounded-md border border-white/[0.08]
+                              px-2 py-1 text-xs text-text-secondary
+                              transition-colors hover:bg-white/[0.08]
+                              hover:text-text focus-visible:outline-none
+                              focus-visible:ring-2 focus-visible:ring-star
+                            "
+                          >
+                            Open target
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <p className="mt-1 text-xs text-text-muted">
+                        Destination unavailable
+                      </p>
+                    )}
+                  </article>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+            This engine palace does not expose a complete origin map. Cinnabar
+            will not reconstruct one from assumptions.
+          </p>
+        )}
+      </section>
+
+      <div className="mt-4 border-t border-white/[0.08] pt-4">
+        <h4 className="text-xs font-medium uppercase tracking-wider text-text-muted">
+          Major stars in this palace
+        </h4>
+        {majorStarExplanations.length > 0 ? (
+          <div className="mt-2 grid gap-2 lg:grid-cols-2">
+            {majorStarExplanations.map(({ star, explanation }) => (
+              <article
+                key={star.name}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.03] p-3"
+              >
+                <h5 className="text-sm font-medium text-gold">
+                  {translateStarLabel(star.name)}
+                </h5>
+                <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+                  {explanation.summary}
+                </p>
+                <p className="mt-1.5 text-xs leading-relaxed text-text-muted">
+                  <span className="font-medium text-text-secondary">Keep in balance:</span>{' '}
+                  {explanation.watchFor}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : palace.majorStars.length === 0 ? (
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            This palace has no major star. Read its supporting stars and related
+            palaces as context rather than treating the space as empty.
+          </p>
+        ) : (
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            Detailed local notes are not available for this major-star label yet.
+          </p>
+        )}
+      </div>
+
+      <p className="mt-4 text-xs leading-relaxed text-text-muted">
+        Use this as a reflective starting point. One palace or star never
+        defines an outcome.
+      </p>
+    </section>
   )
 }
 
@@ -267,8 +779,22 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
       {/* Info list */}
       <div className="text-xs lg:text-sm text-text-secondary space-y-1.5 text-center">
         <p><span className="text-text-muted">Born</span> <span className="text-text">{solarDate}</span></p>
-        <p><span className="text-text-muted">Pillars</span> <span className="text-text font-mono">{translateGanZhi(yearGanZhi)} year</span></p>
-        <p><span className="text-text-muted">Hour</span> <span className="text-text">{translateShichen(chart.time)} {chart.timeRange}</span></p>
+        <p><span className="text-text-muted">Zi Wei year</span> <span className="text-text font-mono">{translateGanZhi(yearGanZhi)}</span></p>
+        <p>
+          <span className="text-text-muted">Hour</span>{' '}
+          <span className="text-text">
+            {birthInfo.birthTimeUnknown === true
+              ? 'Unknown · shortlist required'
+              : (
+                <>
+                  {translateShichen(chart.time)} {chart.timeRange}
+                  {birthInfo.birthTimeReliable === false
+                    ? ' · Approximate'
+                    : ''}
+                </>
+              )}
+          </span>
+        </p>
         {showCorrection && resolvedTime && (
           <p>
             <span className="text-text-muted">True solar time</span>{' '}
@@ -370,10 +896,70 @@ const MONTH_NAMES = [
 export function ChartDisplay() {
   const { chart, birthInfo } = useChartStore()
   const [selectedPalace, setSelectedPalace] = useState<string | null>(null)
+  const [selectedTransformation, setSelectedTransformation] =
+    useState<NatalTransformationCode | null>(null)
 
   if (!chart || !birthInfo) return null
+  if (birthInfo.birthTimeUnknown === true) {
+    return (
+      <div className="relative rounded-2xl border border-gold/20 bg-gradient-to-br from-gold/[0.06] to-transparent p-4 shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl lg:p-6">
+        <div className="max-w-3xl">
+          <p className="text-[10px] uppercase tracking-[0.18em] text-gold/70">
+            Chart held until a time block is chosen
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-text lg:text-xl">
+            Birth hour not set
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            Your date and gender are saved, but Cinnabar is not displaying the
+            noon placeholder as a natal chart. Compare all 13 time blocks
+            below, then explicitly apply the candidate you want to inspect.
+          </p>
+        </div>
+        <BirthTimeSensitivity />
+      </div>
+    )
+  }
 
   const palaceData = parsePalaces(chart)
+  const transformations = collectNatalTransformations(
+    chart.palaces as unknown as NatalTransformationPalaceInput[],
+  )
+  const selectedPalaceData = palaceData.find(
+    (palace) => palace.name === selectedPalace,
+  ) ?? null
+  const selectedRelations = selectedPalaceData
+    ? getSanFangSiZheng(selectedPalaceData.branch)
+    : []
+  const relationByBranch = new Map(
+    selectedRelations.map((relation) => [relation.branch, relation.role]),
+  )
+  const relatedPalaces = selectedRelations.flatMap((relation) => {
+    const palace = palaceData.find((item) => item.branch === relation.branch)
+    return palace ? [{ palace, role: relation.role }] : []
+  })
+  const selectedFlanks = selectedPalaceData
+    ? getFlankingPalaces(selectedPalaceData.branch)
+    : []
+  const flankingPalaces = selectedFlanks.flatMap((flank) => {
+    const palace = palaceData.find((item) => item.branch === flank.branch)
+    return palace ? [{ palace, side: flank.side }] : []
+  })
+  const rawSelectedPalace = selectedPalaceData
+    ? (
+        typeof chart.palace === 'function'
+          ? chart.palace(
+              selectedPalaceData.name as Parameters<typeof chart.palace>[0],
+            )
+          : chart.palaces.find((palace) => (
+              palace.name === selectedPalaceData.name
+              && palace.earthlyBranch === selectedPalaceData.branch
+            ))
+      )
+    : null
+  const originTransformations = collectPalaceOriginTransformations(
+    rawSelectedPalace,
+  )
   const grid: (PalaceData | null)[][] = Array(4).fill(null).map(() => Array(4).fill(null))
 
   palaceData.forEach((p) => {
@@ -391,7 +977,13 @@ export function ChartDisplay() {
         key={key}
         {...palace}
         isSelected={selectedPalace === palace.name}
-        onClick={() => setSelectedPalace(selectedPalace === palace.name ? null : palace.name)}
+        relation={relationByBranch.get(palace.branch)}
+        onClick={() => {
+          setSelectedTransformation(null)
+          setSelectedPalace((current) => (
+            current === palace.name ? null : palace.name
+          ))
+        }}
       />
     )
   }
@@ -427,6 +1019,47 @@ export function ChartDisplay() {
         {grid[3].map((p, c) => renderPalace(p, `3-${c}`))}
       </div>
 
+      <FourTransformationsPanel
+        transformations={transformations}
+        selectedTransformation={selectedTransformation}
+        onSelectTransformation={(transformation) => {
+          setSelectedTransformation(transformation.code)
+          setSelectedPalace(transformation.palaceName)
+        }}
+      />
+
+      <BaZiFourPillars birthInfo={birthInfo} />
+
+      <TimingLens
+        chart={chart}
+        birthInfo={birthInfo}
+        onSelectPalace={(palaceName) => {
+          setSelectedTransformation(null)
+          setSelectedPalace(palaceName)
+        }}
+        onContextChange={() => {
+          setSelectedTransformation(null)
+          setSelectedPalace(null)
+        }}
+      />
+
+      {selectedPalaceData && (
+        <PalaceExplanationPanel
+          palace={selectedPalaceData}
+          relatedPalaces={relatedPalaces}
+          flankingPalaces={flankingPalaces}
+          originTransformations={originTransformations}
+          onNavigatePalace={(palaceName) => {
+            setSelectedTransformation(null)
+            setSelectedPalace(palaceName)
+          }}
+          onClose={() => {
+            setSelectedTransformation(null)
+            setSelectedPalace(null)
+          }}
+        />
+      )}
+
       {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-4 mt-3 pt-3 border-t border-white/[0.06] text-[10px]">
         <div className="flex items-center gap-1">
@@ -452,6 +1085,8 @@ export function ChartDisplay() {
           <span className="text-text-muted">Brightness</span>
         </div>
       </div>
+
+      <BirthTimeSensitivity />
     </div>
   )
 }

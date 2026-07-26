@@ -7,14 +7,24 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { useChartStore, useSettingsStore, useContentCacheStore } from '@/stores'
-import { buildZiWeiChartFacts } from '@/lib/chart-facts'
-import { buildFreeReadingPrompt, buildSystemPrompt, DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
-import { streamChat, type ChatMessage } from '@/lib/llm'
+import {
+  useChartStore,
+  useSettingsStore,
+  useContentCacheStore,
+  useFutureReportActivityStore,
+} from '@/stores'
+import { DISCLAIMER, PERSONA_LABELS, type Persona } from '@/lib/ai-prompts'
+import { ReadingApiError, streamReading } from '@/lib/llm'
+import {
+  isPublicAiReadingEnabled,
+  PUBLIC_AI_UNAVAILABLE_MESSAGE,
+} from '@/lib/public-ai'
+import { buildNatalReadingRequest } from '@/lib/reading-contract'
+import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 import { Button } from '@/components/ui'
 import { FutureReportPaywall } from '@/components/FutureReportPaywall'
 import { SoulCard } from '@/components/SoulCard'
-import { EmailCapture } from '@/components/EmailCapture'
+import { LocalChartSnapshot } from '@/components/LocalChartSnapshot'
 import { analytics } from '@/lib/analytics'
 
 /* ------------------------------------------------------------
@@ -22,8 +32,17 @@ import { analytics } from '@/lib/analytics'
    ------------------------------------------------------------ */
 
 const CHAR_INTERVAL = 35
+const READING_RETRY_MESSAGE =
+  'The reading could not be completed. Please try again.'
 
 const PERSONAS: Persona[] = ['scholar', 'sage']
+
+function getNatalReadingRequestKey(
+  birthInfo: BirthInfo,
+  persona: Persona,
+): string {
+  return JSON.stringify(buildNatalReadingRequest(birthInfo, persona))
+}
 
 /* ------------------------------------------------------------
    Markdown styling
@@ -70,24 +89,41 @@ const MarkdownComponents = {
 export function AIInterpretation() {
   const { chart, birthInfo } = useChartStore()
   const { persona, setPersona } = useSettingsStore()
-  const { aiInterpretation, setAiInterpretation } = useContentCacheStore()
+  const capturePending = useFutureReportActivityStore(
+    (state) => state.captureCount > 0,
+  )
+  const publicAiEnabled = isPublicAiReadingEnabled()
+  const {
+    aiInterpretation,
+    aiInterpretationKey,
+    setAiInterpretation,
+  } = useContentCacheStore()
 
-  const [displayText, setDisplayText] = useState('')
-  const fullTextRef = useRef('')
-  const displayIndexRef = useRef(0)
+  const requestKey = birthInfo && birthInfo.birthTimeUnknown !== true
+    ? getNatalReadingRequestKey(birthInfo, persona)
+    : null
+  const initialText = (
+    requestKey
+    && aiInterpretationKey === requestKey
+    && aiInterpretation
+  ) || ''
+
+  const [displayText, setDisplayText] = useState(initialText)
+  const fullTextRef = useRef(initialText)
+  const displayIndexRef = useRef(initialText.length)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const requestRef = useRef<AbortController | null>(null)
+  const previousRequestKeyRef = useRef(requestKey)
+  const previousChartRef = useRef<FunctionalAstrolabe | null>(chart)
+  const latestRequestKeyRef = useRef(requestKey)
+  const latestChartRef = useRef<FunctionalAstrolabe | null>(chart)
   const loadingRef = useRef(false)
   const [loading, setLoading] = useState(false)
   const [animating, setAnimating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (aiInterpretation && !displayText) {
-      setDisplayText(aiInterpretation)
-      fullTextRef.current = aiInterpretation
-      displayIndexRef.current = aiInterpretation.length
-    }
-  }, [aiInterpretation, displayText])
+  latestRequestKeyRef.current = requestKey
+  latestChartRef.current = chart
 
   const startAnimation = useCallback(() => {
     if (timerRef.current) return
@@ -108,13 +144,67 @@ export function AIInterpretation() {
   }, [])
 
   useEffect(() => {
+    const contextChanged = (
+      previousRequestKeyRef.current !== requestKey
+      || previousChartRef.current !== chart
+    )
+    previousRequestKeyRef.current = requestKey
+    previousChartRef.current = chart
+
+    if (!contextChanged) {
+      if (
+        (aiInterpretation !== null || aiInterpretationKey !== null)
+        && aiInterpretationKey !== requestKey
+      ) {
+        setAiInterpretation(null, null)
+      }
+      return
+    }
+
+    const controller = requestRef.current
+    requestRef.current = null
+    controller?.abort()
+
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+
+    loadingRef.current = false
+    fullTextRef.current = ''
+    displayIndexRef.current = 0
+    setLoading(false)
+    setAnimating(false)
+    setError(null)
+    setDisplayText('')
+    setAiInterpretation(null, null)
+  }, [
+    aiInterpretation,
+    aiInterpretationKey,
+    chart,
+    requestKey,
+    setAiInterpretation,
+  ])
+
+  useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
+      const controller = requestRef.current
+      requestRef.current = null
+      loadingRef.current = false
+      controller?.abort()
     }
   }, [])
 
   const handleInterpret = useCallback(async () => {
-    if (!chart || !birthInfo) return
+    if (!publicAiEnabled || !chart || !birthInfo || !requestKey) return
+
+    requestRef.current?.abort()
+    const controller = new AbortController()
+    requestRef.current = controller
+    const activeChart = chart
+    const activeRequestKey = requestKey
+    const request = buildNatalReadingRequest(birthInfo, persona)
 
     loadingRef.current = true
     setLoading(true)
@@ -122,6 +212,7 @@ export function AIInterpretation() {
     setDisplayText('')
     fullTextRef.current = ''
     displayIndexRef.current = 0
+    setAiInterpretation(null, null)
 
     if (timerRef.current) {
       clearInterval(timerRef.current)
@@ -131,46 +222,113 @@ export function AIInterpretation() {
     analytics.startReading()
 
     try {
-      const chartFacts = buildZiWeiChartFacts(chart, birthInfo)
-      const messages: ChatMessage[] = [
-        { role: 'system', content: buildSystemPrompt(persona) },
-        { role: 'user', content: buildFreeReadingPrompt(chartFacts) },
-      ]
-
       startAnimation()
 
-      for await (const token of streamChat(messages)) {
+      for await (const token of streamReading(request, { signal: controller.signal })) {
+        if (
+          requestRef.current !== controller
+          || latestRequestKeyRef.current !== activeRequestKey
+          || latestChartRef.current !== activeChart
+        ) return
         fullTextRef.current += token
       }
 
-      setAiInterpretation(fullTextRef.current)
+      if (
+        requestRef.current !== controller
+        || latestRequestKeyRef.current !== activeRequestKey
+        || latestChartRef.current !== activeChart
+      ) return
+      setAiInterpretation(fullTextRef.current, activeRequestKey)
       analytics.completeReading()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'The reading failed. Please try again.')
+      if (
+        controller.signal.aborted
+        || requestRef.current !== controller
+        || latestRequestKeyRef.current !== activeRequestKey
+        || latestChartRef.current !== activeChart
+      ) return
+      setError(
+        err instanceof ReadingApiError
+          ? err.message
+          : READING_RETRY_MESSAGE,
+      )
     } finally {
-      loadingRef.current = false
-      setLoading(false)
+      if (requestRef.current === controller) {
+        requestRef.current = null
+        loadingRef.current = false
+        setLoading(false)
+      }
     }
-  }, [chart, birthInfo, persona, startAnimation, setAiInterpretation])
+  }, [
+    birthInfo,
+    chart,
+    persona,
+    publicAiEnabled,
+    requestKey,
+    setAiInterpretation,
+    startAnimation,
+  ])
 
   if (!chart) return null
+  if (birthInfo?.birthTimeUnknown === true) {
+    return (
+      <div
+        role="status"
+        className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 text-sm leading-relaxed text-text-secondary"
+      >
+        Local scoring and optional AI reading stay unavailable while the birth
+        hour is completely unknown. Complete the 13-block comparison in Your
+        Chart first.
+      </div>
+    )
+  }
+
+  if (!publicAiEnabled) {
+    return (
+      <div className="space-y-4">
+        <LocalChartSnapshot />
+        <div
+          className="
+            relative rounded-2xl border border-white/[0.08]
+            bg-gradient-to-br from-white/[0.04] to-transparent p-6
+            shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl lg:p-8
+          "
+        >
+          <h2
+            className="mb-4 text-xl font-semibold text-gold lg:text-2xl"
+            style={{ fontFamily: 'var(--font-serif)' }}
+          >
+            Optional AI Narrative
+          </h2>
+          <div
+            role="status"
+            className="rounded-lg border border-gold/20 bg-gold/5 p-4 text-sm text-text-secondary"
+          >
+            {PUBLIC_AI_UNAVAILABLE_MESSAGE} Your local snapshot above remains
+            available without an account, API, or payment.
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div
-      className="
-        relative p-6 lg:p-8
-        bg-gradient-to-br from-white/[0.04] to-transparent
-        backdrop-blur-xl border border-white/[0.08] rounded-2xl
-        shadow-[0_8px_32px_rgba(0,0,0,0.3)]
-      "
-    >
+    <div className="space-y-4">
+      <LocalChartSnapshot />
       <div
         className="
-          absolute top-0 left-1/2 -translate-x-1/2
-          w-1/3 h-px
-          bg-gradient-to-r from-transparent via-gold/50 to-transparent
+          relative rounded-2xl border border-white/[0.08]
+          bg-gradient-to-br from-white/[0.04] to-transparent p-6
+          shadow-[0_8px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl lg:p-8
         "
-      />
+      >
+        <div
+          className="
+            absolute top-0 left-1/2 -translate-x-1/2
+            w-1/3 h-px
+            bg-gradient-to-r from-transparent via-gold/50 to-transparent
+          "
+        />
 
       {/* Header */}
       <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
@@ -192,8 +350,13 @@ export function AIInterpretation() {
               <button
                 key={p}
                 onClick={() => setPersona(p)}
+                disabled={loading || capturePending}
+                title={capturePending
+                  ? 'Finish PayPal payment verification before changing the reading style.'
+                  : undefined}
                 className={`
                   px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200
+                  disabled:cursor-not-allowed disabled:opacity-50
                   ${persona === p ? 'bg-gold/20 text-gold' : 'text-text-muted hover:text-text-secondary'}
                 `}
               >
@@ -202,7 +365,13 @@ export function AIInterpretation() {
             ))}
           </div>
 
-          <Button onClick={handleInterpret} disabled={loading} size="sm" variant="gold">
+          <Button
+            onClick={handleInterpret}
+            disabled={loading}
+            aria-describedby={error ? 'ai-reading-error' : undefined}
+            size="sm"
+            variant="gold"
+          >
             {loading ? (
               <span className="flex items-center gap-2">
                 <span className="w-3 h-3 border-2 border-night border-t-transparent rounded-full animate-spin" />
@@ -214,7 +383,11 @@ export function AIInterpretation() {
       </div>
 
       {error && (
-        <div className="p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm mb-4 border border-misfortune/20">
+        <div
+          id="ai-reading-error"
+          role="alert"
+          className="p-3 rounded-lg bg-misfortune/10 text-misfortune text-sm mb-4 border border-misfortune/20"
+        >
           {error}
         </div>
       )}
@@ -243,20 +416,9 @@ export function AIInterpretation() {
           )}
 
           {!animating && (
-            <>
-              <p className="mt-6 pt-4 border-t border-white/[0.06] text-xs text-text-muted not-italic font-sans">
-                {DISCLAIMER}
-              </p>
-
-              {/* Low-key inbox opt-in inside the reading panel */}
-              <div className="mt-4 not-italic font-sans">
-                <EmailCapture
-                  source="reading"
-                  title="Want new self-discovery notes as your chart's cycles turn?"
-                  ctaLabel="Keep me posted"
-                />
-              </div>
-            </>
+            <p className="mt-6 pt-4 border-t border-white/[0.06] text-xs text-text-muted not-italic font-sans">
+              {DISCLAIMER}
+            </p>
           )}
         </div>
       )}
@@ -268,9 +430,10 @@ export function AIInterpretation() {
         </div>
       )}
 
-      {/* Soul Card share/fission + locked teaser, then the paid paywall */}
-      {displayText && !animating && <SoulCard />}
-      {displayText && !animating && <FutureReportPaywall />}
+        {/* Soul Card share/fission + locked teaser, then the paid paywall */}
+        {displayText && !animating && <SoulCard />}
+        {displayText && !animating && <FutureReportPaywall />}
+      </div>
     </div>
   )
 }

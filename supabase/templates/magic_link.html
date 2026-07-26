@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your Cinnabar sign-in code</title>
+  </head>
+  <body>
+    <h1>Sign in to Cinnabar</h1>
+    <p>Enter this six-digit code in the Cinnabar sign-in window:</p>
+    <p><strong>{{ .Token }}</strong></p>
+    <p>Or open the secure confirmation page and press the confirmation button:</p>
+    <p>
+      <a href="{{ .SiteURL }}/api/auth/email-confirm#token_hash={{ .TokenHash }}">
+        Continue to Cinnabar
+      </a>
+    </p>
+    <p>If you did not request this email, you can ignore it.</p>
+  </body>
+</html>

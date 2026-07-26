@@ -1,51 +1,116 @@
-# 紫微知道
+# Cinnabar
 
 <p align="center">
-  <img width="820" alt="紫微知道" src="./assets/logo.ja.svg" />
+  <img width="820" alt="Cinnabar" src="./assets/logo.svg" />
 </p>
 
 <p align="center">
-  <strong>現代的な紫微斗数チャート分析ツール</strong>
+  <a href="../README.md">简体中文</a> ·
+  <a href="./README.zh-TW.md">繁體中文</a> ·
+  <a href="./README.ja.md">日本語</a> ·
+  <a href="./README.en.md">English</a>
 </p>
 
 <p align="center">
-  精密な命盤作成 · AI 解釈 · 年運分析 · 相性診断 · ライフカーブ可視化
+  <strong>東洋占星術を英語で提供するオープンソース Web アプリ</strong>
 </p>
 
 ## 概要
 
-紫微知道は、伝統的な紫微斗数の知識、モダンな Web UI、複数モデル対応の AI を組み合わせたセルフホスト可能なアプリです。
+Cinnabar は React、TypeScript、Vite で構築された紫微斗数アプリです。現在の公開 UI は英語で、命盤、AI リーディング、二人の相性、共有カードに重点を置いています。
 
-命盤を表示するだけでなく、「理解しやすいこと」「使いやすいこと」「共有しやすいこと」を重視しています。
+## 現在表示される機能
 
-## 主な機能
+- **Your Chart**：出生情報と場所を入力し、必要に応じて真太陽時を補正してから、
+  `iztro` で命盤を生成します。出生時刻を「おおよそ」と指定した場合は、正しい
+  時刻を断定せず、前後の伝統的な 2 時間帯をローカルで比較します。さらに、
+  早い子刻と遅い子刻を含む 13 の民用時間帯を任意で開き、各候補を出生地から
+  個別に真太陽時補正した後、最大 5 問のスキップ可能な過去イベント質問から
+  証拠点と証拠明細を表示できます。早期終了後の残りの質問にも回答でき、既存の
+  回答を変更して即時に再計算し、任意の 1 回答を除いても首位が維持されるか確認
+  できます。出生時刻が完全に不明でも仮の時刻を本人の情報として扱わずに開始でき、
+  候補を明示的に適用するまで時刻依存の派生機能は表示されません。同じ補正命盤は同順位のままで、
+  正確または正しい出生時刻を特定したとは主張しません。生成後は任意の宮を
+  選ぶと、本宮・対宮・二つの三合宮をローカルで連動表示し、四宮と主星を
+  「三方四正」の読み順としてまとめます。同じ解説パネルでは、本宮の左右に
+  隣接する二つの宮も「夾宮」の構造情報として別枠で表示します。隣宮を
+  三方四正の強調に混ぜたり、自動的に支援／困難と判定したりはしません。
+  生年四化インデックスでは禄・権・
+  科・忌に対応する星と宮をまとめ、選択するとその宮と三方四正を開きますが、
+  ラベル単独で吉凶を断定しません。宮を選ぶと、その宮の天干から禄・権・科・
+  忌が飛ぶ四つの対象宮も同じパネルに表示し、直接移動できます。対象宮は
+  `iztro` の機能宮インターフェースから取得し、未解決値は推測しません。
+  大限・流年レンズでは 1〜100 歳モデルの
+  年を切り替え、該当する十年大限、流年命宮、両層の四化をローカルで重ね、
+  各項目から本命宮と三方四正へ移動できます。この範囲は結果や寿命を予測する
+  ものではありません。また、
+  現在のモデル年について総合スコアと仕事、財運、人間関係、心身の 4 項目も
+  ローカルで表示します。これらには AI、アカウント、API、決済は不要です。
+- **Life Timeline**：命盤の重みに基づく相対的な周期グラフをローカルで生成し、
+  初期表示は現在年齢の 5 年前から 25 年後までです。任意の 1～100 歳モデルは
+  10 個の 10 年周期を覆うための範囲であり、寿命を予測するものではありません。
+  AI、アカウント、決済も不要です。
+- **AI Reading**：ローカルスナップショットに追加できる任意の文章レイヤーです。
+  有効時にブラウザーからサーバー側の `/api/interpret` へ送るのは、バージョン
+  化された `reading.v1` の出生情報／persona リクエストだけです。
+  命盤とプロンプトの再構築、18 歳以上の確認、日次クォータはサーバー側で
+  実行します。messages、prompt、命盤 facts、補正済み時刻、座標、タイム
+  ゾーンはブラウザーから送信しません。DeepSeek のキーもブラウザーには
+  渡りません。
+- **Compatibility**：アカウントや API を使わず、二人の命盤から 4 項目の
+  ローカル相性スナップショットを生成します。Person A は現在の命盤にある
+  表示済み出生情報を再利用でき、二人とも任意の出生地から真太陽時をローカルで
+  再計算できます。結果には補正の有無と幅が表示されます。公開 AI が有効な
+  場合のみ、任意で文章形式の解読を追加できます。
+- **Share Card**：生成済みの命盤から共有用カードを作成します。
 
-- **精密な命盤作成** - `iztro` ベースで 12 宮を含むチャートを生成
-- **AI 解釈** - 構造化された命盤分析を出力
-- **年運分析** - 月次トレンドまで含めた運勢推移
-- **相性診断** - 二人の命盤を比較して関係性を分析
-- **ライフカーブ** - 長期的な運勢の流れを可視化
-- **共有カード** - 共有向けの金言カードを生成
-
-## はじめに
+## ローカル開発
 
 ```bash
-git clone https://github.com/ruijayfeng/ziwei.git
+git clone https://github.com/qq314134306/cinnabar.git
 cd ziwei/app
-npm install
+npm ci
 npm run dev
+```
+
+`npm run dev` が起動するのは Vite のフロントエンド開発サーバーだけで、`app/api/` のサーバー API は提供しません。AI リーディング、ログイン、その他の API を含むフローを確認するには、Vercel Functions と互換性のあるランタイムを使用してください。Vercel CLI をインストールして設定済みの場合は、次のように実行できます。
+
+```bash
+cd app
+vercel dev
+```
+
+AI リーディングには、サーバー環境の `DEEPSEEK_API_KEY` が必要です。アプリ内に API キー設定はなく、ブラウザーから複数の AI モデルを切り替える機能もありません。
+
+公開 AI はデフォルトで無効です。有効化する前に Supabase のクォータ
+migration を適用し、`ENABLE_PUBLIC_AI_READINGS=true` と
+`VITE_ENABLE_PUBLIC_AI_READINGS=true`（どちらも完全一致）、
+`APP_ORIGIN`、`DEEPSEEK_API_KEY`、`SUPABASE_SECRET_KEY`、
+`PUBLIC_AI_QUOTA_HMAC_KEY`、`PUBLIC_AI_DAILY_IP_LIMIT`、
+`PUBLIC_AI_DAILY_GLOBAL_LIMIT` を設定してください。ローカルテストだけでは、
+実際の DeepSeek ストリーム、外部クォータ、コストアラートを検証したことに
+なりません。
+
+## 検証
+
+```bash
+cd app
+npm ci
+npm run lint
+npm run test
+npm run build
 ```
 
 ## デプロイ
 
-### Vercel
+プロジェクトの Root Directory を `app` に設定し、`app/api/` の Vercel Functions 互換ルートを実行できる環境へデプロイしてください。Vite の静的出力だけを配信しても、完全な機能は利用できません。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ruijayfeng/ziwei&project-name=ziwei&root-directory=app)
+Future Report の決済機能はデフォルトで無効です：`ENABLE_FUTURE_REPORT_PAYMENTS=false`、`VITE_ENABLE_FUTURE_REPORT_PAYMENTS=false`。PayPal のライブ環境や完全な本番フローを検証した証拠もまだありません。ローカルテストやワークフロー設定だけを根拠に、決済フラグを有効にしないでください。
 
-### Cloudflare Pages
+## 注意
 
-[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ruijayfeng/ziwei)
+Cinnabar は娯楽と自己理解のためのものであり、医療、法律、金融、その他の専門的助言ではありません。
 
-## 設定
+## ライセンス
 
-アプリ内の設定画面から LLM API を設定できます。OpenAI-compatible API に加えて、Kimi、Gemini、Claude、DeepSeek なども利用できます。
+本プロジェクトは [GPLv3（GNU General Public License v3.0）](../LICENSE) の下で公開されています。

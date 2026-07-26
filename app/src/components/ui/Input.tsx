@@ -2,16 +2,34 @@
    Input — glassmorphism style
    ============================================================ */
 
-import type { InputHTMLAttributes } from 'react'
+import { useId, type InputHTMLAttributes } from 'react'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
   hint?: string
+  hintRole?: 'status' | 'alert'
 }
 
-export function Input({ label, error, hint, className = '', id, ...props }: InputProps) {
-  const inputId = id || label?.toLowerCase().replace(/\s+/g, '-')
+export function Input({
+  label,
+  error,
+  hint,
+  hintRole,
+  className = '',
+  id,
+  'aria-describedby': describedByProp,
+  'aria-invalid': invalidProp,
+  ...props
+}: InputProps) {
+  const generatedId = useId()
+  const inputId = id || label?.toLowerCase().replace(/\s+/g, '-') || generatedId
+  const messageId = error
+    ? `${inputId}-error`
+    : hint
+      ? `${inputId}-hint`
+      : null
+  const describedBy = [describedByProp, messageId].filter(Boolean).join(' ') || undefined
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -26,6 +44,8 @@ export function Input({ label, error, hint, className = '', id, ...props }: Inpu
       <div className="relative">
         <input
           id={inputId}
+          aria-describedby={describedBy}
+          aria-invalid={error ? true : invalidProp}
           className={`
             w-full px-4 py-3 rounded-xl
             bg-white/[0.04] backdrop-blur-sm
@@ -52,10 +72,20 @@ export function Input({ label, error, hint, className = '', id, ...props }: Inpu
         />
       </div>
       {hint && !error && (
-        <span className="text-xs text-text-muted">{hint}</span>
+        <span
+          id={`${inputId}-hint`}
+          role={hintRole}
+          className="text-xs text-text-muted"
+        >
+          {hint}
+        </span>
       )}
       {error && (
-        <span className="text-xs text-misfortune flex items-center gap-1">
+        <span
+          id={`${inputId}-error`}
+          role="alert"
+          className="text-xs text-misfortune flex items-center gap-1"
+        >
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
