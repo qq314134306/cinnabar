@@ -10,7 +10,7 @@
 - Authenticated Vercel inspection on 2026-07-23 confirmed team
   `cinnabarastrology`, project `cinnabar`, direct Git integration to
   `qq314134306/cinnabar`, production branch `main`, and Root Directory `app`.
-  The current production deployment is sourced from merge commit `a07d963`.
+  The current production deployment is sourced from merge commit `3b5b856`.
   No Vercel project identifier or environment value is recorded in repository
   documentation.
 - The current Vercel path is direct GitHub-to-Vercel deployment. The historical
@@ -65,9 +65,21 @@
   without visitor email capture, cast the default chart, rendered BaZi, Zi Wei,
   annual timing, and the local snapshot, and found no horizontal document
   overflow. Public AI stayed fail-closed with its explicit unavailable state.
+- Pull request #12 merged the local Daily Timing navigator into protected
+  `main` as `3b5b856`. Vercel deployment
+  `2X2sdevYTN5wjXgL6YkhaWjSDZgH` is Ready in Production. Its required Lint and
+  Typecheck Deployment Checks passed in 29 and 28 seconds respectively before
+  the one-second custom-domain assignment. A signed-in Chrome production smoke
+  test on `www.cinnabarastrology.com` cast the default chart, advanced the
+  selected date from 2026-07-25 to 2026-07-26, observed the Day Pillar and Ten
+  Gods relationship update, and found no horizontal overflow or console error.
 
 ## Recently Completed
 
+- Merged protected pull request #12 only after all four GitHub/Vercel checks
+  passed and the isolated Vercel Preview completed the same Daily Timing smoke
+  flow. Production now serves exact merge commit `3b5b856`; both required
+  Vercel checks passed before the formal domain was assigned.
 - Added a provider-independent Daily Timing navigator to the lazy chart
   surface. It compares the selected Gregorian day's Day Pillar with the natal
   Day Master through the existing Four Pillars and typed Ten Gods helpers,
