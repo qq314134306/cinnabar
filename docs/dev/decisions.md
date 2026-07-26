@@ -1352,3 +1352,26 @@ This decision does not authorize a BaZi compatibility score, spouse-palace or
 useful-god judgment, branch-combination weighting, hidden-stem synthesis,
 marriage timing, fate claims, relationship advice, AI prose, persistence,
 analytics, account gating, payment, or a network request.
+
+## D057 - BaZi Compatibility May Expose Both Complete Four-Pillar Sets
+
+Cinnabar may extend the score-free BaZi Compatibility layer from its initial
+Day-Pillar-only presentation to a complete Year, Month, Day, and Hour Pillar
+display for both people. The display must use the exact `BaziFourPillars`
+results already built from the two Compatibility-owned `resolvedBirthTime`
+values; it must not recalculate either timestamp or introduce a second
+calendar engine.
+
+This increment is presentation of deterministic chart structure, not expanded
+relationship synthesis. The existing directional Ten Gods comparison remains
+limited to the two Day Masters, and the existing branch classifier remains
+limited to the two Day Branches and its same/Liu He/Liu Chong/unclassified
+contract. Showing all eight pillars does not authorize comparisons between
+other stems or branches, hidden-stem weighting, or favorable/unfavorable
+labels. Approximate input marks the complete display provisional because a
+true-solar correction can change a pillar at a calendar boundary.
+
+The four-pillar display remains separate from the symmetric Zi Wei score and
+does not authorize a BaZi score, spouse-palace or useful-god judgment, luck
+weighting, marriage timing, fate claims, relationship advice, AI prose,
+persistence, analytics, account gating, payment, or a network request.
