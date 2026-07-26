@@ -66,6 +66,18 @@ describe('buildBaziCompatibility', () => {
     expect(result?.personA.pillars.every((pillar) => pillar.ganZhi.length === 2)).toBe(true)
     expect(result?.personAToB.label).toBeTruthy()
     expect(result?.personBToA.label).toBeTruthy()
+    expect(result?.branchContacts.length).toBeGreaterThan(0)
+    expect(result?.branchContacts.length).toBeLessThanOrEqual(16)
+    expect(result?.branchContacts.every((contact) => (
+      contact.kind === 'same'
+      || contact.kind === 'sixHarmony'
+      || contact.kind === 'sixClash'
+    ))).toBe(true)
+    expect(result?.branchContacts).toContainEqual(expect.objectContaining({
+      personAScope: 'year',
+      personBScope: 'year',
+      kind: 'sixHarmony',
+    }))
     expect(result?.provisional).toBe(false)
   })
 

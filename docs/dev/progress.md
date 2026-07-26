@@ -95,6 +95,18 @@
 
 ## Recently Completed
 
+- Extended the score-free BaZi Compatibility layer with a deterministic
+  cross-person Earthly Branch contact map. It evaluates all 16 Four-Pillar
+  pairings but exposes only same-branch, canonical Liu He, and canonical Liu
+  Chong contacts, preserving both pillar scopes and branches for inspection.
+  Unclassified pairings remain hidden behind an explicit empty state. The map
+  adds no weighting, favorable/unfavorable judgment, score, prediction, AI,
+  persistence, analytics, account, payment, or network request. Focused tests
+  passed 34 assertions; complete lint, 81 files / 670 tests, and the production
+  build passed. A real local Chrome pass found five contacts for the default
+  pair, changed Person B from 1992-06-15 to 1992-06-16 and observed seven
+  updated contacts, retained all eight pillars, and found no console
+  warning/error or horizontal overflow at desktop and 390×844 mobile widths.
 - Extended the local BaZi Compatibility result with a complete Four Pillars
   comparison for both people. The model now carries the ordered Year, Month,
   Day, and Hour pillars from the same two true-solar-resolved calculations and

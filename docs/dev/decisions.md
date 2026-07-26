@@ -1375,3 +1375,23 @@ The four-pillar display remains separate from the symmetric Zi Wei score and
 does not authorize a BaZi score, spouse-palace or useful-god judgment, luck
 weighting, marriage timing, fate claims, relationship advice, AI prose,
 persistence, analytics, account gating, payment, or a network request.
+
+## D058 - BaZi Compatibility May Map Canonical Cross-Pillar Branch Contacts
+
+Cinnabar may compare each of Person A's four Earthly Branches with each of
+Person B's four Earthly Branches, producing 16 ordered cross-person pairings.
+The visible map lists only same-branch contacts and the six canonical Liu He
+and Liu Chong pairs already authorized for the Day Branch summary. Pairings
+outside those three recognized structures are omitted, with an explicit empty
+state when none are recognized.
+
+Each listed contact preserves both pillar scopes and both raw branches so the
+claim remains inspectable. The map is descriptive, not evaluative: it does not
+rank pillars, weight repeated contacts, combine structures into a score, or
+label a contact favorable or unfavorable. It continues to consume only the
+two Compatibility-owned true-solar-resolved Four Pillars results.
+
+This decision does not authorize San He, San Hui, punishments, harms,
+destructions, hidden-stem synthesis, spouse-palace or useful-god judgment,
+timing forecasts, fate claims, relationship advice, AI prose, persistence,
+analytics, account gating, payment, or a network request.

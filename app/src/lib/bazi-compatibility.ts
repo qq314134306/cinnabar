@@ -46,12 +46,22 @@ export interface BaziDayBranchRelation {
   description: string
 }
 
+export interface BaziPillarBranchContact {
+  personAScope: BaziPillarScope
+  personABranch: string
+  personBScope: BaziPillarScope
+  personBBranch: string
+  kind: Exclude<BaziDayBranchRelationKind, 'unclassified'>
+  label: string
+}
+
 export interface BaziCompatibilityResult {
   personA: BaziCompatibilityPerson
   personB: BaziCompatibilityPerson
   personAToB: BaziDirectionalRelationship
   personBToA: BaziDirectionalRelationship
   dayBranchRelation: BaziDayBranchRelation
+  branchContacts: BaziPillarBranchContact[]
   provisional: boolean
 }
 
@@ -72,6 +82,12 @@ const SIX_CLASH_PAIRS = new Set([
   '戌|辰',
   '亥|巳',
 ])
+
+const BRANCH_CONTACT_LABELS: Record<BaziPillarBranchContact['kind'], string> = {
+  same: 'Same branch',
+  sixHarmony: 'Six Harmony · Liu He',
+  sixClash: 'Six Clash · Liu Chong',
+}
 
 const RELATIONSHIP_STRUCTURE: Record<DirectionalTenGod, string> = {
   peer: 'the same element and polarity',
@@ -168,6 +184,35 @@ function buildPerson(info: BirthInfo): BaziCompatibilityPerson | null {
   }
 }
 
+function buildPillarBranchContacts(
+  personA: BaziCompatibilityPerson,
+  personB: BaziCompatibilityPerson,
+): BaziPillarBranchContact[] {
+  const contacts: BaziPillarBranchContact[] = []
+
+  for (const personAPillar of personA.pillars) {
+    for (const personBPillar of personB.pillars) {
+      const relation = getBaziDayBranchRelation(
+        personAPillar.branch,
+        personBPillar.branch,
+      )
+
+      if (relation.kind === 'unclassified') continue
+
+      contacts.push({
+        personAScope: personAPillar.scope,
+        personABranch: personAPillar.branch,
+        personBScope: personBPillar.scope,
+        personBBranch: personBPillar.branch,
+        kind: relation.kind,
+        label: BRANCH_CONTACT_LABELS[relation.kind],
+      })
+    }
+  }
+
+  return contacts
+}
+
 export function buildBaziCompatibility(
   personAInfo: BirthInfo,
   personBInfo: BirthInfo,
@@ -195,6 +240,7 @@ export function buildBaziCompatibility(
       personA.dayPillar.branch,
       personB.dayPillar.branch,
     ),
+    branchContacts: buildPillarBranchContacts(personA, personB),
     provisional: personAInfo.birthTimeReliable === false
       || personBInfo.birthTimeReliable === false,
   }
