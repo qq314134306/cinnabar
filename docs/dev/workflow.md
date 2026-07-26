@@ -518,9 +518,9 @@ gh run view <run-id> --repo qq314134306/cinnabar --json status,conclusion,attemp
 Vercel's direct Git integration does not by itself prove that the GitHub checks
 passed. `main` is protected by the two GitHub jobs below, and Vercel has native
 blocking `Lint` and `Typecheck` Deployment Checks. Automatic assignment of
-custom production domains remains enabled. The native checks first run on the
-next deployment, so their successful block-and-release behavior must be
-observed before treating the Production alias path as proven.
+custom production domains remains enabled. Merge commit `a07d963` directly
+proved the sequence: both required native checks completed before Vercel
+assigned the Production aliases. Reconfirm this ordering on later releases.
 
 Use this release order:
 
@@ -532,9 +532,8 @@ Use this release order:
 3. Confirm `main` protection still requires a pull request, both checks, and an
    up-to-date branch, with force pushes, deletion, and bypass disallowed.
 4. Confirm Vercel's blocking native `Lint` and `Typecheck` Deployment Checks
-   are configured. On the first production candidate, observe both checks pass
-   before Vercel assigns the Production alias; do not infer this from build
-   success alone.
+   are configured and observe both pass before Vercel assigns the Production
+   alias; do not infer this from build success alone.
 5. After deployment, verify the production source commit, expected functions,
    runtime logs, and environment scopes in the authenticated Vercel project.
 
