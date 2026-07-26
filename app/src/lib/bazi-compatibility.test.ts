@@ -3,6 +3,7 @@ import type { BirthInfo } from './astro'
 import {
   buildBaziCompatibility,
   getBaziDayBranchRelation,
+  getBaziDayBranchRelations,
   getBaziStemContact,
 } from './bazi-compatibility'
 
@@ -37,7 +38,7 @@ function birthInfo(
 }
 
 describe('getBaziDayBranchRelation', () => {
-  it('recognizes same, Six Harmony, Six Clash, Six Harm, and unclassified pairs', () => {
+  it('recognizes same, Six Harmony, Six Clash, Six Harm, Six Break, and unclassified pairs', () => {
     expect(getBaziDayBranchRelation('子', '子').kind).toBe('same')
     expect(getBaziDayBranchRelation('子', '丑').kind).toBe('sixHarmony')
     expect(getBaziDayBranchRelation('丑', '子').kind).toBe('sixHarmony')
@@ -55,6 +56,30 @@ describe('getBaziDayBranchRelation', () => {
       expect(getBaziDayBranchRelation(first, second).kind).toBe('sixHarm')
       expect(getBaziDayBranchRelation(second, first).kind).toBe('sixHarm')
     }
+    const breakPairs = [
+      ['子', '酉'],
+      ['卯', '午'],
+      ['辰', '丑'],
+      ['未', '戌'],
+      ['寅', '亥'],
+      ['巳', '申'],
+    ]
+    for (const [first, second] of breakPairs) {
+      expect(getBaziDayBranchRelations(first, second)).toContainEqual(
+        expect.objectContaining({ kind: 'sixBreak' }),
+      )
+      expect(getBaziDayBranchRelations(second, first)).toContainEqual(
+        expect.objectContaining({ kind: 'sixBreak' }),
+      )
+    }
+    expect(getBaziDayBranchRelations('寅', '亥').map(({ kind }) => kind)).toEqual([
+      'sixHarmony',
+      'sixBreak',
+    ])
+    expect(getBaziDayBranchRelations('巳', '申').map(({ kind }) => kind)).toEqual([
+      'sixHarmony',
+      'sixBreak',
+    ])
     expect(getBaziDayBranchRelation('子', '寅').kind).toBe('unclassified')
   })
 })
@@ -102,13 +127,15 @@ describe('buildBaziCompatibility', () => {
     expect(result?.personAToB.label).toBeTruthy()
     expect(result?.personBToA.label).toBeTruthy()
     expect(result?.branchContacts.length).toBeGreaterThan(0)
-    expect(result?.branchContacts.length).toBeLessThanOrEqual(16)
+    expect(result?.branchContacts.length).toBeLessThanOrEqual(32)
     expect(result?.branchContacts.every((contact) => (
       contact.kind === 'same'
       || contact.kind === 'sixHarmony'
       || contact.kind === 'sixClash'
       || contact.kind === 'sixHarm'
+      || contact.kind === 'sixBreak'
     ))).toBe(true)
+    expect(result?.dayBranchRelations[0]).toEqual(result?.dayBranchRelation)
     expect(result?.branchContacts).toContainEqual(expect.objectContaining({
       personAScope: 'year',
       personBScope: 'year',

@@ -282,10 +282,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   limited contact map over all 16 cross-person pillar pairings. A separate
   visible-stem contact map lists only canonical Heavenly Stem Five
   Combinations across the same 16 pillar pairings and makes no transformation
-  or strength claim. The branch map
-  lists only same-branch, Liu He, Liu Chong, or Liu Hai contacts and omits
-  unclassified pairs. Liu Hai is a named structural contact rather than an
-  adverse forecast. This layer never
+  or strength claim. The branch map uses an additive multi-contact model and
+  lists only same-branch, Liu He, Liu Chong, Liu Hai, or Liu Po contacts while
+  omitting unclassified pairs. Yin-Hai and Si-Shen retain both their Liu He and
+  Liu Po labels. Liu Hai and Liu Po are named structural contacts rather than
+  adverse forecasts. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership, sends both full allowlisted birth shapes, and is

@@ -144,6 +144,21 @@
 
 ## Recently Completed
 
+- Upgraded the score-free BaZi Compatibility Earthly Branch classifier from a
+  single result to an additive multi-contact model and added all six canonical
+  Liu Po pairs: Zi-You, Mao-Wu, Chen-Chou, Wei-Xu, Yin-Hai, and Si-Shen. The
+  Yin-Hai and Si-Shen pairs now retain both Liu He and Liu Po instead of
+  silently discarding one relationship. Day Branch and all 16 cross-person
+  pillar pairings use the same ordered result model. “Six Break” remains a
+  structural label, not evidence of damage, failure, or an adverse outcome.
+  The legacy primary Day Branch field remains available for rolling component
+  compatibility; no score, weighting, forecast, AI, persistence, account,
+  payment, or network behavior was added. Focused compatibility coverage passes
+  36 tests across four files; complete lint, 81 test files / 672 tests, and the
+  production build pass. Local Chrome rendered one Liu Po contact among seven
+  total branch contacts for the default pair, retained all eight pillars, and
+  showed no horizontal overflow at the desktop viewport.
+
 - Extended the score-free BaZi Compatibility Earthly Branch map with all six
   canonical Liu Hai contacts. The order-independent classifier now recognizes
   Zi-Wei, Chou-Wu, Yin-Si, Mao-Chen, Shen-Hai, and You-Xu across all 16

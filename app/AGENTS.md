@@ -614,8 +614,11 @@ visible pillar stems, producing four A-to-B and four B-to-A relationships;
 never treat a non-Day-Master stem as a Ten Gods reference. The Day Branch
 summary and the map
 may identify only same branch, the six canonical Liu He pairs, the six
-canonical Liu Chong pairs, or explicitly unclassified; the map omits
-unclassified pairings. They must not alter the
+canonical Liu Chong pairs, the six canonical Liu Hai pairs, the six canonical
+Liu Po pairs, or explicitly unclassified; the map omits unclassified pairings.
+The branch classifier is additive because Yin-Hai and Si-Shen are both Liu He
+and Liu Po; never collapse a recognized multi-contact pair back to one label.
+They must not alter the
 existing symmetric score, infer other branch systems, assign good/bad meaning,
 or add advice, AI, persistence, analytics, account, payment, or network work.
 If either input time is approximate, mark the entire BaZi layer provisional.
