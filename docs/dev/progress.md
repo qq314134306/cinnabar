@@ -131,6 +131,16 @@
   Current, and bound to `www.cinnabarastrology.com` for exact source
   `a87a847`. Production Chrome repeated the same empty-to-one-contact flow with
   no overflow or browser warning/error.
+- Pull request #27 merged the canonical Earthly Branch Six Harm map into
+  protected `main` as `e232664`. All four GitHub/Vercel candidate checks
+  passed, and isolated Preview deployment `DJyQY9A9UHFWUGpp33JYyztXMEVs`
+  rendered one Liu Hai contact among six total branch contacts while retaining
+  all eight pillars with no horizontal overflow or console warning/error.
+  Production deployment `6YtL2KGsapAD14WnW5czazMPuTj7` passed both
+  Deployment Checks and is Ready, Current, and bound to
+  `www.cinnabarastrology.com` for exact source `e232664`. Production Chrome
+  repeated the same six-contact flow with no overflow or browser
+  warning/error.
 
 ## Recently Completed
 
