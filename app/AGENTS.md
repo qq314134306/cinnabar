@@ -141,11 +141,13 @@ dependencies eagerly.
 
 `src/lib/question-divination.ts` + `src/components/question/QuestionDivination.tsx`:
 account-independent Question Charts foundation. Capture exactly one immutable
-question/time/timezone/location-evidence event, then calculate Liu Yao, Qi Men
-Dun Jia, and Da Liu Ren into separate versioned fact contracts. Preserve each
-result's provider/version/status/failure metadata and exact shared event
-identity. Production remains local and fail closed; remote APIs are permitted
-only for fixed anonymous golden-sample review. Do not add cross-method
+question/time/timezone/location-evidence event. Convert `datetime-local` using
+the selected IANA timezone and reject DST gaps/folds rather than guessing.
+The initial three deterministic calculators are incomplete development
+placeholders: production must not call or display them. Return versioned
+`ENGINE_UNAVAILABLE` results without facts until independently verified local
+engines replace them. Remote APIs are permitted only for fixed anonymous
+golden-sample review and never as a production fallback. Do not add cross-method
 conclusions, AI copy, scores, persistence, analytics, account/payment gates, or
 birth-profile reuse in this stage. Contract details live in
 `../docs/dev/question-divination-contracts.md`.

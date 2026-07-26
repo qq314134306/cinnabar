@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import {
-  calculateQuestionCharts,
+  createUnavailableQuestionResults,
   createQuestionEvent,
+  zonedLocalDateTimeToUtc,
   type FactResult,
 } from '@/lib/question-divination'
 
@@ -20,7 +21,7 @@ export function QuestionDivination() {
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE)
   const [location, setLocation] = useState('')
   const [error, setError] = useState('')
-  const [chart, setChart] = useState<ReturnType<typeof calculateQuestionCharts> | null>(null)
+  const [chart, setChart] = useState<ReturnType<typeof createUnavailableQuestionResults> | null>(null)
   const captureLabel = useMemo(() => chart
     ? new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short', timeZone: chart.event.timezone }).format(new Date(chart.event.capturedAt))
     : '', [chart])
@@ -31,11 +32,11 @@ export function QuestionDivination() {
     try {
       const questionEvent = createQuestionEvent({
         question,
-        capturedAt: new Date(capturedAt).toISOString(),
+        capturedAt: zonedLocalDateTimeToUtc(capturedAt, timezone),
         timezone,
         locationLabel: location,
       })
-      setChart(calculateQuestionCharts(questionEvent))
+      setChart(createUnavailableQuestionResults(questionEvent))
     } catch (reason) {
       setChart(null)
       setError(reason instanceof Error ? reason.message : 'The question event could not be captured.')
@@ -48,7 +49,7 @@ export function QuestionDivination() {
         <p className="text-xs uppercase tracking-[0.24em] text-gold">One event · three independent charts</p>
         <h2 id="question-charts-title" className="text-3xl font-semibold" style={{ fontFamily: 'var(--font-serif)' }}>Question Charts</h2>
         <p className="mx-auto max-w-2xl text-sm text-text-muted">
-          Capture one question, time, timezone, and location record. Liu Yao, Qi Men Dun Jia, and Da Liu Ren calculate separately from that same immutable event.
+          Capture one question, time, timezone, and location record. The verified local Liu Yao, Qi Men Dun Jia, and Da Liu Ren engines are not available yet.
         </p>
         <p className="text-xs text-text-muted">For entertainment &amp; self-discovery only. Not professional advice.</p>
       </header>
@@ -71,7 +72,7 @@ export function QuestionDivination() {
         <div className="space-y-4">
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-sm">
             <p><span className="text-text-muted">Captured once:</span> {captureLabel} · {chart.event.timezone} · {chart.event.location.label}</p>
-            <p className="mt-1 text-xs text-text-muted">Event contract {chart.event.version}. Free verified structural facts only—combined interpretation is a separate future product boundary.</p>
+            <p className="mt-1 text-xs text-text-muted">Event contract {chart.event.version}. No substitute chart was generated and no external service was called.</p>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
             {chart.results.map((result) => <FactCard key={result.method} result={result} />)}

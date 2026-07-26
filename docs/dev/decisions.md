@@ -1,5 +1,19 @@
 # Decisions
 
+## D066 - Question Charts Fails Closed Until Local Engines Are Verified
+
+The initial Question Charts calculators are deterministic development
+placeholders, not complete Liu Yao, Qi Men Dun Jia, or Da Liu Ren algorithms.
+Production must not call or display their outputs. It captures and freezes the
+question event, converts the selected local wall time with its IANA timezone,
+rejects ambiguous or nonexistent DST times, and returns versioned
+`ENGINE_UNAVAILABLE` results without facts. No external fallback may substitute
+a chart.
+
+Consequence: each method can reopen only after its local algorithm, ruleset,
+independent golden fixtures, failure metadata, and boundary tests are reviewed.
+AI, payment, credit spending, and three-method synthesis remain out of scope.
+
 ## D065 - Question-Divination Facts Stay Independent and Local
 
 Capture one immutable, versioned question event and derive Liu Yao, Qi Men Dun
