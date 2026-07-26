@@ -548,6 +548,14 @@ sanitization; it never retains full URLs, query strings, script samples,
 cookies, or request data. Do not switch CSP to enforcement until production
 reports have been reviewed and payment/browser domains are verified.
 
+`src/lib/qizheng-contract.ts` + `qizheng-adapter.ts` + `qizheng-local.ts` +
+`src/components/chart/QizhengFacts.tsx`: Qizheng structured foundation. AOV is
+anonymous-fixture-only and must never become a production birth-data path.
+Production reuses saved resolved time/location evidence and fails closed until
+the local provider is complete. Unknown/approximate time emits no Qizheng
+time-derived facts. Preserve source/precision metadata and keep this layer free
+of DeepSeek, synthesis, payments, credits, persistence, and redesign.
+
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city
 English names; UTC offsets are DST-aware via the built-in Intl API (China

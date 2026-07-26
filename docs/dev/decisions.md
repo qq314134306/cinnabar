@@ -112,6 +112,16 @@ code and tests.
 [PROTOCOL]: Add a new decision when a choice affects future implementation,
 deployment, product behavior, or contributor workflow.
 
+## D013 - Qizheng Requires a Bundled Deterministic Provider
+
+Production may populate `qizheng.fact.v1` only from Cinnabar's bundled engine,
+using existing resolved time, coordinates, and DST-aware timezone evidence.
+AOV/Mingyu may validate fixed anonymous fixtures but receives no real user
+birth data. Until local fixture parity, show unavailable and generate no
+substitute chart. Unknown/approximate time emits no time-derived facts. Keep
+modern astronomy and traditional Zi Qi precision metadata distinct. DeepSeek
+may later verbalize verified facts server-side but may not calculate them.
+
 ## D007 - Credits Use an Append-Only Server-Written Ledger
 
 Credit balance is the sum of immutable `credit_ledger.amount` entries, not a

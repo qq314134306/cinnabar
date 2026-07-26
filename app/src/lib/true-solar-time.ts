@@ -76,6 +76,8 @@ export interface ResolvedBirthTime {
   location: Birthplace | null
   /** Present on newly resolved values; optional only for persisted legacy shapes. */
   evidence?: BirthTimeEvidence
+  /** DST-aware offset used by every downstream chart adapter. */
+  timezoneOffsetMinutes?: number | null
 }
 
 export function reliabilityForBirthTimeSource(
@@ -255,6 +257,9 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     crossedDate: isDifferentDate(input, correctedDate),
     location,
     evidence: input.evidence ?? createBirthTimeEvidence('unknown', 'exact'),
+    timezoneOffsetMinutes: location
+      ? getUtcOffsetMinutes(location.tz ?? DEFAULT_TIMEZONE, input.year, input.month, input.day, input.hour)
+      : null,
   }
 }
 

@@ -237,6 +237,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   engine position only to enter this flow; derived hour-dependent surfaces
   remain locked. Candidate results are entertainment-and-self-discovery
   comparisons only and never replace the canonical birth input or its caches.
+- `app/src/lib/qizheng-contract.ts` + `qizheng-adapter.ts` +
+  `qizheng-local.ts` + `app/src/components/chart/QizhengFacts.tsx` - versioned
+  Qizheng facts and presentation. AOV is anonymous-fixture-only; production
+  accepts the shared resolved time/coordinates/timezone evidence and fails
+  closed until the bundled deterministic provider is complete.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts. Its
   natal Four Transformations line reuses the chart's pure transformation index
   so local navigation and prompt grounding share one ownership source. Its
