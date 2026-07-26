@@ -15,6 +15,7 @@ import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 import { BirthTimeSensitivity } from './BirthTimeSensitivity'
 import { BaZiFourPillars } from './BaZiFourPillars'
+import { DailyTiming } from './DailyTiming'
 import {
   getMajorStarExplanation,
   getPalaceExplanation,
@@ -1029,6 +1030,8 @@ export function ChartDisplay() {
       />
 
       <BaZiFourPillars birthInfo={birthInfo} />
+
+      <DailyTiming birthInfo={birthInfo} />
 
       <TimingLens
         chart={chart}
