@@ -31,8 +31,12 @@
   release evidence. The verify job exposed a new high-severity
   `brace-expansion` advisory. The Fresh database job uploaded a sanitized
   failure artifact after the Supabase `postgres` role was denied permission to
-  alter the database object's default marker. Compatible toolchain and marker
-  fixes are being prepared for a new exact-head run.
+  alter the database object's default marker. Run `30183888687` proved the
+  toolchain remediation through a successful `Verify candidate` job, but also
+  showed that the role cannot persist its own custom database-scoped default.
+  Marker persistence is now confined to local Supabase's built-in
+  `supabase_admin`, with `PGUSER=postgres` restored before the proof starts.
+  A new exact-head database run is still required.
 - GitHub `main` is not protected. Vercel has Git Fork Protection, Standard
   Deployment Protection, Build Logs protection, and Source protection enabled,
   but no Deployment Checks are configured and automatic custom-production-
@@ -57,8 +61,9 @@
   clean `npm ci` and full-tree audit at zero vulnerabilities. Three newly
   recommended lint rules are explicitly held at the prior candidate baseline
   so the security update does not silently introduce behavior refactors. The
-  database marker now uses the current `postgres` role's own database-scoped
-  default rather than requiring ownership of the Supabase database. Local
+  database marker is persisted by the local stack's built-in administrative
+  role, then the workflow restores the required `postgres` proof owner before
+  invoking any release-proof code. Local
   lint, 77 files / 656 tests, and the strict production build pass after the
   changes. A new exact-head hosted run is still required; the failed initial
   run and its failure artifact are not release evidence.

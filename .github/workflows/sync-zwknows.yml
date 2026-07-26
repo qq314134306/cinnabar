@@ -203,9 +203,17 @@ jobs:
           $env:PGUSER = [System.Uri]::UnescapeDataString($userInfo[0])
           $env:PGPASSWORD = [System.Uri]::UnescapeDataString($userInfo[1])
           $env:PGSSLMODE = 'disable'
-          'alter role current_user in database postgres set "cinnabar.environment" = ''test'';' |
-            & psql -X -q -v ON_ERROR_STOP=1
-          if ($LASTEXITCODE -ne 0) {
+          $proofOwner = $env:PGUSER
+          $markerExitCode = 1
+          try {
+            $env:PGUSER = 'supabase_admin'
+            'alter database postgres set "cinnabar.environment" = ''test'';' |
+              & psql -X -q -v ON_ERROR_STOP=1
+            $markerExitCode = $LASTEXITCODE
+          } finally {
+            $env:PGUSER = $proofOwner
+          }
+          if ($markerExitCode -ne 0) {
             throw 'DATABASE_MARKER_FAILED'
           }
 
