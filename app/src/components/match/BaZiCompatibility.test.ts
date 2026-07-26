@@ -183,12 +183,51 @@ const RESULT: BaziCompatibilityResult = {
       { targetScope: 'hour', targetBranch: '午', targetStem: '己', hiddenStemIndex: 1, relationship: 'indirectResource', label: 'Indirect Resource' },
     ],
   },
+  elementStructures: {
+    personA: {
+      entries: [
+        { scope: 'year', source: 'stem', character: '庚', element: 'Metal' },
+        { scope: 'year', source: 'branch', character: '午', element: 'Fire' },
+        { scope: 'month', source: 'stem', character: '戊', element: 'Earth' },
+        { scope: 'month', source: 'branch', character: '寅', element: 'Wood' },
+        { scope: 'day', source: 'stem', character: '丙', element: 'Fire' },
+        { scope: 'day', source: 'branch', character: '寅', element: 'Wood' },
+        { scope: 'hour', source: 'stem', character: '甲', element: 'Wood' },
+        { scope: 'hour', source: 'branch', character: '午', element: 'Fire' },
+      ],
+      counts: { Wood: 3, Fire: 3, Earth: 1, Metal: 1, Water: 0 },
+    },
+    personB: {
+      entries: [
+        { scope: 'year', source: 'stem', character: '壬', element: 'Water' },
+        { scope: 'year', source: 'branch', character: '申', element: 'Metal' },
+        { scope: 'month', source: 'stem', character: '乙', element: 'Wood' },
+        { scope: 'month', source: 'branch', character: '巳', element: 'Fire' },
+        { scope: 'day', source: 'stem', character: '辛', element: 'Metal' },
+        { scope: 'day', source: 'branch', character: '亥', element: 'Water' },
+        { scope: 'hour', source: 'stem', character: '乙', element: 'Wood' },
+        { scope: 'hour', source: 'branch', character: '未', element: 'Earth' },
+      ],
+      counts: { Wood: 2, Fire: 1, Earth: 1, Metal: 2, Water: 2 },
+    },
+  },
   provisional: false,
 }
 
 afterEach(cleanup)
 
 describe('BaZiCompatibility', () => {
+  it('renders an unweighted, inspectable Five Element inventory for both people', () => {
+    const { container } = render(createElement(BaZiCompatibility, { result: RESULT }))
+
+    expect(screen.getByRole('heading', { name: 'Visible Five Element structure' })).toBeTruthy()
+    expect(screen.getByText(/Counts are unweighted/)).toBeTruthy()
+    expect(container.querySelectorAll('[data-bazi-element-structure]')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-bazi-element-entry]')).toHaveLength(16)
+    expect(container.querySelector('[data-bazi-element-structure="A"] [data-bazi-element-count="Wood"]')?.textContent).toContain('3')
+    expect(container.querySelector('[data-bazi-element-structure="B"] [data-bazi-element-count="Water"]')?.textContent).toContain('2')
+  })
+
   it('renders both directional relationships without merging them into a score', () => {
     const { container } = render(createElement(BaZiCompatibility, { result: RESULT }))
 

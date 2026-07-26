@@ -1518,3 +1518,24 @@ additive Liu He/Liu Chong/Liu Hai/Liu Po map. It adds no weight, strength or
 transformation judgment, favorable/unfavorable label, prediction, advice, AI,
 persistence, analytics, account requirement, payment, or network request. San
 He, San Hui, and any broader branch synthesis remain outside this decision.
+
+## D065 - Visible Five Element Structure Is an Unweighted Inventory
+
+Cinnabar may show a transparent Five Element structure inventory inside the
+score-free BaZi Compatibility layer. For each person it maps exactly the four
+visible Heavenly Stems and four Earthly Branches already owned by the resolved
+Four Pillars result to Wood, Fire, Earth, Metal, or Water. Every one of the
+eight entries retains its Year, Month, Day, or Hour scope, its stem/branch
+source, and its raw character. Counts use a fixed element order and are a
+direct total of those visible positions only.
+
+This inventory is descriptive, not evaluative. It does not include hidden
+stems, assign seasonal or positional weights, measure element strength or
+balance, compare the two totals, or feed the symmetric Zi Wei compatibility
+score. An unknown stem or branch fails the complete BaZi result instead of
+producing a partial or inferred list.
+
+This decision does not authorize favorable/unfavorable labels, useful-element
+selection, a BaZi score, relationship conclusions, timing forecasts, fate
+claims, advice, AI prose, persistence, analytics, account gating, payment, or
+a network request.

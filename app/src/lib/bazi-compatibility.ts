@@ -6,6 +6,10 @@ import {
   type BaziPillarScope,
   type BaziTenGod,
 } from './bazi-four-pillars'
+import {
+  buildBaziElementStructure,
+  type BaziElementStructure,
+} from './bazi-element-structure'
 
 type DirectionalTenGod = Exclude<BaziTenGod, 'dayMaster'>
 
@@ -135,6 +139,10 @@ export interface BaziCompatibilityResult {
   hiddenStemRelationships: {
     personAToB: BaziPillarHiddenStemRelationship[]
     personBToA: BaziPillarHiddenStemRelationship[]
+  }
+  elementStructures: {
+    personA: BaziElementStructure
+    personB: BaziElementStructure
   }
   provisional: boolean
 }
@@ -536,6 +544,9 @@ export function buildBaziCompatibility(
     personA.dayMaster.stem,
   )
   if (!personAToB || !personBToA) return null
+  const personAElementStructure = buildBaziElementStructure(personA.pillars)
+  const personBElementStructure = buildBaziElementStructure(personB.pillars)
+  if (!personAElementStructure || !personBElementStructure) return null
 
   return {
     personA,
@@ -566,6 +577,10 @@ export function buildBaziCompatibility(
         personB.dayMaster.stem,
         personA,
       ),
+    },
+    elementStructures: {
+      personA: personAElementStructure,
+      personB: personBElementStructure,
     },
     provisional: personAInfo.birthTimeReliable === false
       || personBInfo.birthTimeReliable === false,
