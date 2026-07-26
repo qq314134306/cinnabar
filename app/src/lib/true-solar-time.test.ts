@@ -107,6 +107,7 @@ describe('resolveBirthTime', () => {
 
     expect(result.applied).toBe(true)
     expect(result.location?.name).toBe(BEIJING_CITY)
+    expect(result.timezoneOffsetMinutes).toBe(480)
     expect(result.correctedShichen).toBe(WU_SHICHEN)
     expect(result.timeIndex).toBe(6)
   })

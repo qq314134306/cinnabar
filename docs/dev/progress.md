@@ -144,6 +144,14 @@
 
 ## Recently Completed
 
+- Added the first Qizheng structured foundation. The versioned
+  `qizheng.fact.v1` contract retains resolved time/location evidence,
+  provenance, aspects, Life/Body Palace, and Twelve Palace facts. AOV/Mingyu
+  validated only a fixed anonymous offline fixture; production sends it no user
+  data and has no AOV route. The `cinnabar-local` boundary fails closed until a
+  bundled engine reaches fixture parity. Approximate/unknown time emits no
+  Qizheng facts. Focused coverage passes 7 tests across two files.
+
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and
   Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or

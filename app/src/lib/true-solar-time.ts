@@ -49,6 +49,8 @@ export interface ResolvedBirthTime {
   applied: boolean
   crossedDate: boolean
   location: Birthplace | null
+  /** DST-aware offset used by every downstream chart adapter. */
+  timezoneOffsetMinutes?: number | null
 }
 
 const MINUTES_PER_LONGITUDE_DEGREE = 4
@@ -206,6 +208,9 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     applied: shouldApply,
     crossedDate: isDifferentDate(input, correctedDate),
     location,
+    timezoneOffsetMinutes: location
+      ? getUtcOffsetMinutes(location.tz ?? DEFAULT_TIMEZONE, input.year, input.month, input.day, input.hour)
+      : null,
   }
 }
 
