@@ -120,7 +120,7 @@
   favorable/unfavorable label, score, prediction, AI, persistence, account,
   payment, or network request. Focused model/component coverage passes 31
   tests; complete lint, 81 files / 670 tests, and the production build pass.
-  Local Chrome rendered two directions and 21 hidden-stem relationships for
+  Local Chrome rendered two directions and 20 hidden-stem relationships for
   the default pair, changed Person B's date to 1992-06-16 and recomputed 19
   relationships, retained eight pillars, and found no desktop horizontal
   overflow at a 1905-pixel document width.
