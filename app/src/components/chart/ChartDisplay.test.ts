@@ -511,6 +511,28 @@ describe('ChartDisplay palace explanations', () => {
     })).toBeTruthy()
   })
 
+  it('shows the resolved birth-time provenance and source reliability', () => {
+    useChartStore.setState({
+      birthInfo: {
+        ...BIRTH_INFO,
+        resolvedBirthTime: {
+          ...BIRTH_INFO.resolvedBirthTime!,
+          evidence: {
+            source: 'hospital_record',
+            sourceReliability: 'high',
+            uncertainty: 'exact',
+            candidateRange: null,
+          },
+        },
+      },
+      chart: CHART,
+    })
+
+    render(createElement(ChartDisplay))
+
+    expect(screen.getByText(/Hospital record · high reliability/)).toBeTruthy()
+  })
+
   it('labels a completely unknown hour as a placeholder', () => {
     useChartStore.setState({
       birthInfo: {

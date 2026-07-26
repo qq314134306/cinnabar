@@ -144,6 +144,20 @@
 
 ## Recently Completed
 
+- Added a backward-compatible birth-time evidence contract to every new local
+  resolution: source (family recollection, official record, hospital record, or
+  unknown), derived source reliability, uncertainty, and optional candidate
+  interval now travel with the true-solar result. The chart exposes provenance,
+  unknown time never becomes 00:00, approximate comparisons identify suppressed
+  hour-dependent conclusions, and the 13-block finder cannot overwrite
+  canonical birth data. The flow remains local, deterministic, English, and
+  framed for entertainment and self-discovery. Focused coverage passed 46
+  focused tests and the complete 81-file / 678-test suite; lint and production
+  build passed. An anonymous fixed 1990-01-01
+  Chengdu sample cross-checked the local correction direction and Si Hour
+  boundary against AOV/Mingyu; the external service is not a runtime dependency
+  and received no user data.
+
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and
   Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or
@@ -626,16 +640,11 @@
   The birth form also accepts a completely unknown hour. Noon exists only as
   an internal engine position: the palace chart, local snapshot, AI reading,
   timeline, sharing, paid report, and compatibility prefill do not consume or
-  display it. The all-block finder remains available, and applying a real
-  civil candidate clears the placeholder state before derived features unlock.
-  Applying a candidate is explicit, preserves `birthTimeReliable=false`,
-  atomically replaces chart plus birth input, and clears chart-derived caches.
-  Paid-report access, checkout, and generation are also invalidated by the
-  exact chart/persona request identity when an applied candidate replaces the
-  chart, preventing an old asynchronous result from re-entering the cleared
-  cache. Once payment capture begins, chart replacement, Start Over, and
-  persona changes remain locked until verification finishes so a successful
-  purchase cannot be silently detached mid-capture. The complete app passes
+  display it. The all-block finder remains available as a passive candidate
+  comparison and cannot replace canonical birth data. Once payment capture
+  begins, chart replacement, Start Over, and persona changes remain locked
+  until verification finishes so a successful purchase cannot be silently
+  detached mid-capture. The complete app passes
   71 test files / 701 tests, lint, the strict
   production build, and the dependency audit with zero known vulnerabilities.
   The finder is a 22.15 kB raw / 7.71 kB gzip lazy chunk; ChartDisplay remains

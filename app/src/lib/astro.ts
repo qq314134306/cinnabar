@@ -12,7 +12,7 @@
 
 import { astro } from 'iztro'
 import type FunctionalAstrolabe from 'iztro/lib/astro/FunctionalAstrolabe'
-import { resolveBirthTime, type ResolvedBirthTime } from './true-solar-time'
+import { resolveBirthTime, type BirthTimeSource, type ResolvedBirthTime } from './true-solar-time'
 export { getShichenOptions, hourToShichen } from './shichen'
 
 /* ------------------------------------------------------------
@@ -42,6 +42,8 @@ export interface BirthInfo {
   birthTimeReliable?: boolean
   /** True when `hour` is a temporary noon position used only to enter the all-block shortlist. */
   birthTimeUnknown?: boolean
+  /** User-stated provenance; resolvedBirthTime.evidence is canonical after resolution. */
+  birthTimeSource?: BirthTimeSource
   isLeapMonth?: boolean
   fixLeap?: boolean
 }

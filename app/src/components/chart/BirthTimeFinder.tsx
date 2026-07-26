@@ -8,7 +8,6 @@ import {
   groupEquivalentCandidates,
   scoreBirthTimeGroups,
   shouldStopBirthTimeQuestions,
-  type BirthTimeCandidate,
   type BirthTimeCandidateGroup,
   type BirthTimeQuestion,
   type BirthTimeRanking,
@@ -21,7 +20,8 @@ import { Button, Input } from '@/components/ui'
 
 interface BirthTimeFinderProps {
   birthInfo: BirthInfo
-  onApply: (candidate: BirthTimeCandidate) => void
+  /** Legacy no-op retained for rolling component compatibility. */
+  onApply?: (candidate: never) => void
   onClose: () => void
 }
 
@@ -71,7 +71,6 @@ function formatDate(year: number, month: number, day: number): string {
 
 export function BirthTimeFinder({
   birthInfo,
-  onApply,
   onClose,
 }: BirthTimeFinderProps) {
   const [phase, setPhase] = useState<FinderPhase>('setup')
@@ -293,7 +292,8 @@ export function BirthTimeFinder({
             Cinnabar resolves every civil-time block through the exact
             birthplace first, then compares a small set of past-event answers.
             This produces evidence points—not an exact birth time, probability,
-            or minute-level result.
+            or minute-level result. It is for entertainment and self-discovery
+            only.
           </p>
         </div>
         <button
@@ -655,15 +655,9 @@ export function BirthTimeFinder({
                                 )}`
                               : ''}
                           </p>
-                          <Button
-                            onClick={() => onApply(candidate)}
-                            variant="secondary"
-                            size="sm"
-                            className="w-full"
-                            aria-label={`Use ${candidate.block.label}, ${candidate.block.range}`}
-                          >
-                            Use {candidate.block.label}
-                          </Button>
+                          <p className="text-xs leading-relaxed text-text-secondary">
+                            Candidate only — your canonical birth time is unchanged.
+                          </p>
                         </div>
                       )
                     })}
@@ -682,7 +676,7 @@ export function BirthTimeFinder({
                 .map((candidate) => candidate.block.label)
                 .join(', ')}
               . Cinnabar does not choose an arbitrary third candidate from that
-              tie; add stronger memories in a new run before applying one.
+              tie; add stronger memories in a new run before comparing again.
             </div>
           )}
 

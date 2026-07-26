@@ -52,6 +52,12 @@ describe('birth-time candidate preparation', () => {
         year: 1989,
         month: 12,
         day: 31,
+        evidence: {
+          source: 'unknown',
+          sourceReliability: 'unknown',
+          uncertainty: 'approximate',
+          candidateRange: { startHour: 0, endHour: 1, crossesMidnight: false },
+        },
       },
     })
     expect(candidates[12]).toMatchObject({
@@ -60,6 +66,11 @@ describe('birth-time candidate preparation', () => {
       birthInfo: {
         trueSolarEnabled: true,
         birthTimeReliable: false,
+      },
+      resolved: {
+        evidence: {
+          candidateRange: { startHour: 23, endHour: 0, crossesMidnight: true },
+        },
       },
     })
     expect(candidates.every((candidate) => (

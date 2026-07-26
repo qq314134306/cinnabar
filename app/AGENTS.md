@@ -380,7 +380,8 @@ two-hour windows. Shift the wall-clock input before resolving each scenario so
 Rat-hour date boundaries and an explicitly re-enabled true-solar correction
 remain correct. The comparison is passive: it summarizes Life Palace stars,
 Body Palace branch, and element class without replacing the canonical chart or
-claiming rectification. A comparison failure must stay local and retryable.
+claiming rectification. It names the hour-dependent conclusions that remain
+suppressed. A comparison failure must stay local and retryable.
 
 `src/lib/birth-time-finder.ts` +
 `src/components/chart/BirthTimeFinder.tsx`: an explicitly opened, separately
@@ -394,15 +395,13 @@ annual Life Palace placement, Major Limit palace, and the natal-palace
 locations of annual Four Transformations; do not reuse the timeline's
 dimension scores or any random value as event evidence. Show points and their
 ledger, never probabilities, accuracy, minute confidence, or a "correct time"
-claim. Applying a civil candidate must be explicit, keep
-`birthTimeReliable=false`, atomically replace chart plus birth input, and clear
-all chart-derived caches. Early stopping must remain overridable; previously
+claim. Civil candidates are entertainment-and-self-discovery comparisons only
+and must never replace canonical birth data. Early stopping must remain overridable; previously
 recorded answers stay editable and rescore through the same pure engine. The
 one-answer-removal check may describe ranking stability only, never confidence
 or correctness. A `birthTimeUnknown=true` noon value is an internal finder
 position only: do not render its palace chart or enable local/AI/timeline/share/
-payment output, and do not prefill Compatibility from it. Applying a finder
-candidate must clear this marker. No request, analytics, persistence, account,
+payment output, and do not prefill Compatibility from it. No request, analytics, persistence, account,
 AI, or payment dependency belongs in this flow.
 
 `src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI

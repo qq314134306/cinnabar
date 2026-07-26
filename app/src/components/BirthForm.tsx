@@ -7,7 +7,13 @@ import { Button, Input, Select } from '@/components/ui'
 import type { BirthInfo, Gender } from '@/lib/astro'
 import { clampDayToMonth, getDayOptions, getMonthOptions, getYearOptions } from '@/lib/birth-date'
 import { getShichenOptions } from '@/lib/shichen'
-import { findBirthplaceAsync, resolveBirthTimeAsync, type Birthplace } from '@/lib/true-solar-time'
+import {
+  createBirthTimeEvidence,
+  findBirthplaceAsync,
+  resolveBirthTimeAsync,
+  type Birthplace,
+  type BirthTimeSource,
+} from '@/lib/true-solar-time'
 import { useChartStore } from '@/stores'
 import { analytics } from '@/lib/analytics'
 
@@ -21,6 +27,13 @@ const BIRTH_TIME_RELIABILITY_OPTIONS = [
 ]
 
 type BirthTimeReliability = 'recorded' | 'approximate' | 'unknown'
+
+const BIRTH_TIME_SOURCE_OPTIONS = [
+  { value: 'family_recollection', label: 'Family recollection' },
+  { value: 'official_record', label: 'Official record' },
+  { value: 'hospital_record', label: 'Hospital record' },
+  { value: 'unknown', label: 'Unknown source' },
+]
 
 const GENDER_OPTIONS = [
   { value: 'male', label: 'Male', icon: '♂' },
@@ -36,6 +49,8 @@ export function BirthForm() {
   const [hour, setHour] = useState(12)
   const [birthTimeReliability, setBirthTimeReliability] =
     useState<BirthTimeReliability>('recorded')
+  const [birthTimeSource, setBirthTimeSource] =
+    useState<BirthTimeSource>('unknown')
   const [gender, setGender] = useState<Gender>('male')
   const [birthplace, setBirthplace] = useState('')
   const [trueSolarEnabled, setTrueSolarEnabled] = useState(true)
@@ -117,6 +132,14 @@ export function BirthForm() {
         hour: submittedHour,
         birthplace,
         enabled: trueSolarEnabled,
+        evidence: createBirthTimeEvidence(
+          birthTimeSource,
+          birthTimeReliability === 'recorded'
+            ? 'exact'
+            : birthTimeReliability === 'approximate'
+              ? 'approximate'
+              : 'unknown',
+        ),
       })
       const birthInfo: BirthInfo = {
         year,
@@ -129,6 +152,7 @@ export function BirthForm() {
         resolvedBirthTime,
         birthTimeReliable: birthTimeReliability === 'recorded',
         birthTimeUnknown: birthTimeReliability === 'unknown',
+        birthTimeSource,
       }
       const { generateChart } = await import('@/lib/astro')
       const chart = generateChart(birthInfo)
@@ -246,6 +270,20 @@ export function BirthForm() {
               : e.target.value === 'approximate'
                 ? 'approximate'
                 : 'recorded',
+          )}
+        />
+        <Select
+          label="Where did this birth time come from?"
+          options={BIRTH_TIME_SOURCE_OPTIONS}
+          value={birthTimeSource}
+          onChange={(e) => setBirthTimeSource(
+            e.target.value === 'family_recollection'
+              ? 'family_recollection'
+              : e.target.value === 'official_record'
+                ? 'official_record'
+                : e.target.value === 'hospital_record'
+                  ? 'hospital_record'
+                  : 'unknown',
           )}
         />
 

@@ -1,11 +1,10 @@
 import { lazy, useCallback, useMemo, useRef, useState } from 'react'
-import { useChartStore, useFutureReportActivityStore } from '@/stores'
+import { useChartStore } from '@/stores'
 import { LazySurface } from '@/components/LazySurface'
 import {
   buildBirthTimeSensitivity,
   type BirthTimeScenarioPosition,
 } from '@/lib/birth-time-sensitivity'
-import type { BirthTimeCandidate } from '@/lib/birth-time-finder'
 import { hourToShichen } from '@/lib/shichen'
 import {
   describeStarLabel,
@@ -37,15 +36,11 @@ function formatDate(year: number, month: number, day: number): string {
 }
 
 export function BirthTimeSensitivity() {
-  const { chart, birthInfo, replaceChart } = useChartStore()
+  const { chart, birthInfo } = useChartStore()
   const [retryVersion, setRetryVersion] = useState(0)
   const [finderOpen, setFinderOpen] = useState(false)
-  const [appliedStatus, setAppliedStatus] = useState<string | null>(null)
   const finderButtonRef = useRef<HTMLButtonElement | null>(null)
   const timeUnknown = birthInfo?.birthTimeUnknown === true
-  const capturePending = useFutureReportActivityStore(
-    (state) => state.captureCount > 0,
-  )
 
   const buildState = useMemo(() => {
     if (!chart || !birthInfo || birthInfo.birthTimeReliable !== false) {
@@ -70,20 +65,6 @@ export function BirthTimeSensitivity() {
     setFinderOpen(false)
     window.setTimeout(() => finderButtonRef.current?.focus(), 0)
   }, [])
-
-  const applyCandidate = useCallback((candidate: BirthTimeCandidate) => {
-    if (!replaceChart(candidate.birthInfo, candidate.chart)) {
-      setAppliedStatus(
-        'PayPal is verifying a payment. Finish that verification before changing the chart.',
-      )
-      return
-    }
-    setAppliedStatus(
-      `Chart updated to ${candidate.block.label}. The birth time remains marked approximate.`,
-    )
-    setFinderOpen(false)
-    window.setTimeout(() => finderButtonRef.current?.focus(), 0)
-  }, [replaceChart])
 
   if (!chart || !birthInfo || birthInfo.birthTimeReliable !== false) {
     return null
@@ -246,6 +227,14 @@ export function BirthTimeSensitivity() {
               ? 'The neighboring windows change at least one core chart structure. Treat each as a possibility; this comparison does not determine the correct birth time.'
               : 'The neighboring windows keep the displayed core structure stable. Other chart details may still differ; this comparison does not determine the correct birth time.'}
           </p>
+          <div className="mt-3 rounded-lg border border-white/[0.07] bg-black/10 px-3 py-2.5 text-sm text-text-secondary">
+            <p className="font-medium text-text">Suppressed while time is uncertain</p>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-xs text-text-muted">
+              {buildState.result.suppressedConclusions.map((conclusion) => (
+                <li key={conclusion}>{conclusion}</li>
+              ))}
+            </ul>
+          </div>
             </>
           )}
 
@@ -255,15 +244,10 @@ export function BirthTimeSensitivity() {
               type="button"
               aria-expanded={finderOpen}
               aria-controls="birth-time-finder"
-              disabled={capturePending}
-              title={capturePending
-                ? 'Finish PayPal payment verification before changing the chart.'
-                : undefined}
               onClick={() => {
                 if (finderOpen) {
                   closeFinder()
                 } else {
-                  setAppliedStatus(null)
                   setFinderOpen(true)
                 }
               }}
@@ -279,15 +263,6 @@ export function BirthTimeSensitivity() {
             </p>
           </div>
 
-          {appliedStatus && (
-            <p
-              role="status"
-              className="mt-3 rounded-lg border border-fortune/20 bg-fortune/[0.08] px-3 py-2 text-sm text-text-secondary"
-            >
-              {appliedStatus}
-            </p>
-          )}
-
           {finderOpen && (
             <LazySurface
               label="the birth-time shortlist"
@@ -296,7 +271,6 @@ export function BirthTimeSensitivity() {
             >
               <BirthTimeFinder
                 birthInfo={birthInfo}
-                onApply={applyCandidate}
                 onClose={closeFinder}
               />
             </LazySurface>

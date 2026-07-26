@@ -200,7 +200,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   `app/src/lib/birth-time-sensitivity.ts` - three-window local comparison for
   explicitly approximate birth times. It shifts wall-clock time across real
   dates, resolves each candidate independently, and summarizes core structural
-  differences without mutating the selected chart.
+  differences without mutating the selected chart. It also names the exact
+  Hour Pillar and hour-dependent conclusions suppressed by uncertainty.
 - `app/src/components/chart/BirthTimeFinder.tsx` +
   `app/src/lib/birth-time-finder.ts` - separately lazy, provider-independent
   13-candidate birth-time shortlist. It exact-matches one local birthplace,
@@ -211,9 +212,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   user-reviewable, and a one-answer-removal check reports ranking stability
   without a confidence claim. A completely unknown time uses a hidden noon
   engine position only to enter this flow; derived hour-dependent surfaces
-  remain locked. Only an explicit candidate action atomically
-  replaces the chart, preserves approximate status, and clears chart-derived
-  caches.
+  remain locked. Candidate results are entertainment-and-self-discovery
+  comparisons only and never replace the canonical birth input or its caches.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts. Its
   natal Four Transformations line reuses the chart's pure transformation index
   so local navigation and prompt grounding share one ownership source. Its

@@ -18,6 +18,7 @@ import {
   type FunctionalAstrolabe,
 } from './astro'
 import {
+  createBirthTimeEvidence,
   findBirthplaceAsync,
   isExactBirthplaceMatch,
   resolveBirthTime,
@@ -317,6 +318,15 @@ export async function buildBirthTimeCandidates(
       birthplace,
       enabled: true,
       birthplaces: [location],
+      evidence: createBirthTimeEvidence(
+        birthInfo.birthTimeSource ?? 'unknown',
+        'approximate',
+        {
+          startHour: block.hour === 0 ? 0 : block.hour === 23 ? 23 : block.hour - 1,
+          endHour: block.hour === 23 ? 0 : block.hour + 1,
+          crossesMidnight: block.id === 'late-rat',
+        },
+      ),
     })
     const candidateBirthInfo: BirthInfo = {
       ...birthInfo,
