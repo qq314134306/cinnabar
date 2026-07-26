@@ -157,7 +157,13 @@
   and the production build pass. Local Chrome rendered three punishment
   contacts for the default pair—one A→B, one B→A, and one reciprocal—while
   retaining seven additive branch contacts and all eight pillars with no
-  desktop horizontal overflow.
+  desktop horizontal overflow. Feature pull request #31 merged as `ad540ee`
+  after candidate run `30198101496` passed both Verify candidate and the
+  fresh-Supabase migration proof; its isolated Vercel Preview repeated the
+  same 3/7/8 contact-and-pillar result. Production deployment
+  `CDBEYbTen87uCrfwnaK7ccB6Phz7` is Ready, Production, and Current for exact
+  source `ad540ee`. Chrome then repeated the same directed result on
+  `https://www.cinnabarastrology.com`.
 
 - Upgraded the score-free BaZi Compatibility Earthly Branch classifier from a
   single result to an additive multi-contact model and added all six canonical
