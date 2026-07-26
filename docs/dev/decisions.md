@@ -1324,3 +1324,31 @@ This decision authorizes previous/next/date/today navigation only. It does not
 authorize auspiciousness scores, activity recommendations, hour selection,
 event claims, prose divination, AI, persistence, analytics, account gating,
 payment, or a network request.
+
+## D056 - BaZi Compatibility Remains a Separate Structural Layer
+
+Cinnabar may add a BaZi compatibility layer inside the existing Compatibility
+result. It must reuse the two exact `resolvedBirthTime` values already produced
+by the local comparison flow and the established Four Pillars and Ten Gods
+helpers. It must not recalculate true solar time, accept unresolved placeholders,
+or create a second calendar-boundary authority.
+
+The first layer is limited to both Day Pillars, each Day Master's element and
+polarity, the directional Ten Gods relationship from Person A to Person B and
+from Person B to Person A, and an explicit Day Branch classification. The Day
+Branch classifier recognizes only same branch, the six canonical Liu He pairs,
+the six canonical Liu Chong pairs, or unclassified. Unclassified means only
+that none of those three contracts matched; it must not imply neutrality or
+infer additional combinations.
+
+The two directional relationships may differ and must stay visibly separate.
+This BaZi layer must not change, average into, or justify the existing Zi Wei
+local compatibility score. Same branch, Liu He, and Liu Chong are named
+structures rather than favorable/unfavorable verdicts. If either entered time
+is approximate, the entire Day Pillar comparison is marked provisional because
+a later true-solar correction could cross a date boundary.
+
+This decision does not authorize a BaZi compatibility score, spouse-palace or
+useful-god judgment, branch-combination weighting, hidden-stem synthesis,
+marriage timing, fate claims, relationship advice, AI prose, persistence,
+analytics, account gating, payment, or a network request.

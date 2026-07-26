@@ -579,7 +579,8 @@ received during a flight must produce one trailing revalidation.
 
 `tests/`: Tests that sit outside `src`, including workflow contract tests.
 
-`src/lib/compatibility-score.ts` +
+`src/lib/compatibility-score.ts` + `src/lib/bazi-compatibility.ts` +
+`src/components/match/BaZiCompatibility.tsx` +
 `src/components/match/MatchAnalysis.tsx` + their tests: Compatibility always
 offers a symmetric, deterministic local four-dimension snapshot without an
 account, API, payment, cache, or analytics. The optional AI narrative remains
@@ -602,6 +603,14 @@ shape only when both people use it for rolling-deployment compatibility.
 Reject mixed legacy/full people. Compatibility may surface controlled
 birthplace-validation copy and server-owned `ReadingApiError` messages, but
 unknown client/runtime failures must map to fixed retry copy.
+The score-free BaZi layer must consume those same two resolved inputs and reuse
+the established Four Pillars and Ten Gods helpers. Keep A-to-B and B-to-A Day
+Master relationships separate because Ten Gods are directional. The Day Branch
+classifier is limited to same branch, the six canonical Liu He pairs, the six
+canonical Liu Chong pairs, or explicitly unclassified. It must not alter the
+existing symmetric score, infer other branch systems, assign good/bad meaning,
+or add advice, AI, persistence, analytics, account, payment, or network work.
+If either input time is approximate, mark the entire BaZi layer provisional.
 
 `src/components/share/ShareCard.tsx` + `ShareCard.test.ts`: deterministic
 chart-summary card and local PNG export. The quote renderer uses an
@@ -727,6 +736,8 @@ ciphertext makes concurrency tests flaky and invalid.
   src/components/AuthControl.test.ts`, then lint and the complete root build.
 - Compatibility change: run
   `npm run test -- src/lib/compatibility-score.test.ts
+  src/lib/bazi-compatibility.test.ts
+  src/components/match/BaZiCompatibility.test.ts
   src/components/match/MatchAnalysis.test.ts`, then lint and the complete root
   build.
 - Share Card change: run

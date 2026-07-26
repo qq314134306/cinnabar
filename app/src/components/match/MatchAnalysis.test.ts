@@ -315,6 +315,11 @@ describe('MatchAnalysis public AI gate', () => {
       `Local compatibility snapshot · ${new Date().getFullYear()}`,
     )).toBeTruthy()
     expect(screen.getAllByRole('progressbar')).toHaveLength(4)
+    expect(screen.getByRole('heading', {
+      name: 'BaZi compatibility · Day Pillars',
+    })).toBeTruthy()
+    expect(screen.getByText(/does not change the Zi Wei compatibility score/)).toBeTruthy()
+    expect(document.querySelectorAll('[data-bazi-compatibility-person]')).toHaveLength(2)
     expect(screen.getByText(/not scientific evidence/)).toBeTruthy()
     expect(mocks.streamReading).not.toHaveBeenCalled()
     expect(fetchMock).not.toHaveBeenCalled()

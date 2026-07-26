@@ -1,6 +1,10 @@
 import { generateChart, type BirthInfo } from './astro'
 import { calculatePeriodScore } from './fortune-score'
 import { deriveSoulCard, identityLine } from './soul-card'
+import {
+  buildBaziCompatibility,
+  type BaziCompatibilityResult,
+} from './bazi-compatibility'
 
 export type CompatibilityDimensionKey =
   | 'communication'
@@ -31,6 +35,7 @@ export interface LocalCompatibilityResult {
   strongestSignal: string
   growthEdge: string
   elementStory: string
+  bazi: BaziCompatibilityResult | null
 }
 
 const SUPPORTIVE_ELEMENT_PAIRS = new Set([
@@ -213,5 +218,6 @@ export function compareBirthCharts(
       ? 'The model shows no pronounced mismatch; keep checking assumptions as circumstances change.'
       : `${growth.label} is the main area to handle deliberately at ${growth.score}/100.`,
     elementStory: elements.story,
+    bazi: buildBaziCompatibility(personA, personB),
   }
 }

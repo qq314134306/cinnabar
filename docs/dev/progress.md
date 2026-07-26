@@ -78,6 +78,17 @@
 
 ## Recently Completed
 
+- Added a score-free BaZi structural layer to the existing local Compatibility
+  result. It reuses both true-solar-resolved inputs and the established Four
+  Pillars/Ten Gods helpers to show both Day Pillars, separate A-to-B and B-to-A
+  Day Master relationships, and same-branch/Liu He/Liu Chong classification.
+  It does not change the existing compatibility score, infer unimplemented
+  branch systems, or make outcome claims. Approximate input marks the layer
+  provisional. Focused compatibility coverage passes 33 tests across four
+  files; lint, 81 test files / 669 tests, and the production build pass. A real
+  local Chrome check changed Person B from 1992-06-15 to 1992-06-16, observed
+  both Day Pillar and directional Ten Gods updates plus a Liu He classification,
+  and found no horizontal overflow or browser warning/error log.
 - Merged protected pull request #12 only after all four GitHub/Vercel checks
   passed and the isolated Vercel Preview completed the same Daily Timing smoke
   flow. Production now serves exact merge commit `3b5b856`; both required
