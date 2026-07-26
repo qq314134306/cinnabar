@@ -1,5 +1,18 @@
 # Decisions
 
+## D065 - Question-Divination Facts Stay Independent and Local
+
+Capture one immutable, versioned question event and derive Liu Yao, Qi Men Dun
+Jia, and Da Liu Ren through three separately versioned fact contracts.
+Production uses a fail-closed local provider only. Remote APIs may review a
+fixed anonymous golden sample out of band but are not a runtime fallback. This
+stage does not merge conclusions, generate AI copy, or calculate a score.
+
+Consequence: any fuller reconstruction or remote-provider adoption needs a new
+explicit contract/provider version, fixtures, failure tests, and a separate
+product decision. It cannot mutate natal BaZi, Zi Wei, Qi Zheng, or birth-time
+modules.
+
 > L2 | Parent: `AGENTS.md`
 
 ## D001 - True Solar Time Uses Birthplace Matching

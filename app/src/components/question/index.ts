@@ -1,0 +1,1 @@
+export { QuestionDivination } from './QuestionDivination'

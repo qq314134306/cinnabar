@@ -60,6 +60,9 @@ vi.mock('@/components/kline/LifeKLine', () => ({
 vi.mock('@/components/share/ShareCard', () => ({
   ShareCard: () => createElement('div', null, 'Share Card Content'),
 }))
+vi.mock('@/components/question/QuestionDivination', () => ({
+  QuestionDivination: () => createElement('div', null, 'Question Charts Content'),
+}))
 vi.mock('@/components/OpenSourceLinks', () => ({
   GitHubLinkButton: () => null,
   OpenSourceFooterLinks: () => null,
@@ -149,6 +152,16 @@ describe('App navigation', () => {
       'Cinnabar — Share Card',
     )
     expect(document.title).toBe('Cinnabar — Share Card')
+  })
+
+  it('loads the shared Question Charts foundation as one lazy route', async () => {
+    render(createElement(App))
+    const primaryNav = screen.getByRole('navigation', { name: 'Primary' })
+    const mobileNav = screen.getByRole('navigation', { name: 'Mobile' })
+    fireEvent.click(within(primaryNav).getByRole('button', { name: 'Question Charts' }))
+    expect(await screen.findByText('Question Charts Content')).toBeTruthy()
+    expect(within(mobileNav).getByRole('button', { name: 'Question' }).getAttribute('aria-current')).toBe('page')
+    expect(mocks.trackPageView).toHaveBeenLastCalledWith('/question-charts', 'Cinnabar — Question Charts')
   })
 
   it('holds timeline and sharing until an unknown birth hour is shortlisted', () => {

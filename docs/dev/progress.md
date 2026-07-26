@@ -4,6 +4,15 @@
 
 ## Current State
 
+- The Question Charts foundation is implemented on
+  `codex/question-divination-foundation`. One frozen `question-event.v1`
+  captures question, instant, IANA timezone, and user-entered location evidence;
+  Liu Yao, Qi Men Dun Jia, and Da Liu Ren then produce separate versioned local
+  fact contracts with provider/version/status metadata from that exact event.
+  The independently lazy surface contains no synthesis, AI, score, persistence,
+  account, payment, analytics, or production network path. An anonymous offline
+  golden fixture and focused model/component/App tests pin the boundary.
+
 - Production branch: `main`; release-hardening pull request #10 is merged and
   the post-release record continues on `codex/post-release-proof`.
 - Confirmed canonical source and local `origin`: `qq314134306/cinnabar`

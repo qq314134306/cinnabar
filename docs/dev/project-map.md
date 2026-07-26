@@ -90,6 +90,15 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 
 ## Important Files
 
+- `app/src/lib/question-divination.ts` + its fixture/test and
+  `app/src/components/question/QuestionDivination.tsx` + its test - immutable
+  `question-event.v1`, separate `liuyao.facts.v1`, `qimen.facts.v1`, and
+  `liuren.facts.v1` contracts, local provider/failure metadata, an anonymous
+  offline golden sample, and the independently lazy Question Charts surface.
+  All calculations retain the exact same event reference, but no result
+  synthesis, AI narrative, score, persistence, or production remote fallback
+  exists. See `docs/dev/question-divination-contracts.md`.
+
 - `app/src/App.tsx` + `App.test.ts` - top-level visible-surface navigation.
   Desktop and mobile navs have distinct names, report the active surface with
   `aria-current="page"`, keep decorative icons out of accessible names, and

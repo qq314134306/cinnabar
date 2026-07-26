@@ -108,7 +108,7 @@ proofs pass. Future Report payments remain last and disabled.
 `src/main.tsx`: React entry point and app mounting.
 
 `src/App.tsx`: Top-level application composition (Cinnabar shell: Your Chart,
-Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
+Question Charts, Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
 codebase but is hidden from navigation). Desktop and mobile navigation have
 distinct accessible labels, expose the active surface with
 `aria-current="page"`, keep decorative tab icons out of accessible names, and
@@ -119,6 +119,23 @@ Compatibility, and populated Share Card surfaces are additional lazy
 boundaries with announced loading states. Do not make the landing page pay for
 chart calculation, palace rendering, image-export, Markdown, or payment
 dependencies eagerly.
+
+`src/lib/question-divination.ts` + `src/components/question/QuestionDivination.tsx`:
+account-independent Question Charts foundation. Capture exactly one immutable
+question/time/timezone/location-evidence event, then calculate Liu Yao, Qi Men
+Dun Jia, and Da Liu Ren into separate versioned fact contracts. Preserve each
+result's provider/version/status/failure metadata and exact shared event
+identity. Production remains local and fail closed; remote APIs are permitted
+only for fixed anonymous golden-sample review. Do not add cross-method
+conclusions, AI copy, scores, persistence, analytics, account/payment gates, or
+birth-profile reuse in this stage. Contract details live in
+`../docs/dev/question-divination-contracts.md`.
+The browser emits verified facts only. A future DeepSeek English-writing layer
+must remain server-owned and may consume only validated contracts; never place
+`DEEPSEEK_API_KEY`, prompts, or provider prose in this surface. Use “For
+entertainment & self-discovery only. Not professional advice.” and avoid
+fortune-telling, psychic-service, or consulting claims. Question events cannot
+read, infer, or update any canonical birth time, including finder candidates.
 
 The first launchable product surface is the account-independent core: blank-
 place chart casting, the deterministic local snapshot, Life Timeline,
