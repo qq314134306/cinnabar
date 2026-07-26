@@ -1,6 +1,54 @@
 # Decisions
 
+## D065 - Question-Divination Facts Stay Independent and Local
+
+Capture one immutable, versioned question event and derive Liu Yao, Qi Men Dun
+Jia, and Da Liu Ren through three separately versioned fact contracts.
+Production uses a fail-closed local provider only. Remote APIs may review a
+fixed anonymous golden sample out of band but are not a runtime fallback. This
+window does not merge conclusions, generate AI copy, or calculate a score; its
+contracts are stable inputs for the separately owned first-release paid
+three-method synthesis boundary. Structural facts are explicitly free and no
+credit spend or payment code belongs in this PR.
+
+Consequence: any fuller reconstruction or remote-provider adoption needs a new
+explicit contract/provider version, fixtures, failure tests, and a separate
+product decision. It cannot mutate natal BaZi, Zi Wei, Qi Zheng, or birth-time
+modules.
+
 > L2 | Parent: `AGENTS.md`
+
+## D065 - Evidence Synthesis Is Traceable and Score-Free
+
+Passage evidence is modeled separately from interpretation. A source edition
+must disclose version, locator scheme, language, availability, and
+license/rights status; a citation identifies a passage and a page, chapter,
+section, paragraph, line, folio, or stable anchor. A displayed claim must link
+to a deterministic system fact, cited rule evidence, or both.
+
+Cross-system synthesis has exactly four states: `independent-agreement`,
+`shared-input-agreement`, `conflict`, and `insufficient-evidence`. Independent
+agreement requires disjoint evidence groups. Shared inputs, unresolved
+conflicts, and missing evidence remain visible; majority voting, numeric
+scores, probabilities, and confidence-shaped fields cannot replace provenance.
+
+Consequence: keep the contract provider-independent and fail closed on missing
+or dangling evidence. Add only verified, rights-safe passages with explicit
+edition metadata. A large corpus, LLM, or generated conclusion requires a
+separate reviewed decision and tests.
+
+The audience contract is English entertainment and self-discovery, never
+fortune-telling, psychic, or consulting positioning. Only local deterministic
+engines own production facts; Skills constrain rules and support anonymous
+development validation. External validation accepts anonymous fixed fixtures
+only, is not a production dependency, and fails closed. The narrative layer may
+only render verified facts into English on the server; it cannot calculate or
+mutate pillars, palaces, stars, or divination charts. Unreliable time cannot produce an
+Hour Pillar. Birth-time-finder output remains a candidate and can never replace
+canonical birth time, and profile persistence requires explicit user save.
+Free basic facts, time-correction evidence, and synthesis overview remain
+separate from paid future, deep compatibility, and divination synthesis tiers
+so credits can evolve without changing fact authority or adding payment here.
 
 ## D001 - True Solar Time Uses Birthplace Matching
 
@@ -79,6 +127,16 @@ code and tests.
 
 [PROTOCOL]: Add a new decision when a choice affects future implementation,
 deployment, product behavior, or contributor workflow.
+
+## D013 - Qizheng Requires a Bundled Deterministic Provider
+
+Production may populate `qizheng.fact.v1` only from Cinnabar's bundled engine,
+using existing resolved time, coordinates, and DST-aware timezone evidence.
+AOV/Mingyu may validate fixed anonymous fixtures but receives no real user
+birth data. Until local fixture parity, show unavailable and generate no
+substitute chart. Unknown/approximate time emits no time-derived facts. Keep
+modern astronomy and traditional Zi Qi precision metadata distinct. DeepSeek
+may later verbalize verified facts server-side but may not calculate them.
 
 ## D007 - Credits Use an Append-Only Server-Written Ledger
 
@@ -1057,13 +1115,14 @@ before chart generation. Candidates that resolve to the same engine date and
 time index are one equivalent chart group and cannot be separated by event
 scoring.
 
-A completely unknown hour is a first-class input state. The browser may use
-noon only as a private engine position needed to host the finder, marked by
-`birthTimeUnknown=true`; it must not render that position as a natal chart or
-feed hour-dependent snapshots, AI, timeline, sharing, paid reports, or
-compatibility prefill. Explicitly applying one of the independently resolved
-civil candidates clears the unknown marker while retaining
-`birthTimeReliable=false`.
+A completely unknown hour is a first-class input state. It is never silently
+replaced with 00:00. The browser may use noon only as a private engine position
+needed to host the finder, marked by `birthTimeUnknown=true`; it must not render
+that position as a natal chart or feed hour-dependent snapshots, AI, timeline,
+sharing, paid reports, or compatibility prefill. Finder candidates are
+entertainment-and-self-discovery comparisons only and cannot overwrite the
+canonical birth input; only a separate explicit save of real profile data may
+change that authority.
 
 The optional rough-time recollection is bounded to ±2 evidence points. The
 question engine considers only elapsed adult years, chooses at most five
@@ -1091,12 +1150,17 @@ show at most three unambiguous groups plus every non-zero contribution. A tie
 that crosses the third-place cutoff is disclosed as one complete, non-
 applicable tier rather than arbitrarily truncated. Fewer than three scored
 domains or a leader margin below two is explicitly a no-clear-separation
-outcome and exposes no candidate apply action. Applying a candidate is the
-only mutation. It atomically
-replaces `birthInfo` and `chart`, retains `birthTimeReliable=false`, retains
-the candidate's independently resolved time, and clears every chart-derived
-content cache.
+outcome and exposes no candidate apply action. No finder candidate mutates
+`birthInfo`, `chart`, or chart-derived caches.
 Twins or multiples born close together are an explicit method limitation.
+
+Birth-time provenance is part of the resolved evidence contract. New
+resolutions carry one of family recollection, official record, hospital record,
+or unknown source; the derived source-reliability tier; exact, approximate, or
+unknown uncertainty; and an optional candidate interval. Legacy resolved
+objects remain readable without the new field. True-solar correction evidence
+does not upgrade the credibility of the source record, and an unreliable time
+suppresses the exact Hour Pillar and other hour-dependent conclusions.
 
 ## D046 - Palace Reading Uses a Four-Palace Relationship View
 
@@ -1518,3 +1582,30 @@ additive Liu He/Liu Chong/Liu Hai/Liu Po map. It adds no weight, strength or
 transformation judgment, favorable/unfavorable label, prediction, advice, AI,
 persistence, analytics, account requirement, payment, or network request. San
 He, San Hui, and any broader branch synthesis remain outside this decision.
+
+## D065 - Zi Wei Compatibility Is Two Charts Before Interaction
+
+Cinnabar may add a deterministic Zi Wei dual-chart evidence layer inside the
+existing local Compatibility result. It must independently cast both natal
+charts through the established local iztro configuration using the two exact
+Compatibility-owned `resolvedBirthTime` values. It may then map six named key
+palaces by earthly branch, map each person's natal Lu/Quan/Ke/Ji star and source
+palace into the other chart's palace at that branch, and map the Life and
+Partner palace San Fang Si Zheng networks into the other chart in both
+directions. Every output retains direction, branch, source, and receiver so the
+claim is inspectable.
+
+The layer is not a second calendar authority. It never calculates, imports,
+rewrites, or overrides BaZi Four Pillars, and it never changes the existing
+compatibility score. If either birth time is approximate, all hour-dependent
+palace, transformation, and San Fang Si Zheng conclusions are withheld rather
+than labeled as precise or merely provisional. It must not infer or persist a
+replacement birth time.
+
+Production uses only the local deterministic engine. Skills and external AOV
+or Mingyu APIs may constrain rules and cross-check fixed anonymous development
+fixtures, but real user birth data must never be sent to those services and
+runtime availability must not depend on them. The public surface uses English
+entertainment and self-discovery framing. This decision adds no verdict,
+prediction, advice, DeepSeek calculation, client secret, persistence,
+analytics, account gate, credits, payment, or production network request.

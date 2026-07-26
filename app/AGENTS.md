@@ -105,10 +105,29 @@ proofs pass. Future Report payments remain last and disabled.
 
 ## Member List
 
+`src/lib/evidence-contract.ts` + `evidence-fixtures.ts` +
+`src/components/EvidencePanel.tsx`: provider-independent passage evidence and
+minimal read-only inspection. Keep edition, location, availability,
+license/rights, fact, rule, uncertainty, and conflict references explicit.
+Every claim needs a system-fact or cited-rule basis. Synthesis permits only
+independent agreement, shared-input agreement, conflict, or insufficient
+evidence; never add voting, weights, probabilities, numeric confidence,
+generated readings, unverified corpus text, or a network request to this layer.
+Claimed independent evidence groups must be disjoint.
+English evidence presentation is entertainment/self-discovery only. Production
+facts come only from local deterministic engines; Skills constrain rules and
+support anonymous development fixtures. External validation is anonymous,
+fixed-fixture-only, fail-closed, and never a production dependency. Server-side
+narrative rendering may consume but never calculate or mutate verified facts.
+Unreliable time cannot yield an Hour Pillar, and birth-time candidates never
+overwrite canonical input; persistence requires explicit user save. Keep free
+facts/time-correction/synthesis overview separate from paid future,
+compatibility, and divination interpretation plus future credit entitlements.
+
 `src/main.tsx`: React entry point and app mounting.
 
 `src/App.tsx`: Top-level application composition (Cinnabar shell: Your Chart,
-Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
+Question Charts, Life Timeline, Compatibility, and Share Card; Yearly Fortune remains in the
 codebase but is hidden from navigation). Desktop and mobile navigation have
 distinct accessible labels, expose the active surface with
 `aria-current="page"`, keep decorative tab icons out of accessible names, and
@@ -119,6 +138,26 @@ Compatibility, and populated Share Card surfaces are additional lazy
 boundaries with announced loading states. Do not make the landing page pay for
 chart calculation, palace rendering, image-export, Markdown, or payment
 dependencies eagerly.
+
+`src/lib/question-divination.ts` + `src/components/question/QuestionDivination.tsx`:
+account-independent Question Charts foundation. Capture exactly one immutable
+question/time/timezone/location-evidence event, then calculate Liu Yao, Qi Men
+Dun Jia, and Da Liu Ren into separate versioned fact contracts. Preserve each
+result's provider/version/status/failure metadata and exact shared event
+identity. Production remains local and fail closed; remote APIs are permitted
+only for fixed anonymous golden-sample review. Do not add cross-method
+conclusions, AI copy, scores, persistence, analytics, account/payment gates, or
+birth-profile reuse in this stage. Contract details live in
+`../docs/dev/question-divination-contracts.md`.
+Mark structural facts as the free product. Their contracts must remain usable
+by the separately owned paid Question Three-Method synthesis layer, but this
+window must not spend credits, call payments, or implement that synthesis.
+The browser emits verified facts only. A future DeepSeek English-writing layer
+must remain server-owned and may consume only validated contracts; never place
+`DEEPSEEK_API_KEY`, prompts, or provider prose in this surface. Use “For
+entertainment & self-discovery only. Not professional advice.” and avoid
+fortune-telling, psychic-service, or consulting claims. Question events cannot
+read, infer, or update any canonical birth time, including finder candidates.
 
 The first launchable product surface is the account-independent core: blank-
 place chart casting, the deterministic local snapshot, Life Timeline,
@@ -380,7 +419,8 @@ two-hour windows. Shift the wall-clock input before resolving each scenario so
 Rat-hour date boundaries and an explicitly re-enabled true-solar correction
 remain correct. The comparison is passive: it summarizes Life Palace stars,
 Body Palace branch, and element class without replacing the canonical chart or
-claiming rectification. A comparison failure must stay local and retryable.
+claiming rectification. It names the hour-dependent conclusions that remain
+suppressed. A comparison failure must stay local and retryable.
 
 `src/lib/birth-time-finder.ts` +
 `src/components/chart/BirthTimeFinder.tsx`: an explicitly opened, separately
@@ -394,15 +434,13 @@ annual Life Palace placement, Major Limit palace, and the natal-palace
 locations of annual Four Transformations; do not reuse the timeline's
 dimension scores or any random value as event evidence. Show points and their
 ledger, never probabilities, accuracy, minute confidence, or a "correct time"
-claim. Applying a civil candidate must be explicit, keep
-`birthTimeReliable=false`, atomically replace chart plus birth input, and clear
-all chart-derived caches. Early stopping must remain overridable; previously
+claim. Civil candidates are entertainment-and-self-discovery comparisons only
+and must never replace canonical birth data. Early stopping must remain overridable; previously
 recorded answers stay editable and rescore through the same pure engine. The
 one-answer-removal check may describe ranking stability only, never confidence
 or correctness. A `birthTimeUnknown=true` noon value is an internal finder
 position only: do not render its palace chart or enable local/AI/timeline/share/
-payment output, and do not prefill Compatibility from it. Applying a finder
-candidate must clear this marker. No request, analytics, persistence, account,
+payment output, and do not prefill Compatibility from it. No request, analytics, persistence, account,
 AI, or payment dependency belongs in this flow.
 
 `src/lib/chart-facts.ts`: Builds the English CHART FACTS block fed to AI
@@ -530,6 +568,14 @@ sanitization; it never retains full URLs, query strings, script samples,
 cookies, or request data. Do not switch CSP to enforcement until production
 reports have been reviewed and payment/browser domains are verified.
 
+`src/lib/qizheng-contract.ts` + `qizheng-adapter.ts` + `qizheng-local.ts` +
+`src/components/chart/QizhengFacts.tsx`: Qizheng structured foundation. AOV is
+anonymous-fixture-only and must never become a production birth-data path.
+Production reuses saved resolved time/location evidence and fails closed until
+the local provider is complete. Unknown/approximate time emits no Qizheng
+time-derived facts. Preserve source/precision metadata and keep this layer free
+of DeepSeek, synthesis, payments, credits, persistence, and redesign.
+
 `src/lib/true-solar-time.ts`: True solar time and birthplace matching logic.
 Accepts Chinese names, tolerant pinyin ("Zhu Zhou"/"zhuzhou"), and world-city
 English names; UTC offsets are DST-aware via the built-in Intl API (China
@@ -580,7 +626,9 @@ received during a flight must produce one trailing revalidation.
 `tests/`: Tests that sit outside `src`, including workflow contract tests.
 
 `src/lib/compatibility-score.ts` + `src/lib/bazi-compatibility.ts` +
+`src/lib/ziwei-compatibility.ts` +
 `src/components/match/BaZiCompatibility.tsx` +
+`src/components/match/ZiweiCompatibility.tsx` +
 `src/components/match/MatchAnalysis.tsx` + their tests: Compatibility always
 offers a symmetric, deterministic local four-dimension snapshot without an
 account, API, payment, cache, or analytics. The optional AI narrative remains
@@ -626,6 +674,13 @@ must not alter the
 existing symmetric score, infer other branch systems, assign good/bad meaning,
 or add advice, AI, persistence, analytics, account, payment, or network work.
 If either input time is approximate, mark the entire BaZi layer provisional.
+The Zi Wei dual-chart layer separately casts both charts from the same two
+Compatibility-owned `resolvedBirthTime` values and indexes key-palace overlays,
+natal transformation cross-landings, and Life/Partner San Fang Si Zheng
+receiving palaces. It must never supply or overwrite BaZi Four Pillars. If
+either time is approximate, withhold all hour-dependent Zi Wei palace,
+transformation, and network conclusions. Keep production local and
+deterministic; external chart APIs are anonymous-fixture development tools only.
 
 `src/components/share/ShareCard.tsx` + `ShareCard.test.ts`: deterministic
 chart-summary card and local PNG export. The quote renderer uses an

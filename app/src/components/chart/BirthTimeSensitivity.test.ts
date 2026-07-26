@@ -84,6 +84,8 @@ describe('BirthTimeSensitivity', () => {
       name: 'Later window',
     })).toBeTruthy()
     expect(screen.getAllByText('Life Palace')).toHaveLength(3)
+    expect(screen.getByText('Suppressed while time is uncertain')).toBeTruthy()
+    expect(screen.getByText('Exact Hour Pillar')).toBeTruthy()
     expect(screen.getByRole('status').textContent).toContain(
       'does not determine the correct birth time',
     )
@@ -159,7 +161,7 @@ describe('BirthTimeSensitivity', () => {
     })
   })
 
-  it('atomically applies an explicit shortlist candidate and keeps it approximate', async () => {
+  it('keeps shortlist candidates separate from canonical birth data', async () => {
     const info = birthInfo(false)
     const candidateInfo: BirthInfo = {
       ...info,
@@ -224,22 +226,16 @@ describe('BirthTimeSensitivity', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
-    fireEvent.click(screen.getByRole('button', {
-      name: 'Use Snake Hour, 09:00–10:59',
-    }))
-
-    expect(useChartStore.getState().birthInfo).toEqual(candidateInfo)
-    expect(useChartStore.getState().chart).toBe(candidates[0].chart)
+    expect(screen.getAllByText(
+      'Candidate only — your canonical birth time is unchanged.',
+    ).length).toBeGreaterThan(0)
+    expect(useChartStore.getState().birthInfo).toEqual(info)
+    expect(useChartStore.getState().chart).not.toBe(candidates[0].chart)
     expect(useChartStore.getState().birthInfo?.birthTimeReliable).toBe(false)
-    expect(useContentCacheStore.getState().aiInterpretation).toBeNull()
-    expect(screen.getAllByRole('status').some((status) => (
-      status.textContent?.includes(
-        'Chart updated to Snake Hour. The birth time remains marked approximate.',
-      )
-    ))).toBe(true)
-    expect(screen.queryByRole('heading', {
+    expect(useContentCacheStore.getState().aiInterpretation).not.toBeNull()
+    expect(screen.getByRole('heading', {
       name: 'Compare Life Events Across 13 Time Blocks',
-    })).toBeNull()
+    })).toBeTruthy()
   })
 
   it('contains a local comparison failure and retries without hiding the chart', () => {

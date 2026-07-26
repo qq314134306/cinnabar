@@ -62,6 +62,43 @@ describe('findBirthplace', () => {
 })
 
 describe('resolveBirthTime', () => {
+  it('carries provenance, reliability, uncertainty, and candidate range as one evidence contract', async () => {
+    const result = await resolveBirthTimeAsync({
+      year: 1990,
+      month: 1,
+      day: 1,
+      hour: 12,
+      enabled: false,
+      evidence: {
+        source: 'hospital_record',
+        sourceReliability: 'high',
+        uncertainty: 'approximate',
+        candidateRange: { startHour: 11, endHour: 13 },
+      },
+    })
+
+    expect(result.evidence).toEqual({
+      source: 'hospital_record',
+      sourceReliability: 'high',
+      uncertainty: 'approximate',
+      candidateRange: { startHour: 11, endHour: 13 },
+    })
+  })
+
+  it('never invents midnight for an unknown-source legacy resolution', async () => {
+    const result = await resolveBirthTimeAsync({
+      year: 1990,
+      month: 1,
+      day: 1,
+      hour: 12,
+      enabled: false,
+    })
+
+    expect(result.hour).toBe(12)
+    expect(result.hour).not.toBe(0)
+    expect(result.evidence).toMatchObject({ source: 'unknown' })
+  })
+
   it('keeps the original time when true solar correction is disabled', async () => {
     const result = await resolveBirthTimeAsync({
       year: 1990,
@@ -107,6 +144,7 @@ describe('resolveBirthTime', () => {
 
     expect(result.applied).toBe(true)
     expect(result.location?.name).toBe(BEIJING_CITY)
+    expect(result.timezoneOffsetMinutes).toBe(480)
     expect(result.correctedShichen).toBe(WU_SHICHEN)
     expect(result.timeIndex).toBe(6)
   })

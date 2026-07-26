@@ -5,6 +5,10 @@ import {
   buildBaziCompatibility,
   type BaziCompatibilityResult,
 } from './bazi-compatibility'
+import {
+  buildZiweiCompatibility,
+  type ZiweiCompatibilityResult,
+} from './ziwei-compatibility'
 
 export type CompatibilityDimensionKey =
   | 'communication'
@@ -36,6 +40,7 @@ export interface LocalCompatibilityResult {
   growthEdge: string
   elementStory: string
   bazi: BaziCompatibilityResult | null
+  ziwei: ZiweiCompatibilityResult
 }
 
 const SUPPORTIVE_ELEMENT_PAIRS = new Set([
@@ -219,5 +224,6 @@ export function compareBirthCharts(
       : `${growth.label} is the main area to handle deliberately at ${growth.score}/100.`,
     elementStory: elements.story,
     bazi: buildBaziCompatibility(personA, personB),
+    ziwei: buildZiweiCompatibility(personA, personB),
   }
 }

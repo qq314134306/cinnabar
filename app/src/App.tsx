@@ -42,7 +42,12 @@ const ShareCard = lazy(async () => {
   return { default: module.ShareCard }
 })
 
-type TabType = 'chart' | 'timeline' | 'match' | 'share'
+const QuestionDivination = lazy(async () => {
+  const module = await import('@/components/question/QuestionDivination')
+  return { default: module.QuestionDivination }
+})
+
+type TabType = 'chart' | 'question' | 'timeline' | 'match' | 'share'
 
 const TABS: Array<{
   key: TabType
@@ -51,6 +56,7 @@ const TABS: Array<{
   icon: ReactNode
 }> = [
   { key: 'chart', label: 'Your Chart', icon: '☰' },
+  { key: 'question', label: 'Question Charts', mobileLabel: 'Question', icon: '◇' },
   {
     key: 'timeline',
     label: 'Life Timeline',
@@ -64,6 +70,7 @@ const TABS: Array<{
 /** Virtual SPA routes reported to GA4 on each tab change. */
 const TAB_ROUTES: Record<TabType, { path: string; title: string }> = {
   chart: { path: '/', title: 'Cinnabar — Your Chart' },
+  question: { path: '/question-charts', title: 'Cinnabar — Question Charts' },
   timeline: { path: '/life-timeline', title: 'Cinnabar — Life Timeline' },
   match: { path: '/compatibility', title: 'Cinnabar — Compatibility' },
   share: { path: '/share-card', title: 'Cinnabar — Share Card' },
@@ -318,6 +325,16 @@ export default function App() {
                 </div>
               </div>
             )
+          )}
+
+          {/* Life Timeline tab */}
+          {activeTab === 'question' && (
+            <LazySurface
+              label="Question Charts"
+              loadingLabel="Loading Question Charts…"
+            >
+              <QuestionDivination />
+            </LazySurface>
           )}
 
           {/* Life Timeline tab */}

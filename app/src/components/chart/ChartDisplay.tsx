@@ -15,6 +15,7 @@ import { useChartStore } from '@/stores'
 import type { BirthInfo, FunctionalAstrolabe } from '@/lib/astro'
 import { BirthTimeSensitivity } from './BirthTimeSensitivity'
 import { BaZiFourPillars } from './BaZiFourPillars'
+import { QizhengFacts } from './QizhengFacts'
 import { DailyTiming } from './DailyTiming'
 import {
   getMajorStarExplanation,
@@ -756,6 +757,14 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
   const resolvedTime = birthInfo.resolvedBirthTime
   const showCorrection = birthInfo.trueSolarEnabled && resolvedTime?.applied
   const showUnmatched = birthInfo.trueSolarEnabled && birthInfo.birthplace && !resolvedTime?.applied
+  const evidence = resolvedTime?.evidence
+  const sourceLabel = evidence?.source === 'family_recollection'
+    ? 'Family recollection'
+    : evidence?.source === 'official_record'
+      ? 'Official record'
+      : evidence?.source === 'hospital_record'
+        ? 'Hospital record'
+        : 'Unknown source'
 
   return (
     <div className="
@@ -794,6 +803,12 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
                     : ''}
                 </>
               )}
+          </span>
+        </p>
+        <p>
+          <span className="text-text-muted">Time source</span>{' '}
+          <span className="text-text">
+            {sourceLabel} · {evidence?.sourceReliability ?? 'unknown'} reliability
           </span>
         </p>
         {showCorrection && resolvedTime && (
@@ -913,8 +928,9 @@ export function ChartDisplay() {
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-text-secondary">
             Your date and gender are saved, but Cinnabar is not displaying the
-            noon placeholder as a natal chart. Compare all 13 time blocks
-            below, then explicitly apply the candidate you want to inspect.
+            noon placeholder as a natal chart. Compare all 13 time blocks below.
+            Each result stays a separate candidate for review and never replaces
+            your saved birth time.
           </p>
         </div>
         <BirthTimeSensitivity />
@@ -1030,6 +1046,8 @@ export function ChartDisplay() {
       />
 
       <BaZiFourPillars birthInfo={birthInfo} />
+
+      <QizhengFacts birthInfo={birthInfo} />
 
       <DailyTiming birthInfo={birthInfo} />
 

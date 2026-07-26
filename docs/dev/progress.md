@@ -4,6 +4,17 @@
 
 ## Current State
 
+- The Question Charts foundation is implemented on
+  `codex/question-divination-foundation`. One frozen `question-event.v1`
+  captures question, instant, IANA timezone, and user-entered location evidence;
+  Liu Yao, Qi Men Dun Jia, and Da Liu Ren then produce separate versioned local
+  free fact contracts with provider/version/status and entitlement metadata from that exact event.
+  The independently lazy surface contains no synthesis, AI, score, persistence,
+  account, credit spend, payment, analytics, or production network path. These
+  contracts are ready for the separately owned first-release paid Question
+  Three-Method synthesis boundary. An anonymous offline
+  golden fixture and focused model/component/App tests pin the boundary.
+
 - Production branch: `main`; release-hardening pull request #10 is merged and
   the post-release record continues on `codex/post-release-proof`.
 - Confirmed canonical source and local `origin`: `qq314134306/cinnabar`
@@ -143,6 +154,75 @@
   warning/error.
 
 ## Recently Completed
+
+- Integrated candidate pull requests #35-#39 on
+  `codex/core-metaphysics-integration-20260726` without changing their product
+  boundaries. The shared resolved-time contract now retains both birth-time
+  reliability evidence and DST-aware timezone offset; finder candidates remain
+  comparison-only and cannot replace canonical input. The combined tree has no
+  production AOV/Mingyu fetch path. A clean `npm ci` reported zero known
+  vulnerabilities, 14 focused files / 98 tests and the complete 89-file /
+  729-test suite passed, and lint plus the production TypeScript/Vite build
+  passed. Anonymous Vercel Preview acceptance then confirmed the three local
+  Question Charts, dual-chart Zi Wei compatibility, high-reliability Chengdu
+  true-solar correction, Qizheng's explicit fail-closed state, and complete
+  unknown-hour suppression of the placeholder chart, Life Timeline, and Share
+  Card. That pass found and removed two stale “apply candidate” phrases so the
+  visible UI now matches the non-mutating candidate contract; the 18 focused
+  tests, full suite, lint, and build passed again. This is candidate evidence
+  only until the updated integration PR's hosted checks and Vercel Preview
+  complete.
+
+- Established the first passage-level evidence foundation without adding a
+  reading, corpus, network request, LLM, score, or vote. The contract separates
+  source editions, passage locators, citations, deterministic system facts,
+  cited rule evidence, claims, uncertainty, and structured conflicts. Runtime
+  validation rejects dangling references, missing edition/rights/location
+  metadata, claims without a fact or rule basis, and confidence/voting fields.
+  Synthesis is limited to `independent-agreement`,
+  `shared-input-agreement`, `conflict`, and `insufficient-evidence`; claimed
+  independence requires disjoint evidence groups. A read-only inspector and
+  synthetic MIT fixture exercise the contract without importing a classical
+  corpus. The same contract pins English entertainment/self-discovery
+  positioning, local deterministic-engine fact authority, Skill-only rule and
+  anonymous fixture validation, server-only narrative assembly that cannot
+  mutate verified facts, anonymous/fixed/fail-closed external validation,
+  reliable-time-only Hour Pillars,
+  candidate-only birth-time suggestions that never replace canonical input,
+  explicit-save-only profile persistence, and separate extensible free evidence
+  and paid interpretation tiers.
+
+- Added a backward-compatible birth-time evidence contract to every new local
+  resolution: source (family recollection, official record, hospital record, or
+  unknown), derived source reliability, uncertainty, and optional candidate
+  interval now travel with the true-solar result. The chart exposes provenance,
+  unknown time never becomes 00:00, approximate comparisons identify suppressed
+  hour-dependent conclusions, and the 13-block finder cannot overwrite
+  canonical birth data. The flow remains local, deterministic, English, and
+  framed for entertainment and self-discovery. Focused coverage passed 46
+  focused tests and the complete 81-file / 678-test suite; lint and production
+  build passed. An anonymous fixed 1990-01-01
+  Chengdu sample cross-checked the local correction direction and Si Hour
+  boundary against AOV/Mingyu; the external service is not a runtime dependency
+  and received no user data.
+
+- Added the first Qizheng structured foundation. The versioned
+  `qizheng.fact.v1` contract retains resolved time/location evidence,
+  provenance, aspects, Life/Body Palace, and Twelve Palace facts. AOV/Mingyu
+  validated only a fixed anonymous offline fixture; production sends it no user
+  data and has no AOV route. The `cinnabar-local` boundary fails closed until a
+  bundled engine reaches fixture parity. Approximate/unknown time emits no
+  Qizheng facts. Focused coverage passes 7 tests across two files.
+
+- Added a deterministic, evidence-first Zi Wei dual-chart layer to local
+  Compatibility. It casts both charts independently from the existing
+  `resolvedBirthTime` values, then exposes key-palace overlays, natal
+  Lu/Quan/Ke/Ji cross-chart landing palaces, and Life/Partner San Fang Si
+  Zheng networks in both directions. It remains separate from BaZi Four
+  Pillars and the existing score and adds no AI, persistence, payment,
+  analytics, or production network dependency. If either birth time is
+  approximate, every hour-dependent conclusion is withheld. Fixed anonymous
+  golden coverage pins the engine output and UI fail-closed state.
 
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and
@@ -626,16 +706,11 @@
   The birth form also accepts a completely unknown hour. Noon exists only as
   an internal engine position: the palace chart, local snapshot, AI reading,
   timeline, sharing, paid report, and compatibility prefill do not consume or
-  display it. The all-block finder remains available, and applying a real
-  civil candidate clears the placeholder state before derived features unlock.
-  Applying a candidate is explicit, preserves `birthTimeReliable=false`,
-  atomically replaces chart plus birth input, and clears chart-derived caches.
-  Paid-report access, checkout, and generation are also invalidated by the
-  exact chart/persona request identity when an applied candidate replaces the
-  chart, preventing an old asynchronous result from re-entering the cleared
-  cache. Once payment capture begins, chart replacement, Start Over, and
-  persona changes remain locked until verification finishes so a successful
-  purchase cannot be silently detached mid-capture. The complete app passes
+  display it. The all-block finder remains available as a passive candidate
+  comparison and cannot replace canonical birth data. Once payment capture
+  begins, chart replacement, Start Over, and persona changes remain locked
+  until verification finishes so a successful purchase cannot be silently
+  detached mid-capture. The complete app passes
   71 test files / 701 tests, lint, the strict
   production build, and the dependency audit with zero known vulnerabilities.
   The finder is a 22.15 kB raw / 7.71 kB gzip lazy chunk; ChartDisplay remains

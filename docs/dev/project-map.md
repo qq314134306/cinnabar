@@ -38,6 +38,12 @@ Primary runtime flow:
    server validates 18+ eligibility, rebuilds the chart and prompt, claims the
    persistent daily quota, and then streams DeepSeek SSE.
 
+The passage-evidence contract is currently an independent, provider-free
+foundation rather than another generation step. `src/lib/evidence-contract.ts`
+owns types and fail-closed validation; `src/lib/evidence-fixtures.ts` supplies
+synthetic fixtures; `src/components/EvidencePanel.tsx` is a minimal read-only
+renderer. No production claim or large source corpus is connected yet.
+
 ## Deployment Topology
 
 ```text
@@ -89,6 +95,31 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 </directory>
 
 ## Important Files
+
+- `app/src/lib/evidence-contract.ts` + `evidence-fixtures.ts` +
+  `app/src/components/EvidencePanel.tsx` - passage-level provenance boundary.
+  Sources retain edition, locator scheme, availability, license/rights, and
+  access metadata; citations retain an exact passage locator. Every claim must
+  point to a deterministic system fact or cited rule. Synthesis has four
+  exhaustive states and no vote, score, probability, or confidence field.
+  Production facts identify local deterministic-engine authority; Skills are
+  limited to rule constraints and anonymous development validation. External
+  validation uses anonymous fixed fixtures, is never a production dependency,
+  and fails closed. Hour Pillars require verified birth time; finder output stays
+  candidate-only and cannot replace canonical input. English presentation is
+  limited to entertainment/self-discovery, and server-side narrative rendering
+  cannot calculate or mutate verified facts. Free evidence and paid
+  interpretation categories remain separate without adding payment here.
+  Fixtures use synthetic project text rather
+  than imported classical material.
+- `app/src/lib/question-divination.ts` + its fixture/test and
+  `app/src/components/question/QuestionDivination.tsx` + its test - immutable
+  `question-event.v1`, separate `liuyao.facts.v1`, `qimen.facts.v1`, and
+  `liuren.facts.v1` contracts, local provider/failure metadata, an anonymous
+  offline golden sample, and the independently lazy Question Charts surface.
+  All calculations retain the exact same event reference, but no result
+  synthesis, AI narrative, score, persistence, or production remote fallback
+  exists. See `docs/dev/question-divination-contracts.md`.
 
 - `app/src/App.tsx` + `App.test.ts` - top-level visible-surface navigation.
   Desktop and mobile navs have distinct names, report the active surface with
@@ -200,7 +231,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   `app/src/lib/birth-time-sensitivity.ts` - three-window local comparison for
   explicitly approximate birth times. It shifts wall-clock time across real
   dates, resolves each candidate independently, and summarizes core structural
-  differences without mutating the selected chart.
+  differences without mutating the selected chart. It also names the exact
+  Hour Pillar and hour-dependent conclusions suppressed by uncertainty.
 - `app/src/components/chart/BirthTimeFinder.tsx` +
   `app/src/lib/birth-time-finder.ts` - separately lazy, provider-independent
   13-candidate birth-time shortlist. It exact-matches one local birthplace,
@@ -211,9 +243,13 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   user-reviewable, and a one-answer-removal check reports ranking stability
   without a confidence claim. A completely unknown time uses a hidden noon
   engine position only to enter this flow; derived hour-dependent surfaces
-  remain locked. Only an explicit candidate action atomically
-  replaces the chart, preserves approximate status, and clears chart-derived
-  caches.
+  remain locked. Candidate results are entertainment-and-self-discovery
+  comparisons only and never replace the canonical birth input or its caches.
+- `app/src/lib/qizheng-contract.ts` + `qizheng-adapter.ts` +
+  `qizheng-local.ts` + `app/src/components/chart/QizhengFacts.tsx` - versioned
+  Qizheng facts and presentation. AOV is anonymous-fixture-only; production
+  accepts the shared resolved time/coordinates/timezone evidence and fails
+  closed until the bundled deterministic provider is complete.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts. Its
   natal Four Transformations line reuses the chart's pure transformation index
   so local navigation and prompt grounding share one ownership source. Its
@@ -259,7 +295,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   until real third-party browser flows establish an enforcement allowlist.
 - `app/src/lib/compatibility-score.ts` +
   `app/src/lib/bazi-compatibility.ts` +
+  `app/src/lib/ziwei-compatibility.ts` +
   `app/src/components/match/BaZiCompatibility.tsx` +
+  `app/src/components/match/ZiweiCompatibility.tsx` +
   `app/src/components/match/MatchAnalysis.tsx` + their tests - always-available
   deterministic local Compatibility snapshot across communication, shared
   direction, emotional rhythm, and resilience. It is symmetric, needs no
@@ -292,6 +330,14 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   Liu Hai, Liu Po, and punishment are named structural contacts rather than
   adverse forecasts. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.
+  The resolved pair also feeds an independent Zi Wei dual-chart evidence
+  adapter. It casts each chart through iztro, maps six key palaces by earthly
+  branch, maps each natal Lu/Quan/Ke/Ji landing into the other chart, and maps
+  Life/Partner San Fang Si Zheng receiving palaces in both directions. It does
+  not consume or produce BaZi pillars. Approximate time suppresses every
+  hour-dependent Zi Wei cross-chart fact rather than presenting a provisional
+  palace conclusion. Anonymous fixtures may cross-check external development
+  tools, but production has no external chart API dependency.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership, sends both full allowlisted birth shapes, and is
   preflighted by the same local place check before quota/provider work.

@@ -49,6 +49,9 @@ describe('BirthForm', () => {
     expect(screen.getByRole('combobox', { name: 'Year of birth' })).toBeTruthy()
     expect(screen.getByRole('combobox', { name: 'Month of birth' })).toBeTruthy()
     expect(screen.getByRole('combobox', { name: 'Day of birth' })).toBeTruthy()
+    expect(screen.getByRole('combobox', {
+      name: 'Where did this birth time come from?',
+    })).toBeTruthy()
   })
 
   it('defaults solar correction off for an approximate time and stores the uncertainty', async () => {
