@@ -281,6 +281,15 @@ describe('Cinnabar candidate verification workflow', () => {
       "$summary.supabaseCliVersion -cne '2.84.2'",
     )
     expect(databaseProofJob).toContain(
+      '$summaryText -notmatch',
+    )
+    expect(databaseProofJob).toContain(
+      'PROOF_SUMMARY_TIMESTAMPS_INVALID',
+    )
+    expect(databaseProofJob).not.toContain(
+      "$summary.startedAt -notmatch '^\\d{4}",
+    )
+    expect(databaseProofJob).toContain(
       "$summary.cleanup.status -cne 'pass'",
     )
     expect(databaseProofJob).toContain(

@@ -106,6 +106,12 @@
   pin, and migration fingerprint remain fail-closed inside that validator. The
   run itself remains non-evidence because the job conclusion was failure; a new
   exact-head run is required.
+- Hosted run `30185160313` confirmed the final tail gate was correctly exposing
+  a hidden validator failure: newer runner PowerShell materialized ISO JSON
+  timestamps as `DateTime` values, so a post-deserialization `...Z` regex
+  rejected valid evidence. UTC `Z` encoding is now verified on the raw JSON,
+  while parsed values retain the chronological-order check. The failed run is
+  not evidence; a new exact-head run is required.
 - Exercised the release path for the first time through pushed pull request
   #10. The trusted Vercel Preview built and passed a real default-chart and
   Major Luck browser check. Hosted run `30183316408` correctly blocked the

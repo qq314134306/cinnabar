@@ -202,6 +202,12 @@ or incomplete cleanup. The last Bash gate therefore requires the validator and
 artifact upload outcomes only; it does not independently reinterpret the same
 intermediate outcomes a second time.
 
+Timestamp encoding is checked against the raw JSON before deserialization, so
+both `startedAt` and `finishedAt` must remain UTC `Z` strings. Chronological
+ordering is checked after parsing. This avoids PowerShell-version differences
+where `ConvertFrom-Json` may materialize ISO strings as `DateTime` objects and
+then culture-format them during a later regex comparison.
+
 CI's `database-proof` job creates its Supabase working directory outside the
 checkout so repository migrations are not auto-applied before the runner checks
 the `Fresh` baseline. It uses the local database's built-in `auth` schema,

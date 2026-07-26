@@ -349,6 +349,12 @@ jobs:
           if ($summaryText.Length -gt 32768) {
             throw 'PROOF_SUMMARY_TOO_LARGE'
           }
+          if ($summaryText -notmatch
+              '"startedAt"\s*:\s*"\d{4}-\d{2}-\d{2}T[^"\r\n]*Z"' -or
+              $summaryText -notmatch
+              '"finishedAt"\s*:\s*"\d{4}-\d{2}-\d{2}T[^"\r\n]*Z"') {
+            throw 'PROOF_SUMMARY_TIMESTAMPS_INVALID'
+          }
           $summary = $summaryText | ConvertFrom-Json -AsHashtable
           Assert-ExactKeys $summary @(
             'schemaVersion',
@@ -442,9 +448,7 @@ jobs:
           }
           $startedAt = [DateTimeOffset]::MinValue
           $finishedAt = [DateTimeOffset]::MinValue
-          if ($summary.startedAt -notmatch '^\d{4}-\d{2}-\d{2}T.*Z$' -or
-            $summary.finishedAt -notmatch '^\d{4}-\d{2}-\d{2}T.*Z$' -or
-            -not [DateTimeOffset]::TryParse(
+          if (-not [DateTimeOffset]::TryParse(
               [string]$summary.startedAt,
               [Globalization.CultureInfo]::InvariantCulture,
               [Globalization.DateTimeStyles]::RoundtripKind,
