@@ -606,7 +606,9 @@ received during a flight must produce one trailing revalidation.
 `tests/`: Tests that sit outside `src`, including workflow contract tests.
 
 `src/lib/compatibility-score.ts` + `src/lib/bazi-compatibility.ts` +
+`src/lib/ziwei-compatibility.ts` +
 `src/components/match/BaZiCompatibility.tsx` +
+`src/components/match/ZiweiCompatibility.tsx` +
 `src/components/match/MatchAnalysis.tsx` + their tests: Compatibility always
 offers a symmetric, deterministic local four-dimension snapshot without an
 account, API, payment, cache, or analytics. The optional AI narrative remains
@@ -652,6 +654,13 @@ must not alter the
 existing symmetric score, infer other branch systems, assign good/bad meaning,
 or add advice, AI, persistence, analytics, account, payment, or network work.
 If either input time is approximate, mark the entire BaZi layer provisional.
+The Zi Wei dual-chart layer separately casts both charts from the same two
+Compatibility-owned `resolvedBirthTime` values and indexes key-palace overlays,
+natal transformation cross-landings, and Life/Partner San Fang Si Zheng
+receiving palaces. It must never supply or overwrite BaZi Four Pillars. If
+either time is approximate, withhold all hour-dependent Zi Wei palace,
+transformation, and network conclusions. Keep production local and
+deterministic; external chart APIs are anonymous-fixture development tools only.
 
 `src/components/share/ShareCard.tsx` + `ShareCard.test.ts`: deterministic
 chart-summary card and local PNG export. The quote renderer uses an

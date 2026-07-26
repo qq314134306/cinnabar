@@ -1566,3 +1566,30 @@ additive Liu He/Liu Chong/Liu Hai/Liu Po map. It adds no weight, strength or
 transformation judgment, favorable/unfavorable label, prediction, advice, AI,
 persistence, analytics, account requirement, payment, or network request. San
 He, San Hui, and any broader branch synthesis remain outside this decision.
+
+## D065 - Zi Wei Compatibility Is Two Charts Before Interaction
+
+Cinnabar may add a deterministic Zi Wei dual-chart evidence layer inside the
+existing local Compatibility result. It must independently cast both natal
+charts through the established local iztro configuration using the two exact
+Compatibility-owned `resolvedBirthTime` values. It may then map six named key
+palaces by earthly branch, map each person's natal Lu/Quan/Ke/Ji star and source
+palace into the other chart's palace at that branch, and map the Life and
+Partner palace San Fang Si Zheng networks into the other chart in both
+directions. Every output retains direction, branch, source, and receiver so the
+claim is inspectable.
+
+The layer is not a second calendar authority. It never calculates, imports,
+rewrites, or overrides BaZi Four Pillars, and it never changes the existing
+compatibility score. If either birth time is approximate, all hour-dependent
+palace, transformation, and San Fang Si Zheng conclusions are withheld rather
+than labeled as precise or merely provisional. It must not infer or persist a
+replacement birth time.
+
+Production uses only the local deterministic engine. Skills and external AOV
+or Mingyu APIs may constrain rules and cross-check fixed anonymous development
+fixtures, but real user birth data must never be sent to those services and
+runtime availability must not depend on them. The public surface uses English
+entertainment and self-discovery framing. This decision adds no verdict,
+prediction, advice, DeepSeek calculation, client secret, persistence,
+analytics, account gate, credits, payment, or production network request.

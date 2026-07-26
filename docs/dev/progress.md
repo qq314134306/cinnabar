@@ -185,6 +185,16 @@
   bundled engine reaches fixture parity. Approximate/unknown time emits no
   Qizheng facts. Focused coverage passes 7 tests across two files.
 
+- Added a deterministic, evidence-first Zi Wei dual-chart layer to local
+  Compatibility. It casts both charts independently from the existing
+  `resolvedBirthTime` values, then exposes key-palace overlays, natal
+  Lu/Quan/Ke/Ji cross-chart landing palaces, and Life/Partner San Fang Si
+  Zheng networks in both directions. It remains separate from BaZi Four
+  Pillars and the existing score and adds no AI, persistence, payment,
+  analytics, or production network dependency. If either birth time is
+  approximate, every hour-dependent conclusion is withheld. Fixed anonymous
+  golden coverage pins the engine output and UI fail-closed state.
+
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and
   Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or

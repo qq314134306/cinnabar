@@ -31,6 +31,7 @@ import {
 } from '@/lib/compatibility-score'
 import { Button, Input, Select } from '@/components/ui'
 import { BaZiCompatibility } from './BaZiCompatibility'
+import { ZiweiCompatibility } from './ZiweiCompatibility'
 
 const YEAR_OPTIONS = getYearOptions()
 const MONTH_OPTIONS = getMonthOptions()
@@ -905,6 +906,8 @@ function LocalCompatibilitySnapshot({
       </div>
 
       {result.bazi && <BaZiCompatibility result={result.bazi} />}
+
+      <ZiweiCompatibility result={result.ziwei} />
 
       <div className="grid gap-4 md:grid-cols-2">
         {result.dimensions.map((dimension) => (
