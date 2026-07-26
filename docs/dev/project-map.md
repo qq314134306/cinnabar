@@ -279,7 +279,10 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   target pillar, branch, canonical hidden-stem (藏干) sequence, and Ten Gods
   result without
   strength weights. The same layer shows the named Day Branch contact and a
-  limited contact map over all 16 cross-person pillar pairings. The branch map
+  limited contact map over all 16 cross-person pillar pairings. A separate
+  visible-stem contact map lists only canonical Heavenly Stem Five
+  Combinations across the same 16 pillar pairings and makes no transformation
+  or strength claim. The branch map
   lists only same-branch, Liu He, or Liu Chong contacts and omits unclassified
   pairs. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.

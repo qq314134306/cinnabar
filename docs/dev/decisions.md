@@ -1436,3 +1436,23 @@ This decision does not authorize stem combinations, branch transformations,
 strength or useful-god judgment, a BaZi score, timing forecasts, fate claims,
 relationship advice, AI prose, persistence, analytics, account gating,
 payment, or a network request.
+
+## D061 - Heavenly Stem Five Combinations Are Named Contacts Only
+
+Cinnabar may extend the score-free BaZi Compatibility layer with a
+cross-person visible-stem contact map. It evaluates the 16 pairings formed by
+Person A's and Person B's Year, Month, Day, and Hour Heavenly Stems, and lists
+only the five canonical Wu He pairs: Jia-Ji, Yi-Geng, Bing-Xin, Ding-Ren, and
+Wu-Gui. Every listed contact retains both person labels, pillar scopes, and raw
+stems so the output remains inspectable and deterministic.
+
+A listed pair means only that the two visible stems form a canonical Five
+Combination. It does not claim that the pair transforms, name a transformed
+element, or judge whether transformation succeeds. Seasonal conditions,
+supporting branches, strength, useful-god analysis, and repeated-contact weight
+remain outside this increment.
+
+This decision does not authorize Heavenly Stem clashes, hidden-stem
+combinations, branch transformations, favorable or unfavorable labels, a BaZi
+score, timing forecasts, fate claims, relationship advice, AI prose,
+persistence, analytics, account gating, payment, or a network request.
