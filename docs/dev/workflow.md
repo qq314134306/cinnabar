@@ -182,6 +182,13 @@ concurrency proof reports cleanup failure directly instead of depending on a
 parent shell's stale `$LASTEXITCODE`. An invalid or unwritable summary path
 still leaves a sanitized failure summary on stdout.
 
+If the ordered migration transaction fails, the runner also emits one bounded
+warning containing at most twelve recognized PostgreSQL diagnostic lines. It
+redacts database URLs, replaces the repository root with `<repo>`, truncates
+each line to 300 characters, and never adds the diagnostic to the retained JSON
+artifact. This keeps the release gate actionable without turning CI logs into a
+connection-detail channel.
+
 CI's `database-proof` job creates its Supabase working directory outside the
 checkout so repository migrations are not auto-applied before the runner checks
 the `Fresh` baseline. It uses the local database's built-in `auth` schema,

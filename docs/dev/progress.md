@@ -36,7 +36,10 @@
   showed that the role cannot persist its own custom database-scoped default.
   Marker persistence is now confined to local Supabase's built-in
   `supabase_admin`, with `PGUSER=postgres` restored before the proof starts.
-  A new exact-head database run is still required.
+  Run `30184030058` then proved the marker, target guard, prerequisites, and
+  baseline state, but the ordered migration transaction failed. The prior
+  runner suppressed the useful PostgreSQL error text, so it is not release
+  evidence and an exact-head rerun with bounded diagnostics is required.
 - GitHub `main` is not protected. Vercel has Git Fork Protection, Standard
   Deployment Protection, Build Logs protection, and Source protection enabled,
   but no Deployment Checks are configured and automatic custom-production-
@@ -51,6 +54,15 @@
 
 ## Recently Completed
 
+- Confirmed the GitHub authorization is now persisted for account
+  `qq314134306`; local HEAD and `origin/codex/release-hardening` both resolve to
+  `e75cd476aa3acf9292909efcc65fa7f9e5a34d04`. Added a bounded migration failure
+  diagnostic to the Fresh database proof after run `30184030058` reached the
+  real migration transaction and failed with only the generic
+  `MIGRATION_TRANSACTION_FAILED` code. The warning retains only the first
+  twelve recognized PostgreSQL error/detail/hint/context lines, redacts any
+  database URL, replaces the repository root, truncates each retained line,
+  and remains outside the sanitized JSON artifact.
 - Exercised the release path for the first time through pushed pull request
   #10. The trusted Vercel Preview built and passed a real default-chart and
   Major Luck browser check. Hosted run `30183316408` correctly blocked the

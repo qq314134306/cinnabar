@@ -133,6 +133,37 @@ function Invoke-ProofStep {
   }
 }
 
+function Write-CinnabarPsqlFailureDiagnostic {
+  param(
+    [AllowEmptyString()]
+    [string]$Output
+  )
+
+  $diagnosticLines = @(
+    $Output -split "`r?`n" |
+      Where-Object {
+        $_ -match '(?i)(?:^|:\s)(?:ERROR|FATAL|DETAIL|HINT|CONTEXT):'
+      } |
+      Select-Object -First 12 |
+      ForEach-Object {
+        $line = $_ -replace '(?i)postgres(?:ql)?://\S+',
+          '[redacted-database-url]'
+        $line = $line.Replace($repoRoot, '<repo>')
+        if ($line.Length -gt 300) {
+          $line.Substring(0, 300) + '...'
+        } else {
+          $line
+        }
+      }
+  )
+  $diagnostic = if ($diagnosticLines.Count -gt 0) {
+    $diagnosticLines -join ' | '
+  } else {
+    'psql returned no recognized safe diagnostic lines'
+  }
+  Write-Warning "migration-transaction diagnostic: $diagnostic"
+}
+
 function Invoke-ScalarQuery {
   param([string]$Sql)
   $result = Invoke-CinnabarPsql -Arguments @(
@@ -238,6 +269,7 @@ select (to_regclass('public.profiles') is not null)::int,
       }
       $result = Invoke-CinnabarPsql -Arguments $arguments.ToArray()
       if ($result.ExitCode -ne 0) {
+        Write-CinnabarPsqlFailureDiagnostic -Output $result.Output
         throw 'MIGRATION_TRANSACTION_FAILED'
       }
     } 'MIGRATION_TRANSACTION_FAILED'

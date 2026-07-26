@@ -244,4 +244,15 @@ describe('database release-proof contract', () => {
     expect(runner).toContain("Add-Result 'summary-write' 'fail' 0")
     expect(runner).toMatch(/\$summaryJson\r?\nif \(\$failureCode\)/u)
   })
+
+  it('surfaces only bounded redacted psql migration diagnostics', () => {
+    expect(runner).toContain('Write-CinnabarPsqlFailureDiagnostic')
+    expect(runner).toContain('Select-Object -First 12')
+    expect(runner).toContain("$line.Length -gt 300")
+    expect(runner).toContain('[redacted-database-url]')
+    expect(runner).toContain("$line.Replace($repoRoot, '<repo>')")
+    expect(runner).toContain(
+      'Write-CinnabarPsqlFailureDiagnostic -Output $result.Output',
+    )
+  })
 })
