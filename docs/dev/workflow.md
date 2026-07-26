@@ -442,8 +442,13 @@ Authenticated inspection on 2026-07-23 confirmed the active deployment path:
 - Git repository: `qq314134306/cinnabar`
 - production branch: `main`
 - Root Directory: `app`
-- current production source commit: `104de00`
-- deployed functions include `interpret` and `subscribe`
+- production source and function inventory: use the latest authenticated
+  evidence recorded in `docs/dev/progress.md`; do not preserve an older
+  deployment snapshot here as current state
+
+The accepted release inventory has no visitor-subscription function. The
+retired `/api/subscribe` path must not be inferred from historical deployments
+or reintroduced without a new product/privacy decision.
 
 Do not record the Vercel project identifier or any environment value in
 repository documentation, logs, screenshots, or proof artifacts.

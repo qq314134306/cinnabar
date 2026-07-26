@@ -144,6 +144,19 @@
 
 ## Recently Completed
 
+- Audited exact `origin/main` commit `39622eb` from an independent QA branch.
+  A clean `npm ci` reported zero vulnerabilities; lint, all 81 test files / 675
+  tests, and the strict production build passed. The focused Compatibility and
+  true-solar suite passed 55 tests across six files. Local browser acceptance
+  matched tolerant `Zhu Zhou` and DST-aware `New York`, recomputed Person B's
+  Day Pillar from Ren-Xu to Gui-Hai after a one-day edit, proved that disabling
+  Person A correction bypasses an invalid birthplace, and found no horizontal
+  overflow or browser warning/error. No functional defect was reproduced.
+  Reconciled stale release text that still described Actions and branch
+  protection as absent and an old deployment's retired `subscribe` function as
+  current. This is local QA evidence, not a replacement for exact-candidate
+  hosted checks or the sanitized Fresh database artifact.
+
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and
   Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or
@@ -1522,12 +1535,12 @@ hosted run or artifact exists yet.
   than restoring an independent, potentially divergent project guide.
 - The birthplace matching experience depends on the quality and coverage of the
   local coordinate dataset.
-- Direct Vercel deployment is not currently proven to wait for the candidate
-  workflow. `main` is unprotected, Vercel Deployment Checks are empty, and
-  automatic custom-production-domain assignment is enabled. Until required
-  GitHub checks plus Vercel Deployment Checks, or an exact-SHA manual-promotion
-  policy, are enforced, a successful Vercel build is deployment evidence but
-  not verification-gate evidence.
+- Direct Vercel deployment still requires exact-candidate evidence on every
+  release. `main` is protected by the two required GitHub jobs and Vercel has
+  blocking native Lint and Typecheck Deployment Checks, but automatic
+  custom-production-domain assignment remains enabled. A successful Vercel
+  build alone is not verification-gate evidence; retain the exact GitHub run,
+  sanitized database artifact, deployment checks, and source binding.
 
 ## Next Useful Work
 
@@ -1546,14 +1559,12 @@ hosted run or artifact exists yet.
   keep both public-AI and Future Report payment flags false, run the hosted
   candidate gates, then repeat the accepted chart/timeline/compatibility/share
   flow in an isolated Vercel Preview before promotion.
-- Explicitly enable GitHub Actions for `qq314134306/cinnabar`, run the
-  candidate-verification workflow, require both jobs to pass, and inspect the
-  sanitized database artifact. Do not claim hosted proof from workflow YAML or
-  local contract tests alone.
-- Protect `main` after both check names have registered, then either import them
-  into Vercel Deployment Checks or disable automatic production-domain
-  assignment and manually promote the exact verified SHA. Do not merge the
-  candidate while GitHub and Vercel can independently race to Production.
+- For every candidate, require both protected GitHub jobs to pass on the exact
+  up-to-date head and inspect the sanitized database artifact. Reconfirm that
+  branch protection still disallows bypass, force pushes, and deletion, and
+  that Vercel's blocking Lint and Typecheck checks pass before automatic
+  production-domain assignment. Do not claim hosted proof from workflow YAML,
+  local contract tests, or a successful Vercel build alone.
 - Configure the missing runtime settings in an isolated Vercel Preview, keeping
   a stable Branch URL plus branch-scoped exact `APP_ORIGIN`; prefer a separate
   preview Supabase project for direct email-link proof. Keep public AI
