@@ -4,6 +4,18 @@
 
 ## Current State
 
+- Question Charts now fails closed in production after an accuracy audit found
+  that its initial deterministic calculators were development placeholders, not
+  complete Liu Yao, Qi Men Dun Jia, or Da Liu Ren engines. The UI captures one
+  immutable event, converts its `datetime-local` value with the selected IANA
+  timezone, rejects DST gaps/folds, and returns three versioned
+  `ENGINE_UNAVAILABLE` results with no facts. It calls no external service and
+  generates no substitute chart. The placeholder contracts remain only for
+  future independently verified local-engine development. Verification on
+  2026-07-26 passed the focused suite (3 files / 12 tests), full suite
+  (89 files / 732 tests), clean `npm ci`, `npm audit`, lint, build, and
+  `git diff --check`.
+
 - The Question Charts foundation is implemented on
   `codex/question-divination-foundation`. One frozen `question-event.v1`
   captures question, instant, IANA timezone, and user-entered location evidence;

@@ -23,7 +23,7 @@ export interface ProviderMetadata {
   readonly contractVersion: string
   readonly status: 'ok' | 'failed'
   readonly failure?: {
-    readonly code: 'INVALID_EVENT' | 'UNSUPPORTED_TIMEZONE' | 'CALCULATION_FAILED'
+    readonly code: 'INVALID_EVENT' | 'UNSUPPORTED_TIMEZONE' | 'CALCULATION_FAILED' | 'ENGINE_UNAVAILABLE'
     readonly message: string
   }
 }
@@ -123,6 +123,61 @@ function isSupportedTimezone(timezone: string): boolean {
   }
 }
 
+interface LocalDateTimeParts {
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
+  second: number
+}
+
+function parseLocalDateTime(value: string): LocalDateTimeParts {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value)
+  if (!match) throw new Error('Capture time must use YYYY-MM-DDTHH:mm.')
+  const [, year, month, day, hour, minute, second = '0'] = match
+  const parts = { year: Number(year), month: Number(month), day: Number(day), hour: Number(hour), minute: Number(minute), second: Number(second) }
+  const check = new Date(Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second))
+  if (check.getUTCFullYear() !== parts.year || check.getUTCMonth() !== parts.month - 1 || check.getUTCDate() !== parts.day || parts.hour > 23 || parts.minute > 59 || parts.second > 59) {
+    throw new Error('Capture time is not a valid calendar time.')
+  }
+  return parts
+}
+
+function offsetMinutesAt(instant: Date, timezone: string): number {
+  const name = new Intl.DateTimeFormat('en-US', { timeZone: timezone, timeZoneName: 'longOffset' })
+    .formatToParts(instant)
+    .find((part) => part.type === 'timeZoneName')?.value
+  if (name === 'GMT' || name === 'UTC') return 0
+  const match = /^GMT([+-])(\d{2}):(\d{2})$/.exec(name ?? '')
+  if (!match) throw new Error('The timezone offset could not be resolved.')
+  const minutes = Number(match[2]) * 60 + Number(match[3])
+  return match[1] === '+' ? minutes : -minutes
+}
+
+function partsAt(instant: Date, timezone: string): LocalDateTimeParts {
+  const values = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  }).formatToParts(instant)
+  const number = (type: Intl.DateTimeFormatPartTypes) => Number(values.find((part) => part.type === type)?.value)
+  return { year: number('year'), month: number('month'), day: number('day'), hour: number('hour'), minute: number('minute'), second: number('second') }
+}
+
+export function zonedLocalDateTimeToUtc(value: string, timezone: string): string {
+  if (!isSupportedTimezone(timezone)) throw new Error('A supported IANA timezone is required.')
+  const wanted = parseLocalDateTime(value)
+  const wallClockAsUtc = Date.UTC(wanted.year, wanted.month - 1, wanted.day, wanted.hour, wanted.minute, wanted.second)
+  const offsets = new Set([-172_800_000, 0, 172_800_000].map((delta) => offsetMinutesAt(new Date(wallClockAsUtc + delta), timezone)))
+  const matches = [...offsets]
+    .map((offset) => new Date(wallClockAsUtc - offset * 60_000))
+    .filter((instant) => JSON.stringify(partsAt(instant, timezone)) === JSON.stringify(wanted))
+  if (matches.length === 0) throw new Error('This local time does not exist because of a timezone clock change.')
+  if (matches.length > 1) throw new Error('This local time is ambiguous because of a timezone clock change.')
+  return matches[0].toISOString()
+}
+
 function localParts(event: QuestionEvent) {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: event.timezone,
@@ -148,6 +203,7 @@ const FREE_FACTS = deepFreeze({
   product: 'question-structural-facts' as const,
 })
 
+/** @deprecated Development placeholder. Never call from a production entry point. */
 export function calculateLiuYao(event: QuestionEvent): FactResult<'liuyao'> {
   const time = Math.floor(new Date(event.capturedAt).getTime() / 60_000)
   const seed = (time ^ hashQuestion(event.question)) >>> 0
@@ -161,6 +217,7 @@ export function calculateLiuYao(event: QuestionEvent): FactResult<'liuyao'> {
   } }) as FactResult<'liuyao'>
 }
 
+/** @deprecated Development placeholder. Never call from a production entry point. */
 export function calculateQimen(event: QuestionEvent): FactResult<'qimen'> {
   const { month, day, hour } = localParts(event)
   const hourBranchIndex = Math.floor(((hour + 1) % 24) / 2)
@@ -174,6 +231,7 @@ export function calculateQimen(event: QuestionEvent): FactResult<'qimen'> {
   } }) as FactResult<'qimen'>
 }
 
+/** @deprecated Development placeholder. Never call from a production entry point. */
 export function calculateLiuRen(event: QuestionEvent): FactResult<'liuren'> {
   const { month, day, hour } = localParts(event)
   const hourIndex = Math.floor(((hour + 1) % 24) / 2)
@@ -187,9 +245,36 @@ export function calculateLiuRen(event: QuestionEvent): FactResult<'liuren'> {
   } }) as FactResult<'liuren'>
 }
 
+/** @deprecated Development placeholder bundle. Never call from a production entry point. */
 export function calculateQuestionCharts(event: QuestionEvent) {
   return deepFreeze({
     event,
     results: [calculateLiuYao(event), calculateQimen(event), calculateLiuRen(event)],
+  })
+}
+
+export function createUnavailableQuestionResults(event: QuestionEvent) {
+  const result = <M extends QuestionMethod>(method: M, contractVersion: MethodFacts[M]['contract']): FactResult<M> => deepFreeze({
+    method,
+    event,
+    entitlement: FREE_FACTS,
+    metadata: {
+      provider: 'cinnabar-local',
+      providerVersion: '2026-07-26.v1',
+      contractVersion,
+      status: 'failed',
+      failure: {
+        code: 'ENGINE_UNAVAILABLE',
+        message: 'The verified local engine is not available yet. No chart was generated and no external service was called.',
+      },
+    },
+  }) as FactResult<M>
+  return deepFreeze({
+    event,
+    results: [
+      result('liuyao', 'liuyao.facts.v1'),
+      result('qimen', 'qimen.facts.v1'),
+      result('liuren', 'liuren.facts.v1'),
+    ],
   })
 }
