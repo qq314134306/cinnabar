@@ -78,7 +78,7 @@ begin
     v_window - 8,
     lpad(value::text, 43, 'S'),
     1
-  from generate_series(1, 101) value;
+  from generate_series(1, 201) value;
 
   select allowed, retry_after_seconds
     into v_allowed, v_retry
@@ -143,7 +143,7 @@ begin
     select count(*) = 1
       from public.public_ai_daily_quotas
      where window_start < v_window - 7
-  ), 'successful claims must delete at most one bounded batch of 100 stale rows';
+  ), 'each successful claim must delete at most one bounded batch of 100 stale rows';
 
   begin
     perform public.claim_public_ai_daily_quota(

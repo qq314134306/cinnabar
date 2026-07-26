@@ -78,6 +78,12 @@
   stderr. The same bounded, redacted PostgreSQL diagnostic is now applied to
   named SQL-test failures so the next exact-head run can expose the remaining
   assertion without leaking it into the retained artifact.
+- Hosted run `30184748654` identified that final assertion. The quota behavior
+  test created 101 stale rows while exercising two successful claims; because
+  each success correctly performs a separately bounded cleanup of at most 100,
+  no stale row remained. The fixture now creates 201 rows so two successes must
+  leave exactly one, while the intervening rejected claims prove they do not
+  trigger cleanup. A new exact-head Fresh proof remains required.
 - Exercised the release path for the first time through pushed pull request
   #10. The trusted Vercel Preview built and passed a real default-chart and
   Major Luck browser check. Hosted run `30183316408` correctly blocked the
