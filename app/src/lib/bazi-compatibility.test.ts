@@ -56,6 +56,14 @@ describe('buildBaziCompatibility', () => {
     expect(result).not.toBeNull()
     expect(result?.personA.dayPillar.ganZhi).toHaveLength(2)
     expect(result?.personB.dayPillar.ganZhi).toHaveLength(2)
+    expect(result?.personA.pillars.map((pillar) => pillar.scope)).toEqual([
+      'year',
+      'month',
+      'day',
+      'hour',
+    ])
+    expect(result?.personB.pillars).toHaveLength(4)
+    expect(result?.personA.pillars.every((pillar) => pillar.ganZhi.length === 2)).toBe(true)
     expect(result?.personAToB.label).toBeTruthy()
     expect(result?.personBToA.label).toBeTruthy()
     expect(result?.provisional).toBe(false)

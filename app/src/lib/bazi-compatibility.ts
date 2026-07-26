@@ -3,6 +3,7 @@ import {
   BAZI_TEN_GOD_LABELS,
   buildBaziFourPillars,
   getBaziTenGod,
+  type BaziPillarScope,
   type BaziTenGod,
 } from './bazi-four-pillars'
 
@@ -25,6 +26,12 @@ export interface BaziCompatibilityPerson {
     branch: string
     ganZhi: string
   }
+  pillars: Array<{
+    scope: BaziPillarScope
+    stem: string
+    branch: string
+    ganZhi: string
+  }>
 }
 
 export interface BaziDirectionalRelationship {
@@ -152,6 +159,12 @@ function buildPerson(info: BirthInfo): BaziCompatibilityPerson | null {
       branch: dayPillar.branch,
       ganZhi: dayPillar.ganZhi,
     },
+    pillars: pillars.pillars.map((pillar) => ({
+      scope: pillar.scope,
+      stem: pillar.stem,
+      branch: pillar.branch,
+      ganZhi: pillar.ganZhi,
+    })),
   }
 }
 

@@ -316,8 +316,9 @@ describe('MatchAnalysis public AI gate', () => {
     )).toBeTruthy()
     expect(screen.getAllByRole('progressbar')).toHaveLength(4)
     expect(screen.getByRole('heading', {
-      name: 'BaZi compatibility · Day Pillars',
+      name: 'BaZi compatibility · Four Pillars',
     })).toBeTruthy()
+    expect(document.querySelectorAll('[data-bazi-pillar]')).toHaveLength(8)
     expect(screen.getByText(/does not change the Zi Wei compatibility score/)).toBeTruthy()
     expect(document.querySelectorAll('[data-bazi-compatibility-person]')).toHaveLength(2)
     expect(screen.getByText(/not scientific evidence/)).toBeTruthy()

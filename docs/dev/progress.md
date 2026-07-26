@@ -87,6 +87,17 @@
 
 ## Recently Completed
 
+- Extended the local BaZi Compatibility result with a complete Four Pillars
+  comparison for both people. The model now carries the ordered Year, Month,
+  Day, and Hour pillars from the same two true-solar-resolved calculations and
+  the UI exposes all eight pillars before the existing Day Master and Day
+  Branch analysis. No additional branch system, score, outcome judgment, API,
+  account, payment, analytics, or persistence was added. Focused compatibility
+  coverage passes 33 tests across four files; lint, all 81 test files / 669
+  tests, and the production build pass. Chrome acceptance is still required:
+  the installed extension is enabled, but its Windows native-host registry
+  binding is currently absent, so no browser evidence is claimed for this
+  candidate yet.
 - Added a score-free BaZi structural layer to the existing local Compatibility
   result. It reuses both true-solar-resolved inputs and the established Four
   Pillars/Ten Gods helpers to show both Day Pillars, separate A-to-B and B-to-A

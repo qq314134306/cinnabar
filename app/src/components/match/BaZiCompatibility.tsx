@@ -5,6 +5,13 @@ interface BaZiCompatibilityProps {
   result: BaziCompatibilityResult
 }
 
+const PILLAR_LABELS = {
+  year: 'Year',
+  month: 'Month',
+  day: 'Day',
+  hour: 'Hour',
+} as const
+
 export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
   return (
     <section
@@ -18,7 +25,7 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
         id="bazi-compatibility-heading"
         className="mt-1 text-base font-semibold text-text"
       >
-        BaZi compatibility · Day Pillars
+        BaZi compatibility · Four Pillars
       </h4>
       <p className="mt-1 text-xs leading-relaxed text-text-secondary">
         A separate local comparison using the same true-solar-resolved birth
@@ -36,11 +43,24 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
             className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3"
           >
             <p className="text-[10px] uppercase tracking-wider text-text-muted">
-              {label} Day Pillar
+              {label} Four Pillars
             </p>
-            <p className="mt-1 font-mono text-base font-semibold text-text">
-              {translateGanZhi(person.dayPillar.ganZhi)}
-            </p>
+            <div className="mt-2 grid grid-cols-4 gap-1.5">
+              {person.pillars.map((pillar) => (
+                <div
+                  key={pillar.scope}
+                  data-bazi-pillar={pillar.scope}
+                  className="min-w-0 rounded-md border border-white/[0.06] bg-black/10 px-1 py-2 text-center"
+                >
+                  <p className="text-[9px] uppercase tracking-wide text-text-muted">
+                    {PILLAR_LABELS[pillar.scope]}
+                  </p>
+                  <p className="mt-1 font-mono text-sm font-semibold text-text">
+                    {translateGanZhi(pillar.ganZhi)}
+                  </p>
+                </div>
+              ))}
+            </div>
             <p className="mt-1 text-xs text-gold/85">
               Day Master · {translateStem(person.dayMaster.stem)}
             </p>
@@ -93,15 +113,15 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
       {result.provisional && (
         <p role="note" className="mt-3 text-xs leading-relaxed text-gold/80">
           At least one entered birth time is approximate. Because a true-solar
-          correction may cross a date boundary, treat this Day Pillar comparison
+          correction may cross a date boundary, treat this Four Pillar comparison
           as provisional until both times are confirmed.
         </p>
       )}
 
       <p className="mt-3 border-t border-white/[0.06] pt-3 text-[10px] leading-relaxed text-text-muted">
         Ten Gods are directional: A reading B can differ from B reading A. This
-        panel shows named structure only—no score, fate claim, or relationship
-        advice.
+        panel shows the complete pillars but interprets only the two Day Masters
+        and Day Branch contact—no score, fate claim, or relationship advice.
       </p>
     </section>
   )

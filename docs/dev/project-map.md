@@ -272,8 +272,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   exact-place predicate, displays the applied correction, and rejects stale
   async work after edits. Local failures are announced and retryable.
   The same resolved pair also feeds a separate score-free BaZi layer. It reuses
-  the established Four Pillars and Ten Gods helpers to show both Day Pillars,
-  directional A-to-B and B-to-A Day Master relationships, and only the named
+  the established Four Pillars and Ten Gods helpers to show both complete
+  ordered Four-Pillar sets, directional A-to-B and B-to-A Day Master
+  relationships, and only the named
   same-branch, Liu He, or Liu Chong Day Branch contacts. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.
   The optional uncached AI narrative retains controller/request-key/
