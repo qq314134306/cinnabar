@@ -92,6 +92,14 @@
   passed before the one-second custom-domain assignment. A production Chrome
   smoke test on `www.cinnabarastrology.com` rendered both ordered Four-Pillar
   sets and both Day Master relationships with no overflow or warning/error.
+- Pull request #19 merged the cross-person Four-Pillar Earthly Branch contact
+  map into protected `main` as `dd3c945`. All four candidate checks passed;
+  the isolated Vercel Preview rendered five canonical contacts across the
+  eight pillars with no overflow or console warning/error. Production
+  deployment `EqXJLwoQrNqkAMPKHeoDitgvbRFt` is Ready for source `dd3c945` and
+  owns `www.cinnabarastrology.com`. A production Chrome smoke test repeated
+  the five-contact default comparison, retained all eight pillars, and found
+  no horizontal overflow or browser warning/error.
 
 ## Recently Completed
 
