@@ -75,6 +75,15 @@
   test on `www.cinnabarastrology.com` cast the default chart, advanced the
   selected date from 2026-07-25 to 2026-07-26, observed the Day Pillar and Ten
   Gods relationship update, and found no horizontal overflow or console error.
+- Pull request #15 merged the score-free BaZi Compatibility layer into
+  protected `main` as feature commit `02c64d5`. Vercel deployment
+  `Dt46BMFMXmxUHbrNiYtGhWC4CEzd` is Ready in Production. Its required Lint and
+  Typecheck Deployment Checks passed in 28 and 27 seconds respectively before
+  the one-second custom-domain assignment. A production Chrome smoke test on
+  `www.cinnabarastrology.com` compared the defaults, changed Person B from
+  1992-06-15 to 1992-06-16, observed the Day Pillar and both directional Ten
+  Gods updates plus Liu He classification, and found no horizontal overflow or
+  console warning/error.
 
 ## Recently Completed
 
@@ -88,7 +97,9 @@
   files; lint, 81 test files / 669 tests, and the production build pass. A real
   local Chrome check changed Person B from 1992-06-15 to 1992-06-16, observed
   both Day Pillar and directional Ten Gods updates plus a Liu He classification,
-  and found no horizontal overflow or browser warning/error log.
+  and found no horizontal overflow or browser warning/error log. Protected PR
+  #15 subsequently passed all four GitHub/Vercel checks, the same flow in an
+  isolated Vercel Preview, and the production smoke described above.
 - Merged protected pull request #12 only after all four GitHub/Vercel checks
   passed and the isolated Vercel Preview completed the same Daily Timing smoke
   flow. Production now serves exact merge commit `3b5b856`; both required
