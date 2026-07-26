@@ -37,12 +37,24 @@ function birthInfo(
 }
 
 describe('getBaziDayBranchRelation', () => {
-  it('recognizes same, Six Harmony, Six Clash, and unclassified pairs', () => {
+  it('recognizes same, Six Harmony, Six Clash, Six Harm, and unclassified pairs', () => {
     expect(getBaziDayBranchRelation('子', '子').kind).toBe('same')
     expect(getBaziDayBranchRelation('子', '丑').kind).toBe('sixHarmony')
     expect(getBaziDayBranchRelation('丑', '子').kind).toBe('sixHarmony')
     expect(getBaziDayBranchRelation('子', '午').kind).toBe('sixClash')
     expect(getBaziDayBranchRelation('午', '子').kind).toBe('sixClash')
+    const harmPairs = [
+      ['子', '未'],
+      ['丑', '午'],
+      ['寅', '巳'],
+      ['卯', '辰'],
+      ['申', '亥'],
+      ['酉', '戌'],
+    ]
+    for (const [first, second] of harmPairs) {
+      expect(getBaziDayBranchRelation(first, second).kind).toBe('sixHarm')
+      expect(getBaziDayBranchRelation(second, first).kind).toBe('sixHarm')
+    }
     expect(getBaziDayBranchRelation('子', '寅').kind).toBe('unclassified')
   })
 })
@@ -95,11 +107,17 @@ describe('buildBaziCompatibility', () => {
       contact.kind === 'same'
       || contact.kind === 'sixHarmony'
       || contact.kind === 'sixClash'
+      || contact.kind === 'sixHarm'
     ))).toBe(true)
     expect(result?.branchContacts).toContainEqual(expect.objectContaining({
       personAScope: 'year',
       personBScope: 'year',
       kind: 'sixHarmony',
+    }))
+    expect(result?.branchContacts).toContainEqual(expect.objectContaining({
+      personAScope: 'month',
+      personBScope: 'hour',
+      kind: 'sixHarm',
     }))
     expect(result?.stemContacts.length).toBeLessThanOrEqual(16)
     expect(result?.stemContacts.every((contact) => (
