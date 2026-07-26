@@ -220,7 +220,9 @@
   28-mansion facts, followed by Twelve Palaces and fixed-orb aspects. The
   algorithm and license audit is recorded in `qizheng-sources.md`.
   Approximate/unknown time still emits no Qizheng facts. Focused
-  local/fixture/UI coverage passes 11 tests.
+  local/fixture/UI coverage passes 13 tests, including all 28 mansion
+  boundaries, strict reliable-time gating, coordinate ranges, and UTC/DST
+  evidence consistency.
 
 - Added a deterministic, evidence-first Zi Wei dual-chart layer to local
   Compatibility. It casts both charts independently from the existing

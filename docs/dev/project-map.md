@@ -253,7 +253,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   formula. `docs/dev/qizheng-sources.md` records the mansion, Life/Body Palace,
   aspect, provenance, and license audit.
   The shared resolved time, coordinates, IANA zone, and DST offset determine
-  UTC, palaces, and aspects; unknown/approximate time remains fail-closed.
+  UTC, palaces, and aspects; the IANA zone must reproduce the supplied local
+  fields at that UTC instant. Missing/unknown/approximate time and invalid or
+  conflicting evidence remain fail-closed.
 - `app/src/lib/chart-facts.ts` - English CHART FACTS builder for AI prompts. Its
   natal Four Transformations line reuses the chart's pure transformation index
   so local navigation and prompt grounding share one ownership source. Its

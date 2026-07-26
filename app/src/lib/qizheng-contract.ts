@@ -3,6 +3,7 @@ export const QIZHENG_FACT_VERSION = 'qizheng.fact.v1' as const
 
 export interface QizhengEvidence {
   resolvedLocalTime: string
+  resolvedUtcTime: string
   latitude: number
   longitude: number
   timezoneOffsetHours: number

@@ -137,8 +137,10 @@ birth data. The local provider uses pinned MIT-licensed `astronomy-engine` for
 the seven modern bodies, separately labeled mean lunar node/apogee
 approximations, and the traditional Zi Qi mean-motion formula. Life/Body
 Palace uses the documented Sun/Moon-plus-birth-hour rules; mansion assignment
-uses unequal ancient distances after the sidereal conversion. Unknown/approximate time emits
-no time-derived facts. Keep every source and precision class distinct. DeepSeek
+uses the selected 366.5-du unequal-distance table after the sidereal conversion.
+Only explicit reliable time with finite coordinates and IANA/offset-consistent
+UTC evidence may calculate; all other states emit no time-derived facts. Keep
+every source and precision class distinct. DeepSeek
 may later verbalize verified facts server-side but may not calculate them.
 
 ## D007 - Credits Use an Append-Only Server-Written Ledger

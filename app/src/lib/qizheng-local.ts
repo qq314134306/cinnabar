@@ -25,9 +25,11 @@ const MODERN_BODIES = [
   ['镇星(土)', Body.Saturn, 'astronomy-engine-saturn'],
 ] as const
 const MANSIONS = ['角', '亢', '氐', '房', '心', '尾', '箕', '斗', '牛', '女', '虚', '危', '室', '壁', '奎', '娄', '胃', '昴', '毕', '觜', '参', '井', '鬼', '柳', '星', '张', '翼', '轸']
-// Ancient mansion distances, scaled from their 365.5-du total onto 360 degrees.
+// Mingyu's audited ancient-distance table totals 366.5 du; scale that complete
+// table onto the project's 360-degree sidereal coordinate.
 const MANSION_DISTANCES = [12, 9, 16, 5, 6, 18, 9.5, 26, 8, 12, 10, 17, 16, 9, 16, 12, 15, 11, 16, 2, 9, 33, 4, 15, 7, 18, 18, 17]
 const MANSION_TOTAL = MANSION_DISTANCES.reduce((sum, distance) => sum + distance, 0)
+export const QIZHENG_MANSION_BOUNDARIES = MANSION_DISTANCES.map((_, index) => MANSION_DISTANCES.slice(0, index).reduce((sum, distance) => sum + distance, 0) * 360 / MANSION_TOTAL)
 const PALACES = ['命宫', '财帛', '兄弟', '田宅', '男女', '奴仆', '妻妾', '疾厄', '迁移', '官禄', '福德', '相貌']
 const LIFE_MASTERS = ['土', '土', '木', '火', '金', '水', '日', '月', '水', '金', '火', '木']
 const ASPECTS = [
@@ -107,7 +109,7 @@ function residualLongitudes(date: Date) {
 
 function starFact(name: string, kind: '七政' | '四余', longitude: number, retrograde: boolean, sourceId: string, sourceLabel: string, precisionClass: string, lifePalace: number, date: Date): QizhengStarFact {
   const siderealLongitude = toSidereal(longitude, decimalYear(date))
-  const mansion = longitudeToMansion(siderealLongitude)
+  const mansion = longitudeToQizhengMansion(siderealLongitude)
   const signIndex = Math.floor(siderealLongitude / 30)
   return {
     name, kind, longitude: siderealLongitude, mansion: mansion.name, mansionDegree: mansion.degree,
@@ -125,7 +127,7 @@ function aspectFacts(stars: QizhengStarFact[]): QizhengAspectFact[] {
         const orb = Math.abs(actualAngle - exactAngle)
         if (orb > allowedOrb) continue
         const ratio = orb / allowedOrb
-        const mixed = stars[left].sourceId === 'qizhengsuan-ziqi' || stars[right].sourceId === 'qizhengsuan-ziqi'
+        const mixed = stars[left].precisionClass !== '现代天文计算' || stars[right].precisionClass !== '现代天文计算'
         facts.push({ star1: stars[left].name, star2: stars[right].name, type, actualAngle, orb, closeness: ratio <= 1 / 3 ? '紧密' : ratio <= 2 / 3 ? '中等' : '宽松', precisionClass: mixed ? '混合模型' : '同层现代天文' })
         break
       }
@@ -134,13 +136,14 @@ function aspectFacts(stars: QizhengStarFact[]): QizhengAspectFact[] {
   return facts.sort((a, b) => a.orb - b.orb)
 }
 
-function longitudeToMansion(longitude: number): { name: string; degree: number } {
-  let remaining = normalize(longitude) * MANSION_TOTAL / 360
-  for (let index = 0; index < MANSION_DISTANCES.length; index += 1) {
-    if (remaining < MANSION_DISTANCES[index]) return { name: MANSIONS[index], degree: remaining }
-    remaining -= MANSION_DISTANCES[index]
+export function longitudeToQizhengMansion(longitude: number): { name: string; degree: number } {
+  const normalized = normalize(longitude)
+  for (let index = QIZHENG_MANSION_BOUNDARIES.length - 1; index >= 0; index -= 1) {
+    if (normalized >= QIZHENG_MANSION_BOUNDARIES[index]) {
+      return { name: MANSIONS[index], degree: (normalized - QIZHENG_MANSION_BOUNDARIES[index]) * MANSION_TOTAL / 360 }
+    }
   }
-  return { name: MANSIONS[0], degree: remaining }
+  return { name: MANSIONS[0], degree: normalized * MANSION_TOTAL / 360 }
 }
 
 function siderealSign(longitude: number, date: Date): number {
@@ -165,12 +168,9 @@ function shichenIndex(localTime: string): number {
 }
 
 function utcDate(evidence: QizhengEvidence): Date {
-  const [datePart, timePart] = evidence.resolvedLocalTime.split('T')
-  const [year, month, day] = datePart.split('-').map(Number)
-  const [hour, minute, second] = timePart.split(':').map(Number)
-  return new Date(Date.UTC(year, month - 1, day, hour, minute, second) - evidence.timezoneOffsetHours * 3_600_000)
+  return new Date(evidence.resolvedUtcTime)
 }
 
-function normalize(value: number): number { return ((value % 360) + 360) % 360 }
+function normalize(value: number): number { return value >= 0 && value < 360 ? value : ((value % 360) + 360) % 360 }
 function signedAngle(value: number): number { const angle = normalize(value); return angle > 180 ? angle - 360 : angle }
 function normalizeIndex(value: number, length: number): number { return ((value % length) + length) % length }

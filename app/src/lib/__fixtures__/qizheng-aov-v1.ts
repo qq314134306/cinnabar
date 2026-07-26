@@ -24,5 +24,12 @@ export const QIZHENG_AOV_V1_FIXTURE = {
     mingZhu: '日',
     twelvePalaces: ['命宫', '财帛', '兄弟', '田宅', '男女', '奴仆', '妻妾', '疾厄', '迁移', '官禄', '福德', '相貌'].map((palace, index) => ({ palace, signIndex: (6 - index + 12) % 12 })),
   },
-  meta: { service: 'aov.cc', version: 'v1' },
+  meta: {
+    service: 'aov.cc',
+    version: 'v1',
+    validationLayers: {
+      modernEphemeris: 'external cross-check',
+      traditionalRules: 'same-source Mingyu regression parity',
+    },
+  },
 } as const

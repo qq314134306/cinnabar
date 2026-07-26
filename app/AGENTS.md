@@ -576,7 +576,9 @@ pinned `astronomy-engine` for the seven modern bodies, separate modern mean
 lunar node/apogee approximations, and the traditional Zi Qi mean-motion
 formula. Traditional Life/Body Palace rules and unequal mansion distances are
 documented in `../docs/dev/qizheng-sources.md`.
-Unknown/approximate time emits no Qizheng time-derived facts. Preserve source
+Only `birthTimeReliable === true` with finite coordinates and IANA/offset-
+consistent UTC evidence may calculate. Every other state emits no Qizheng
+time-derived facts. Preserve source
 and precision metadata and keep this layer free of DeepSeek, synthesis,
 payments, credits, persistence, and redesign.
 

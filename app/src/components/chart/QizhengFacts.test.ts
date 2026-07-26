@@ -8,7 +8,7 @@ import { QizhengFacts } from './QizhengFacts'
 
 afterEach(cleanup)
 
-const BIRTH: BirthInfo = { year: 1990, month: 1, day: 1, hour: 12, gender: 'male', resolvedBirthTime: { year: 1990, month: 1, day: 1, hour: 12, minute: 0, timeIndex: 6, originalShichen: '午时', correctedShichen: '午时', correctionMinutes: 0, applied: true, crossedDate: false, timezoneOffsetMinutes: 480, location: { name: '北京', enName: 'Beijing', longitude: 116.4074, latitude: 39.9042 } } }
+const BIRTH: BirthInfo = { year: 1990, month: 1, day: 1, hour: 12, gender: 'male', birthTimeReliable: true, resolvedBirthTime: { year: 1990, month: 1, day: 1, hour: 12, minute: 0, timeIndex: 6, originalShichen: '午时', correctedShichen: '午时', correctionMinutes: 0, applied: true, crossedDate: false, timezoneOffsetMinutes: 480, location: { name: '北京', enName: 'Beijing', longitude: 116.4074, latitude: 39.9042, tz: 'Asia/Shanghai' } } }
 
 describe('QizhengFacts', () => {
   it('renders stars, aspects, palaces, evidence, and provenance from verified facts', () => {

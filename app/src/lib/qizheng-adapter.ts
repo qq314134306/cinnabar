@@ -15,15 +15,22 @@ const metadata = (providerVersion: string | null, source: 'fixture'): QizhengPro
 export function buildQizhengEvidence(birth: BirthInfo): QizhengEvidence | null {
   const resolved = birth.resolvedBirthTime
   const place = resolved?.location
-  if (!resolved || !place || typeof place.latitude !== 'number') return null
+  if (!resolved || !place) return null
+  if (!isFiniteRange(place.latitude, -90, 90) || !isFiniteRange(place.longitude, -180, 180)) return null
   const timezoneOffsetMinutes = resolved.timezoneOffsetMinutes
-  if (typeof timezoneOffsetMinutes !== 'number') return null
+  if (!isFiniteRange(timezoneOffsetMinutes, -720, 840) || !Number.isInteger(timezoneOffsetMinutes)) return null
+  if (typeof place.tz !== 'string' || !place.tz.trim()) return null
+  const localParts = [resolved.year, resolved.month, resolved.day, resolved.hour, resolved.minute]
+  if (!validLocalParts(localParts)) return null
+  const utcMs = Date.UTC(resolved.year, resolved.month - 1, resolved.day, resolved.hour, resolved.minute) - timezoneOffsetMinutes * 60_000
+  if (!timezoneMatchesInstant(place.tz, utcMs, localParts)) return null
   return {
     resolvedLocalTime: `${resolved.year}-${String(resolved.month).padStart(2, '0')}-${String(resolved.day).padStart(2, '0')}T${String(resolved.hour).padStart(2, '0')}:${String(resolved.minute).padStart(2, '0')}:00`,
+    resolvedUtcTime: new Date(utcMs).toISOString(),
     latitude: place.latitude,
     longitude: place.longitude,
     timezoneOffsetHours: timezoneOffsetMinutes / 60,
-    timezoneId: place.tz ?? 'Asia/Shanghai',
+    timezoneId: place.tz,
     locationLabel: place.enName ?? place.name,
   }
 }
@@ -78,7 +85,7 @@ export function adaptAovQizheng(
 }
 
 export function qizhengPreflight(birth: BirthInfo): QizhengResult | QizhengEvidence {
-  if (birth.birthTimeUnknown || birth.birthTimeReliable === false) {
+  if (birth.birthTimeReliable !== true || birth.birthTimeUnknown) {
     return failure('unreliable_birth_time', 'Qizheng requires a recorded birth time; no time-derived facts were generated.', null, 'fixture')
   }
   const evidence = buildQizhengEvidence(birth)
@@ -94,3 +101,22 @@ function requiredRecord(value: unknown): Record<string, unknown> { if (!isRecord
 function requiredString(value: unknown): string { if (typeof value !== 'string' || !value) throw new Error('string'); return value }
 function requiredNumber(value: unknown): number { if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('number'); return value }
 function requiredBoolean(value: unknown): boolean { if (typeof value !== 'boolean') throw new Error('boolean'); return value }
+function isFiniteRange(value: unknown, min: number, max: number): value is number { return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max }
+function validLocalParts(parts: number[]): boolean {
+  const [year, month, day, hour, minute] = parts
+  if (!parts.every(Number.isInteger) || month < 1 || month > 12 || day < 1 || hour < 0 || hour > 23 || minute < 0 || minute > 59) return false
+  const date = new Date(Date.UTC(year, month - 1, day, hour, minute))
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+}
+function timezoneMatchesInstant(timezoneId: string, utcMs: number, expected: number[]): boolean {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezoneId, year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: 'numeric', minute: 'numeric', hourCycle: 'h23',
+    }).formatToParts(new Date(utcMs))
+    const value = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find((part) => part.type === type)?.value)
+    return [value('year'), value('month'), value('day'), value('hour'), value('minute')].every((part, index) => part === expected[index])
+  } catch {
+    return false
+  }
+}
