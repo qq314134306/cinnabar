@@ -4,14 +4,15 @@
 
 ## Current State
 
-- Candidate branch: `codex/release-hardening` (production branch remains `main`)
+- Production branch: `main`; release-hardening pull request #10 is merged and
+  the post-release record continues on `codex/post-release-proof`.
 - Confirmed canonical source and local `origin`: `qq314134306/cinnabar`
 - Authenticated Vercel inspection on 2026-07-23 confirmed team
   `cinnabarastrology`, project `cinnabar`, direct Git integration to
   `qq314134306/cinnabar`, production branch `main`, and Root Directory `app`.
-  The current production deployment is sourced from commit `104de00` and
-  includes the `interpret` and `subscribe` functions. No Vercel project
-  identifier or environment value is recorded in repository documentation.
+  The current production deployment is sourced from merge commit `a07d963`.
+  No Vercel project identifier or environment value is recorded in repository
+  documentation.
 - The current Vercel path is direct GitHub-to-Vercel deployment. The historical
   `ruijayfeng/zwknows` mirror and its write credential are not current
   deployment dependencies.
@@ -50,19 +51,30 @@
   Supabase`; bypass, force pushes, and deletion are disallowed. Vercel has Git
   Fork Protection, Standard Deployment Protection, Build Logs protection, and
   Source protection enabled. Its native `Lint` and `Typecheck` Deployment
-  Checks now block Production promotion and will first run on the next
-  deployment. Automatic custom-production-domain assignment remains enabled,
-  so the new Vercel checks still require an observed production-candidate run
-  before the promotion sequence is considered proven.
-- The candidate branch is pushed and tracked at
-  `origin/codex/release-hardening`; pull request #10 targets `main`. Its trusted
-  Vercel branch Preview is live and passed the default chart plus eight-cycle
-  Major Luck browser check without console errors or horizontal overflow.
-  Production remains commit `104de00`; no merge or production promotion is
-  claimed here.
+  Checks block Production promotion. On merge commit `a07d963`, both required
+  checks ran for 28 seconds, passed, and preceded the one-second custom-domain
+  assignment. Automatic custom-production-domain assignment remains enabled;
+  its check-before-alias sequence is now directly observed.
+- Pull request #10 merged 54 commits from `codex/release-hardening` into `main`.
+  Vercel deployment `EmqvsfgKW785v5hRT97gNEQqjmjr` is Current Production and
+  serves `www.cinnabarastrology.com`. Its resource inventory exposes the
+  expected 11 API functions, including consolidated `/api/auth`, credits,
+  Future Report, `/api/interpret`, PayPal webhook/reconciliation, and CSP
+  reporting; the retired visitor-subscription function is absent. A signed-in
+  production Chrome smoke test loaded the birth form, retained account controls
+  without visitor email capture, cast the default chart, rendered BaZi, Zi Wei,
+  annual timing, and the local snapshot, and found no horizontal document
+  overflow. Public AI stayed fail-closed with its explicit unavailable state.
 
 ## Recently Completed
 
+- Merged protected pull request #10 as `a07d963` only after exact candidate
+  run `30185910720` passed all four checks. Its inspected 807-byte sanitized
+  proof artifact reports `success=true`, all 13 Fresh steps and cleanup as
+  `pass`, migration fingerprint
+  `3f196265095dfe938e4f91c63b45dd3d97d63afbf75d9d0c89e107c9edf559f1`,
+  Supabase CLI `2.84.2`, and no failure code. Vercel then ran required native
+  `Lint` and `Typecheck` checks before assigning the production domains.
 - Protected `main` after exact candidate head `4440e40` passed hosted run
   `30185445036`: pull requests, up-to-date branches, both candidate workflow
   jobs, and no bypass are now enforced. Vercel could not import PR-only GitHub
