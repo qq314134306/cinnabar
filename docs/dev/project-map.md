@@ -283,8 +283,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   visible-stem contact map lists only canonical Heavenly Stem Five
   Combinations across the same 16 pillar pairings and makes no transformation
   or strength claim. The branch map
-  lists only same-branch, Liu He, or Liu Chong contacts and omits unclassified
-  pairs. This layer never
+  lists only same-branch, Liu He, Liu Chong, or Liu Hai contacts and omits
+  unclassified pairs. Liu Hai is a named structural contact rather than an
+  adverse forecast. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership, sends both full allowlisted birth shapes, and is

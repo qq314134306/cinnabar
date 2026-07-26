@@ -13,6 +13,7 @@ export type BaziDayBranchRelationKind =
   | 'same'
   | 'sixHarmony'
   | 'sixClash'
+  | 'sixHarm'
   | 'unclassified'
 
 export type BaziStemContactKind = 'fiveCombination' | 'unclassified'
@@ -126,6 +127,15 @@ const SIX_CLASH_PAIRS = new Set([
   '亥|巳',
 ])
 
+const SIX_HARM_PAIRS = new Set([
+  orderedPair('子', '未'),
+  orderedPair('丑', '午'),
+  orderedPair('寅', '巳'),
+  orderedPair('卯', '辰'),
+  orderedPair('申', '亥'),
+  orderedPair('酉', '戌'),
+])
+
 const FIVE_COMBINATION_PAIRS = new Set([
   '己|甲',
   '乙|庚',
@@ -138,6 +148,7 @@ const BRANCH_CONTACT_LABELS: Record<BaziPillarBranchContact['kind'], string> = {
   same: 'Same branch',
   sixHarmony: 'Six Harmony · Liu He',
   sixClash: 'Six Clash · Liu Chong',
+  sixHarm: 'Six Harm · Liu Hai',
 }
 
 const RELATIONSHIP_STRUCTURE: Record<DirectionalTenGod, string> = {
@@ -184,11 +195,18 @@ export function getBaziDayBranchRelation(
       description: 'The two day branches form one of the six canonical Liu Chong oppositions. It identifies contrast, not a predicted conflict.',
     }
   }
+  if (SIX_HARM_PAIRS.has(pair)) {
+    return {
+      kind: 'sixHarm',
+      label: 'Six Harm · Liu Hai',
+      description: 'The two day branches form one of the six canonical Liu Hai pairs. It names a structural interaction, not harm or an adverse outcome.',
+    }
+  }
 
   return {
     kind: 'unclassified',
-    label: 'No same / Liu He / Liu Chong pair',
-    description: 'This day-branch pair is not same-branch, Six Harmony, or Six Clash. Other systems are intentionally not inferred here.',
+    label: 'No same / Liu He / Liu Chong / Liu Hai pair',
+    description: 'This day-branch pair is not same-branch, Six Harmony, Six Clash, or Six Harm. Other systems are intentionally not inferred here.',
   }
 }
 

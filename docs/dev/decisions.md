@@ -1456,3 +1456,23 @@ This decision does not authorize Heavenly Stem clashes, hidden-stem
 combinations, branch transformations, favorable or unfavorable labels, a BaZi
 score, timing forecasts, fate claims, relationship advice, AI prose,
 persistence, analytics, account gating, payment, or a network request.
+
+## D062 - Six Harm Is a Structural Label, Not an Adverse Forecast
+
+Cinnabar may extend the existing score-free Earthly Branch contact classifier
+and its 16 cross-person Four-Pillar pairings with the six canonical Liu Hai
+pairs: Zi-Wei, Chou-Wu, Yin-Si, Mao-Chen, Shen-Hai, and You-Xu. Classification
+is order-independent, and every listed cross-pillar contact continues to retain
+both person labels, pillar scopes, and raw branches.
+
+The English label “Six Harm” names the traditional relationship only. It must
+not be presented as evidence that either person causes harm, that the
+relationship is unfavorable, or that an adverse event will occur. The feature
+adds no weight and does not alter the symmetric Zi Wei compatibility score.
+
+This decision does not authorize Six Break, punishments, San He, San Hui,
+branch transformation, favorable or unfavorable labels, a BaZi score, timing
+forecasts, fate claims, relationship advice, AI prose, persistence, analytics,
+account gating, payment, or a network request. Six Break requires a later
+multi-contact model because some canonical pairs overlap already recognized
+structures.

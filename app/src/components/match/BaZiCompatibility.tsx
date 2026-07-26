@@ -288,7 +288,7 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
         </h5>
         <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
           Recognized contacts across all 16 cross-person pillar pairings. Only
-          same branch, Liu He, and Liu Chong are listed.
+          same branch, Liu He, Liu Chong, and Liu Hai are listed.
         </p>
         {result.branchContacts.length > 0 ? (
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -315,8 +315,8 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
             data-bazi-branch-contact-empty
             className="mt-2 text-xs text-text-secondary"
           >
-            No same-branch, Liu He, or Liu Chong contact appears across the 16
-            pairings.
+            No same-branch, Liu He, Liu Chong, or Liu Hai contact appears
+            across the 16 pairings.
           </p>
         )}
       </section>

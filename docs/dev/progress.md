@@ -134,6 +134,21 @@
 
 ## Recently Completed
 
+- Extended the score-free BaZi Compatibility Earthly Branch map with all six
+  canonical Liu Hai contacts. The order-independent classifier now recognizes
+  Zi-Wei, Chou-Wu, Yin-Si, Mao-Chen, Shen-Hai, and You-Xu across all 16
+  cross-person pillar pairings while preserving both pillar scopes and raw
+  branches. “Six Harm” remains a traditional structural label, not evidence of
+  personal harm or an adverse outcome. Six Break is deliberately deferred
+  until the model can retain multiple simultaneous relationships for one
+  branch pair. The increment adds no weighting, score, forecast, AI,
+  persistence, account, payment, or network request. Focused model/component
+  coverage passes 9 tests; complete lint, 81 test files / 672 tests, and the
+  production build pass. Local Chrome rendered one Liu Hai contact among six
+  total branch contacts for the default pair, retained all eight pillars, and
+  found no warning/error or horizontal overflow at desktop and 390×844 mobile
+  widths.
+
 - Extended score-free BaZi Compatibility with a cross-person Heavenly Stem
   Five Combinations map. It evaluates all 16 visible-stem pillar pairings and
   exposes only the five canonical Wu He contacts while retaining both pillar

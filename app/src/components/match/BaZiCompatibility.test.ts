@@ -59,6 +59,14 @@ const RESULT: BaziCompatibilityResult = {
       kind: 'sixClash',
       label: 'Six Clash · Liu Chong',
     },
+    {
+      personAScope: 'month',
+      personABranch: '寅',
+      personBScope: 'month',
+      personBBranch: '巳',
+      kind: 'sixHarm',
+      label: 'Six Harm · Liu Hai',
+    },
   ],
   stemContacts: [
     {
@@ -167,8 +175,10 @@ describe('BaZiCompatibility', () => {
     expect(screen.getByRole('heading', {
       name: 'Four-Pillar branch contacts',
     })).toBeTruthy()
-    expect(container.querySelectorAll('[data-bazi-branch-contact]')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-bazi-branch-contact]')).toHaveLength(3)
     expect(screen.getByText('A Year · Wu ↔ B Hour · Wei')).toBeTruthy()
+    expect(screen.getByText('A Month · Yin ↔ B Month · Si')).toBeTruthy()
+    expect(screen.getByText('Six Harm · Liu Hai')).toBeTruthy()
     expect(screen.getAllByText('Year')).toHaveLength(2)
     expect(screen.getAllByText('Hour')).toHaveLength(2)
     expect(screen.getByText(/no score, fate claim/)).toBeTruthy()
@@ -190,7 +200,7 @@ describe('BaZiCompatibility', () => {
     }))
 
     expect(screen.getByText(
-      'No same-branch, Liu He, or Liu Chong contact appears across the 16 pairings.',
+      'No same-branch, Liu He, Liu Chong, or Liu Hai contact appears across the 16 pairings.',
     )).toBeTruthy()
   })
 
