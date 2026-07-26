@@ -64,6 +64,9 @@ describe('buildBaziCompatibility', () => {
     ])
     expect(result?.personB.pillars).toHaveLength(4)
     expect(result?.personA.pillars.every((pillar) => pillar.ganZhi.length === 2)).toBe(true)
+    expect(result?.personA.pillars.every((pillar) => (
+      pillar.hiddenStems.length >= 1 && pillar.hiddenStems.length <= 3
+    ))).toBe(true)
     expect(result?.personAToB.label).toBeTruthy()
     expect(result?.personBToA.label).toBeTruthy()
     expect(result?.branchContacts.length).toBeGreaterThan(0)
@@ -92,6 +95,37 @@ describe('buildBaziCompatibility', () => {
       relationship: 'directOfficer',
       label: 'Direct Officer',
     })
+    expect(result?.hiddenStemRelationships.personAToB).toHaveLength(
+      result?.personB.pillars.reduce(
+        (total, pillar) => total + pillar.hiddenStems.length,
+        0,
+      ) ?? 0,
+    )
+    expect(result?.hiddenStemRelationships.personBToA).toHaveLength(
+      result?.personA.pillars.reduce(
+        (total, pillar) => total + pillar.hiddenStems.length,
+        0,
+      ) ?? 0,
+    )
+    expect(result?.hiddenStemRelationships.personAToB).toContainEqual({
+      targetScope: 'year',
+      targetBranch: '申',
+      targetStem: '庚',
+      hiddenStemIndex: 0,
+      relationship: 'indirectWealth',
+      label: 'Indirect Wealth',
+    })
+    expect(result?.hiddenStemRelationships.personAToB.every((relationship) => {
+      const pillar = result.personB.pillars.find(
+        (item) => item.scope === relationship.targetScope,
+      )
+      return Boolean(
+        pillar
+        && pillar.branch === relationship.targetBranch
+        && pillar.hiddenStems[relationship.hiddenStemIndex]
+          === relationship.targetStem,
+      )
+    })).toBe(true)
     expect(result?.provisional).toBe(false)
   })
 

@@ -160,6 +160,78 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
       </section>
 
       <section
+        aria-labelledby="bazi-hidden-stem-relationships-heading"
+        className="mt-3 rounded-lg border border-white/[0.07] p-3"
+      >
+        <h5
+          id="bazi-hidden-stem-relationships-heading"
+          className="text-xs font-medium text-text"
+        >
+          Hidden-stem Ten Gods map
+        </h5>
+        <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
+          Each Day Master also reads the stems stored inside the other
+          person&apos;s four Earthly Branches. Stems stay in canonical sequence;
+          this view assigns no strength weights.
+        </p>
+        <div className="mt-2 grid gap-3 lg:grid-cols-2">
+          {([
+            [
+              'A Day Master reads B hidden stems',
+              'B',
+              result.personB,
+              result.hiddenStemRelationships.personAToB,
+            ],
+            [
+              'B Day Master reads A hidden stems',
+              'A',
+              result.personA,
+              result.hiddenStemRelationships.personBToA,
+            ],
+          ] as const).map(([heading, targetLabel, target, relationships]) => (
+            <article
+              key={heading}
+              data-bazi-hidden-stem-direction={
+                targetLabel === 'B' ? 'personAToB' : 'personBToA'
+              }
+              className="rounded-md bg-white/[0.025] p-2.5"
+            >
+              <p className="text-[10px] font-medium text-text-secondary">
+                {heading}
+              </p>
+              <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+                {target.pillars.map((pillar) => (
+                  <div
+                    key={pillar.scope}
+                    className="rounded bg-black/10 px-2 py-1.5"
+                  >
+                    <p className="text-[9px] text-text-muted">
+                      {targetLabel} {PILLAR_LABELS[pillar.scope]} ·{' '}
+                      {translateBranch(pillar.branch)}
+                    </p>
+                    <div className="mt-1 space-y-1">
+                      {relationships
+                        .filter((item) => item.targetScope === pillar.scope)
+                        .map((relationship) => (
+                          <p
+                            key={`${relationship.targetScope}-${relationship.hiddenStemIndex}`}
+                            data-bazi-hidden-stem-relationship={relationship.relationship}
+                            className="text-[10px] leading-snug text-gold/90"
+                          >
+                            {translateStem(relationship.targetStem)} ·{' '}
+                            {relationship.label}
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section
         aria-labelledby="bazi-branch-contacts-heading"
         className="mt-3 rounded-lg border border-white/[0.07] p-3"
       >
@@ -214,7 +286,7 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
 
       <p className="mt-3 border-t border-white/[0.06] pt-3 text-[10px] leading-relaxed text-text-muted">
         Ten Gods are directional: A reading B can differ from B reading A. This
-        panel shows the complete pillars, directional visible-stem
+        panel shows the complete pillars, directional visible- and hidden-stem
         relationships, and a limited branch-contact map—no score, fate claim,
         or relationship advice.
       </p>

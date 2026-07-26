@@ -31,6 +31,7 @@ export interface BaziCompatibilityPerson {
     stem: string
     branch: string
     ganZhi: string
+    hiddenStems: string[]
   }>
 }
 
@@ -62,6 +63,15 @@ export interface BaziPillarStemRelationship {
   label: string
 }
 
+export interface BaziPillarHiddenStemRelationship {
+  targetScope: BaziPillarScope
+  targetBranch: string
+  targetStem: string
+  hiddenStemIndex: number
+  relationship: DirectionalTenGod
+  label: string
+}
+
 export interface BaziCompatibilityResult {
   personA: BaziCompatibilityPerson
   personB: BaziCompatibilityPerson
@@ -72,6 +82,10 @@ export interface BaziCompatibilityResult {
   stemRelationships: {
     personAToB: BaziPillarStemRelationship[]
     personBToA: BaziPillarStemRelationship[]
+  }
+  hiddenStemRelationships: {
+    personAToB: BaziPillarHiddenStemRelationship[]
+    personBToA: BaziPillarHiddenStemRelationship[]
   }
   provisional: boolean
 }
@@ -191,6 +205,7 @@ function buildPerson(info: BirthInfo): BaziCompatibilityPerson | null {
       stem: pillar.stem,
       branch: pillar.branch,
       ganZhi: pillar.ganZhi,
+      hiddenStems: pillar.hiddenStems.map(({ stem }) => stem),
     })),
   }
 }
@@ -241,6 +256,27 @@ function buildPillarStemRelationships(
   })
 }
 
+function buildPillarHiddenStemRelationships(
+  sourceDayMaster: string,
+  target: BaziCompatibilityPerson,
+): BaziPillarHiddenStemRelationship[] {
+  return target.pillars.flatMap((pillar) => (
+    pillar.hiddenStems.flatMap((targetStem, hiddenStemIndex) => {
+      const relationship = getBaziTenGod(sourceDayMaster, targetStem)
+      if (!relationship) return []
+
+      return [{
+        targetScope: pillar.scope,
+        targetBranch: pillar.branch,
+        targetStem,
+        hiddenStemIndex,
+        relationship,
+        label: BAZI_TEN_GOD_LABELS[relationship],
+      }]
+    })
+  ))
+}
+
 export function buildBaziCompatibility(
   personAInfo: BirthInfo,
   personBInfo: BirthInfo,
@@ -272,6 +308,16 @@ export function buildBaziCompatibility(
     stemRelationships: {
       personAToB: buildPillarStemRelationships(personA.dayMaster.stem, personB),
       personBToA: buildPillarStemRelationships(personB.dayMaster.stem, personA),
+    },
+    hiddenStemRelationships: {
+      personAToB: buildPillarHiddenStemRelationships(
+        personA.dayMaster.stem,
+        personB,
+      ),
+      personBToA: buildPillarHiddenStemRelationships(
+        personB.dayMaster.stem,
+        personA,
+      ),
     },
     provisional: personAInfo.birthTimeReliable === false
       || personBInfo.birthTimeReliable === false,

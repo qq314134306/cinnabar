@@ -111,6 +111,19 @@
 
 ## Recently Completed
 
+- Extended score-free BaZi Compatibility with a directional hidden-stem Ten
+  Gods map. Each person's Day Master now classifies the canonical hidden-stem
+  (藏干) sequence
+  inside the other person's Year, Month, Day, and Hour branches while retaining
+  target pillar, branch, raw stem, and sequence order. The two directions stay
+  separate and the feature adds no hidden-stem weight, strength judgment,
+  favorable/unfavorable label, score, prediction, AI, persistence, account,
+  payment, or network request. Focused model/component coverage passes 31
+  tests; complete lint, 81 files / 670 tests, and the production build pass.
+  Local Chrome rendered two directions and 20 hidden-stem relationships for
+  the default pair, changed Person B's date to 1992-06-16 and recomputed 19
+  relationships, retained eight pillars, and found no desktop horizontal
+  overflow at a 1905-pixel document width.
 - Extended score-free BaZi Compatibility with a visible-stem Ten Gods map.
   Person A's Day Master classifies Person B's Year, Month, Day, and Hour stems,
   while Person B's Day Master independently classifies Person A's four stems.
