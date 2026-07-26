@@ -105,6 +105,25 @@ proofs pass. Future Report payments remain last and disabled.
 
 ## Member List
 
+`src/lib/evidence-contract.ts` + `evidence-fixtures.ts` +
+`src/components/EvidencePanel.tsx`: provider-independent passage evidence and
+minimal read-only inspection. Keep edition, location, availability,
+license/rights, fact, rule, uncertainty, and conflict references explicit.
+Every claim needs a system-fact or cited-rule basis. Synthesis permits only
+independent agreement, shared-input agreement, conflict, or insufficient
+evidence; never add voting, weights, probabilities, numeric confidence,
+generated readings, unverified corpus text, or a network request to this layer.
+Claimed independent evidence groups must be disjoint.
+English evidence presentation is entertainment/self-discovery only. Production
+facts come only from local deterministic engines; Skills constrain rules and
+support anonymous development fixtures. External validation is anonymous,
+fixed-fixture-only, fail-closed, and never a production dependency. Server-side
+narrative rendering may consume but never calculate or mutate verified facts.
+Unreliable time cannot yield an Hour Pillar, and birth-time candidates never
+overwrite canonical input; persistence requires explicit user save. Keep free
+facts/time-correction/synthesis overview separate from paid future,
+compatibility, and divination interpretation plus future credit entitlements.
+
 `src/main.tsx`: React entry point and app mounting.
 
 `src/App.tsx`: Top-level application composition (Cinnabar shell: Your Chart,

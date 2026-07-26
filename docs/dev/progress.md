@@ -144,6 +144,25 @@
 
 ## Recently Completed
 
+- Established the first passage-level evidence foundation without adding a
+  reading, corpus, network request, LLM, score, or vote. The contract separates
+  source editions, passage locators, citations, deterministic system facts,
+  cited rule evidence, claims, uncertainty, and structured conflicts. Runtime
+  validation rejects dangling references, missing edition/rights/location
+  metadata, claims without a fact or rule basis, and confidence/voting fields.
+  Synthesis is limited to `independent-agreement`,
+  `shared-input-agreement`, `conflict`, and `insufficient-evidence`; claimed
+  independence requires disjoint evidence groups. A read-only inspector and
+  synthetic MIT fixture exercise the contract without importing a classical
+  corpus. The same contract pins English entertainment/self-discovery
+  positioning, local deterministic-engine fact authority, Skill-only rule and
+  anonymous fixture validation, server-only narrative assembly that cannot
+  mutate verified facts, anonymous/fixed/fail-closed external validation,
+  reliable-time-only Hour Pillars,
+  candidate-only birth-time suggestions that never replace canonical input,
+  explicit-save-only profile persistence, and separate extensible free evidence
+  and paid interpretation tiers.
+
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and
   Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or

@@ -2,6 +2,38 @@
 
 > L2 | Parent: `AGENTS.md`
 
+## D065 - Evidence Synthesis Is Traceable and Score-Free
+
+Passage evidence is modeled separately from interpretation. A source edition
+must disclose version, locator scheme, language, availability, and
+license/rights status; a citation identifies a passage and a page, chapter,
+section, paragraph, line, folio, or stable anchor. A displayed claim must link
+to a deterministic system fact, cited rule evidence, or both.
+
+Cross-system synthesis has exactly four states: `independent-agreement`,
+`shared-input-agreement`, `conflict`, and `insufficient-evidence`. Independent
+agreement requires disjoint evidence groups. Shared inputs, unresolved
+conflicts, and missing evidence remain visible; majority voting, numeric
+scores, probabilities, and confidence-shaped fields cannot replace provenance.
+
+Consequence: keep the contract provider-independent and fail closed on missing
+or dangling evidence. Add only verified, rights-safe passages with explicit
+edition metadata. A large corpus, LLM, or generated conclusion requires a
+separate reviewed decision and tests.
+
+The audience contract is English entertainment and self-discovery, never
+fortune-telling, psychic, or consulting positioning. Only local deterministic
+engines own production facts; Skills constrain rules and support anonymous
+development validation. External validation accepts anonymous fixed fixtures
+only, is not a production dependency, and fails closed. The narrative layer may
+only render verified facts into English on the server; it cannot calculate or
+mutate pillars, palaces, stars, or divination charts. Unreliable time cannot produce an
+Hour Pillar. Birth-time-finder output remains a candidate and can never replace
+canonical birth time, and profile persistence requires explicit user save.
+Free basic facts, time-correction evidence, and synthesis overview remain
+separate from paid future, deep compatibility, and divination synthesis tiers
+so credits can evolve without changing fact authority or adding payment here.
+
 ## D001 - True Solar Time Uses Birthplace Matching
 
 Users should not need to know longitude, latitude, or minute-level correction
