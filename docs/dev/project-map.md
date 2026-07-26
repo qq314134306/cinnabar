@@ -258,6 +258,8 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   bounded, sanitized CSP violation collector. The policy remains report-only
   until real third-party browser flows establish an enforcement allowlist.
 - `app/src/lib/compatibility-score.ts` +
+  `app/src/lib/bazi-compatibility.ts` +
+  `app/src/components/match/BaZiCompatibility.tsx` +
   `app/src/components/match/MatchAnalysis.tsx` + their tests - always-available
   deterministic local Compatibility snapshot across communication, shared
   direction, emotional rhythm, and resilience. It is symmetric, needs no
@@ -269,6 +271,11 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   resolution; Compare Locally resolves both people again, requires the shared
   exact-place predicate, displays the applied correction, and rejects stale
   async work after edits. Local failures are announced and retryable.
+  The same resolved pair also feeds a separate score-free BaZi layer. It reuses
+  the established Four Pillars and Ten Gods helpers to show both Day Pillars,
+  directional A-to-B and B-to-A Day Master relationships, and only the named
+  same-branch, Liu He, or Liu Chong Day Branch contacts. This layer never
+  changes the symmetric Zi Wei score and marks approximate inputs provisional.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership, sends both full allowlisted birth shapes, and is
   preflighted by the same local place check before quota/provider work.
