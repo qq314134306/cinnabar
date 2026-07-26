@@ -580,6 +580,7 @@ received during a flight must produce one trailing revalidation.
 `tests/`: Tests that sit outside `src`, including workflow contract tests.
 
 `src/lib/compatibility-score.ts` + `src/lib/bazi-compatibility.ts` +
+`src/lib/bazi-element-structure.ts` +
 `src/components/match/BaZiCompatibility.tsx` +
 `src/components/match/MatchAnalysis.tsx` + their tests: Compatibility always
 offers a symmetric, deterministic local four-dimension snapshot without an
@@ -611,8 +612,13 @@ map across the 16 pillar pairings. Relationship synthesis remains limited to
 the two Day Masters as Ten Gods reference points and to the named Earthly
 Branch structures. Each Day Master may classify the other person's four
 visible pillar stems, producing four A-to-B and four B-to-A relationships;
-never treat a non-Day-Master stem as a Ten Gods reference. The Day Branch
-summary and the map
+never treat a non-Day-Master stem as a Ten Gods reference. The result may also
+include a visible Five Element structure inventory. It
+must map only the four visible stems and four branches for each person, retain
+pillar and stem/branch source, keep Wood/Fire/Earth/Metal/Water in fixed order,
+and report unweighted counts only. It must not include hidden-stem weights or
+claim strength, balance, compatibility, favorable/unfavorable meaning, or an
+outcome. The Day Branch summary and the map
 may identify only same branch, the six canonical Liu He pairs, the six
 canonical Liu Chong pairs, the six canonical Liu Hai pairs, the six canonical
 Liu Po pairs, or explicitly unclassified; the map omits unclassified pairings.

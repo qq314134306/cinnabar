@@ -1,4 +1,5 @@
 import type { BaziCompatibilityResult } from '@/lib/bazi-compatibility'
+import { BAZI_ELEMENT_ORDER } from '@/lib/bazi-element-structure'
 import { translateBranch, translateGanZhi, translateStem } from '@/lib/ziwei-glossary'
 
 interface BaZiCompatibilityProps {
@@ -70,6 +71,67 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
           </article>
         ))}
       </div>
+
+      <section
+        aria-labelledby="bazi-element-structure-heading"
+        className="mt-3 rounded-lg border border-white/[0.07] p-3"
+      >
+        <h5
+          id="bazi-element-structure-heading"
+          className="text-xs font-medium text-text"
+        >
+          Visible Five Element structure
+        </h5>
+        <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
+          A transparent inventory of each person&apos;s four visible stems and
+          four branches. Counts are unweighted and do not measure strength,
+          balance, compatibility, or outcomes.
+        </p>
+        <div className="mt-2 grid gap-3 lg:grid-cols-2">
+          {([
+            ['Person A', 'A', result.elementStructures.personA],
+            ['Person B', 'B', result.elementStructures.personB],
+          ] as const).map(([heading, personLabel, structure]) => (
+            <article
+              key={heading}
+              data-bazi-element-structure={personLabel}
+              className="rounded-md bg-white/[0.025] p-2.5"
+            >
+              <p className="text-[10px] font-medium text-text-secondary">
+                {heading} · 8 visible positions
+              </p>
+              <div className="mt-2 grid grid-cols-5 gap-1">
+                {BAZI_ELEMENT_ORDER.map((element) => (
+                  <div
+                    key={element}
+                    data-bazi-element-count={element}
+                    className="rounded bg-black/10 px-1 py-1.5 text-center"
+                  >
+                    <p className="text-[9px] text-text-muted">{element}</p>
+                    <p className="text-xs font-semibold text-gold/90">
+                      {structure.counts[element]}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-1 sm:grid-cols-4">
+                {structure.entries.map((entry) => (
+                  <p
+                    key={`${entry.scope}-${entry.source}`}
+                    data-bazi-element-entry={entry.element}
+                    className="rounded bg-black/10 px-2 py-1 text-[9px] text-text-secondary"
+                  >
+                    {PILLAR_LABELS[entry.scope]} {entry.source === 'stem' ? 'Stem' : 'Branch'} ·{' '}
+                    {entry.source === 'stem'
+                      ? translateStem(entry.character)
+                      : translateBranch(entry.character)} · {entry.element}
+                  </p>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <div className="mt-3 grid gap-3 md:grid-cols-3">
         <article className="rounded-lg border border-white/[0.07] p-3">

@@ -144,6 +144,20 @@
 
 ## Recently Completed
 
+- Added a transparent, score-free Five Element structure inventory to BaZi
+  Compatibility. A new pure helper maps each person's four visible Heavenly
+  Stems and four Earthly Branches to Wood, Fire, Earth, Metal, or Water,
+  preserves pillar scope plus stem/branch source for all eight positions, and
+  reports unweighted counts in a fixed element order. The surface explicitly
+  states that counts do not measure strength, balance, compatibility, or an
+  outcome. Unknown stems or branches fail the complete local BaZi result rather
+  than producing a partial inventory. No hidden-stem weighting, useful-element
+  judgment, score, forecast, AI, persistence, analytics, account, payment, or
+  network behavior was added. Focused coverage passes 39 tests across the new
+  helper and the existing compatibility model/component integration; complete
+  lint, 82 test files / 678 tests, and the strict production build pass. Every
+  generated JavaScript chunk remains below 500 kB.
+
 - Added a separate, score-free Earthly Branch punishment-contact layer to BaZi
   Compatibility. It preserves the directed Yin→Si→Shen→Yin and
   Chou→Xu→Wei→Chou sequences, reciprocal Zi-Mao, and repeated Chen, Wu, You, or

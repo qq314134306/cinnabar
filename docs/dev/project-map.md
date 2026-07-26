@@ -259,6 +259,7 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   until real third-party browser flows establish an enforcement allowlist.
 - `app/src/lib/compatibility-score.ts` +
   `app/src/lib/bazi-compatibility.ts` +
+  `app/src/lib/bazi-element-structure.ts` +
   `app/src/components/match/BaZiCompatibility.tsx` +
   `app/src/components/match/MatchAnalysis.tsx` + their tests - always-available
   deterministic local Compatibility snapshot across communication, shared
@@ -278,7 +279,12 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   map anchored only to the two Day Masters. The hidden map preserves each
   target pillar, branch, canonical hidden-stem (藏干) sequence, and Ten Gods
   result without
-  strength weights. The same layer shows the named Day Branch contact and a
+  strength weights. A transparent Five Element inventory maps each person's
+  four visible stems and
+  four branches to a fixed Wood/Fire/Earth/Metal/Water list. It retains all
+  eight pillar-scoped sources and reports only unweighted counts; it makes no
+  strength, balance, compatibility, or outcome claim. The same layer shows the
+  named Day Branch contact and a
   limited contact map over all 16 cross-person pillar pairings. A separate
   visible-stem contact map lists only canonical Heavenly Stem Five
   Combinations across the same 16 pillar pairings and makes no transformation

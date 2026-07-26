@@ -236,6 +236,15 @@ describe('buildBaziCompatibility', () => {
         0,
       ) ?? 0,
     )
+    expect(result?.elementStructures.personA.entries).toHaveLength(8)
+    expect(result?.elementStructures.personB.entries).toHaveLength(8)
+    expect(Object.values(result?.elementStructures.personA.counts ?? {}).reduce(
+      (total, count) => total + count,
+      0,
+    )).toBe(8)
+    expect(result?.elementStructures.personA.entries.every((entry) => (
+      entry.source === 'stem' || entry.source === 'branch'
+    ))).toBe(true)
     expect(result?.hiddenStemRelationships.personAToB).toContainEqual({
       targetScope: 'year',
       targetBranch: '申',
