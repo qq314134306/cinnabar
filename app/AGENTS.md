@@ -130,6 +130,9 @@ only for fixed anonymous golden-sample review. Do not add cross-method
 conclusions, AI copy, scores, persistence, analytics, account/payment gates, or
 birth-profile reuse in this stage. Contract details live in
 `../docs/dev/question-divination-contracts.md`.
+Mark structural facts as the free product. Their contracts must remain usable
+by the separately owned paid Question Three-Method synthesis layer, but this
+window must not spend credits, call payments, or implement that synthesis.
 The browser emits verified facts only. A future DeepSeek English-writing layer
 must remain server-owned and may consume only validated contracts; never place
 `DEEPSEEK_API_KEY`, prompts, or provider prose in this surface. Use “For

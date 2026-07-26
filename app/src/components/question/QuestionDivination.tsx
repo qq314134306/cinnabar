@@ -71,7 +71,7 @@ export function QuestionDivination() {
         <div className="space-y-4">
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4 text-sm">
             <p><span className="text-text-muted">Captured once:</span> {captureLabel} · {chart.event.timezone} · {chart.event.location.label}</p>
-            <p className="mt-1 text-xs text-text-muted">Event contract {chart.event.version}. Verified structural facts only—no merged conclusion, AI narrative, or score.</p>
+            <p className="mt-1 text-xs text-text-muted">Event contract {chart.event.version}. Free verified structural facts only—combined interpretation is a separate future product boundary.</p>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
             {chart.results.map((result) => <FactCard key={result.method} result={result} />)}

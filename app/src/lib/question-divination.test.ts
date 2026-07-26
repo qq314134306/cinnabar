@@ -21,6 +21,8 @@ describe('question divination foundation', () => {
     expect(bundle.results.every((result) => result.event === QUESTION_GOLDEN_EVENT)).toBe(true)
     expect(bundle.results.map((result) => result.metadata.contractVersion)).toEqual(['liuyao.facts.v1', 'qimen.facts.v1', 'liuren.facts.v1'])
     expect(bundle.results.every((result) => result.metadata.status === 'ok')).toBe(true)
+    expect(bundle.results.every((result) => result.entitlement.tier === 'free')).toBe(true)
+    expect(bundle.results.every((result) => result.entitlement.product === 'question-structural-facts')).toBe(true)
     expect(JSON.stringify(bundle)).not.toMatch(/prompt|deepseek|score|birth/i)
   })
 

@@ -5,8 +5,10 @@
 ## Scope
 
 Question Charts captures one event and calculates three independent structural
-fact sets. It does not merge conclusions, write an interpretation, rank a
-method, or assign a score. User-facing copy is English for Western audiences
+fact sets. This window does not merge conclusions, write an interpretation,
+rank a method, or assign a score. Its versioned outputs are the stable input for
+the separately owned first-release Question Three-Method synthesis boundary.
+User-facing copy is English for Western audiences
 and uses the product boundary “For entertainment & self-discovery only. Not
 professional advice.” It does not market fortune telling, psychic service, or
 consulting.
@@ -27,7 +29,8 @@ same event object.
 | Da Liu Ren | `liuren.facts.v1` | `cinnabar-liuren-local-v1` |
 
 Each result carries `provider`, `providerVersion`, `contractVersion`, `status`,
-and a stable failure category. Consumers must branch on `status`; missing facts
+an explicit free `question-structural-facts` entitlement, and a stable failure
+category. Consumers must branch on `status`; missing facts
 are not partial success. These v1 contracts intentionally expose only minimum
 auditable structure and must not be described as a full scholarly
 reconstruction.
@@ -41,12 +44,13 @@ stage. AOV may be used out of band to review a fixed anonymous sample, but no
 AOV request, response, prompt, secret, or availability dependency belongs in
 the production path.
 
-The browser produces verified facts only. Any future DeepSeek prose layer must
-be a separate server-owned boundary that receives only validated, versioned
+The browser produces verified facts only. The first-release DeepSeek English
+prose layer is a separate server-owned boundary that receives only validated, versioned
 facts; `DEEPSEEK_API_KEY` and provider prompts must never enter this client
 module. The question event is not a birth profile and cannot read, infer,
 backfill, or overwrite canonical birth time. Free facts remain independent of
-future paid prose and credit-accounting boundaries.
+paid three-method synthesis prose and credit-accounting boundaries. This window
+exports the entitlement marker but does not spend credits or integrate payment.
 
 ## Verification
 

@@ -65,6 +65,10 @@ export type MethodFacts = {
 export type FactResult<M extends QuestionMethod = QuestionMethod> = {
   readonly method: M
   readonly event: QuestionEvent
+  readonly entitlement: {
+    readonly tier: 'free'
+    readonly product: 'question-structural-facts'
+  }
   readonly metadata: ProviderMetadata
   readonly facts?: MethodFacts[M]
 }
@@ -139,6 +143,11 @@ function metadata(contractVersion: string): ProviderMetadata {
   return { provider: 'cinnabar-local', providerVersion: '2026-07-26.v1', contractVersion, status: 'ok' }
 }
 
+const FREE_FACTS = deepFreeze({
+  tier: 'free' as const,
+  product: 'question-structural-facts' as const,
+})
+
 export function calculateLiuYao(event: QuestionEvent): FactResult<'liuyao'> {
   const time = Math.floor(new Date(event.capturedAt).getTime() / 60_000)
   const seed = (time ^ hashQuestion(event.question)) >>> 0
@@ -146,7 +155,7 @@ export function calculateLiuYao(event: QuestionEvent): FactResult<'liuyao'> {
   const moving = lines.findIndex((line) => line === 6 || line === 9)
   const movingLine = moving < 0 ? (seed % 6) + 1 : moving + 1
   const binary = lines.reduce((value, line, index) => value | ((line % 2) << index), 0)
-  return deepFreeze({ method: 'liuyao', event, metadata: metadata('liuyao.facts.v1'), facts: {
+  return deepFreeze({ method: 'liuyao', event, entitlement: FREE_FACTS, metadata: metadata('liuyao.facts.v1'), facts: {
     contract: 'liuyao.facts.v1', casting: 'time-seeded-local-v1', primaryHexagram: binary + 1,
     changedHexagram: (binary ^ (1 << (movingLine - 1))) + 1, movingLine, lines,
   } }) as FactResult<'liuyao'>
@@ -159,7 +168,7 @@ export function calculateQimen(event: QuestionEvent): FactResult<'qimen'> {
   const yang = month <= 6 || month === 12
   const order = yang ? [...PALACE_RING] : [...PALACE_RING].reverse()
   const dutyPalace = order[(ju + hourBranchIndex - 1) % order.length]
-  return deepFreeze({ method: 'qimen', event, metadata: metadata('qimen.facts.v1'), facts: {
+  return deepFreeze({ method: 'qimen', event, entitlement: FREE_FACTS, metadata: metadata('qimen.facts.v1'), facts: {
     contract: 'qimen.facts.v1', ruleset: 'mainline-cn-v1-minimal', dun: yang ? 'yang' : 'yin',
     ju, hourBranch: BRANCHES[hourBranchIndex], dutyPalace, palaceOrder: order,
   } }) as FactResult<'qimen'>
@@ -171,7 +180,7 @@ export function calculateLiuRen(event: QuestionEvent): FactResult<'liuren'> {
   const generalIndex = (12 - month) % 12
   const offset = (generalIndex - hourIndex + 12) % 12
   const first = (day + offset - 1) % 12
-  return deepFreeze({ method: 'liuren', event, metadata: metadata('liuren.facts.v1'), facts: {
+  return deepFreeze({ method: 'liuren', event, entitlement: FREE_FACTS, metadata: metadata('liuren.facts.v1'), facts: {
     contract: 'liuren.facts.v1', ruleset: 'cinnabar-liuren-local-v1', monthGeneral: BRANCHES[generalIndex],
     hourBranch: BRANCHES[hourIndex], heavenPlateOffset: offset,
     threeTransmissions: [BRANCHES[first], BRANCHES[(first + 4) % 12], BRANCHES[(first + 8) % 12]],
