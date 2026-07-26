@@ -72,6 +72,12 @@
   expressions unqualified, retain the explicit bigint credit fallback, and pin
   both rules in the release contract test. Both failed runs remain
   non-evidence; a new exact-head Fresh proof is required.
+- Hosted run `30184584887` advanced materially: the complete ordered migration
+  transaction and the first five SQL behavior suites passed. Only
+  `public_ai_quota.sql` failed, but the runner did not yet surface SQL-test
+  stderr. The same bounded, redacted PostgreSQL diagnostic is now applied to
+  named SQL-test failures so the next exact-head run can expose the remaining
+  assertion without leaking it into the retained artifact.
 - Exercised the release path for the first time through pushed pull request
   #10. The trusted Vercel Preview built and passed a real default-chart and
   Major Luck browser check. Hosted run `30183316408` correctly blocked the

@@ -284,5 +284,6 @@ describe('database release-proof contract', () => {
     expect(runner).toContain(
       'Write-CinnabarPsqlFailureDiagnostic -Output $result.Output',
     )
+    expect(runner).toContain('-Context "sql-test:$sqlTest"')
   })
 })

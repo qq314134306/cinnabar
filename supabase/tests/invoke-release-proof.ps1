@@ -136,7 +136,10 @@ function Invoke-ProofStep {
 function Write-CinnabarPsqlFailureDiagnostic {
   param(
     [AllowEmptyString()]
-    [string]$Output
+    [string]$Output,
+
+    [ValidatePattern('^[a-z0-9:_.-]{1,100}$')]
+    [string]$Context = 'migration-transaction'
   )
 
   $diagnosticLines = @(
@@ -161,7 +164,7 @@ function Write-CinnabarPsqlFailureDiagnostic {
   } else {
     'psql returned no recognized safe diagnostic lines'
   }
-  Write-Warning "migration-transaction diagnostic: $diagnostic"
+  Write-Warning "$Context diagnostic: $diagnostic"
 }
 
 function Invoke-ScalarQuery {
@@ -311,6 +314,9 @@ select (to_regclass('public.profiles') is not null)::int,
         (Join-Path $sqlTestsDirectory $sqlTest)
       )
       if ($result.ExitCode -ne 0) {
+        Write-CinnabarPsqlFailureDiagnostic `
+          -Output $result.Output `
+          -Context "sql-test:$sqlTest"
         throw 'SQL_TEST_FAILED'
       }
     } 'SQL_TEST_FAILED'
