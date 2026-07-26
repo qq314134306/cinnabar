@@ -412,3 +412,4 @@ $summaryJson
 if ($failureCode) {
   exit 1
 }
+exit 0

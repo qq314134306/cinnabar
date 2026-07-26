@@ -189,6 +189,12 @@ diagnostic lines. It redacts database URLs, replaces the repository root with
 to the retained JSON artifact. This keeps the release gate actionable without
 turning CI logs into a connection-detail channel.
 
+The proof script owns its process exit contract: after emitting the pending-
+cleanup summary it exits `0` only when every proof step passed, and exits `1`
+when `failureCode` is set. This prevents an expected non-zero `psql` call inside
+a successfully handled concurrency assertion from leaking through the ambient
+PowerShell `$LASTEXITCODE` into the workflow step.
+
 CI's `database-proof` job creates its Supabase working directory outside the
 checkout so repository migrations are not auto-applied before the runner checks
 the `Fresh` baseline. It uses the local database's built-in `auth` schema,

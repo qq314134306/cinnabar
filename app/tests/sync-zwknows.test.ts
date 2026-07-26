@@ -68,7 +68,7 @@ describe('Cinnabar candidate verification workflow', () => {
       expect(result.stderr).toBe('')
       expect(result.status).toBe(0)
     }
-  })
+  }, 20_000)
 
   it('verifies pushes, pull requests, and manual candidates without deployment credentials', () => {
     expect(workflow).toContain('name: Cinnabar candidate verification')

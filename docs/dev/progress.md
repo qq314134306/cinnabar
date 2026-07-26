@@ -84,6 +84,19 @@
   no stale row remained. The fixture now creates 201 rows so two successes must
   leave exactly one, while the intervening rejected claims prove they do not
   trigger cleanup. A new exact-head Fresh proof remains required.
+- Hosted run `30184856679` exposed a separate cold-run reliability issue in the
+  candidate verifier: all 659 assertions reached completion except the workflow
+  contract that launches the real PowerShell parser, whose default five-second
+  Vitest timeout expired on the Ubuntu runner. The parser contract now has a
+  scoped 20-second allowance; no production test timeout or global timeout was
+  relaxed. Its Fresh database proof then passed every migration, all six SQL
+  suites, and the credit-ledger concurrency test, but a deliberately handled
+  non-zero `psql` assertion leaked through PowerShell's ambient
+  `$LASTEXITCODE`; the workflow misclassified the otherwise successful proof as
+  incomplete cleanup. The proof runner now explicitly exits zero after writing
+  a no-failure pending-cleanup summary, while preserving exit one whenever a
+  real `failureCode` exists. The run remains non-evidence because its final
+  gates failed; a new exact-head run is required.
 - Exercised the release path for the first time through pushed pull request
   #10. The trusted Vercel Preview built and passed a real default-chart and
   Major Luck browser check. Hosted run `30183316408` correctly blocked the

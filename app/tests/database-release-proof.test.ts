@@ -273,6 +273,9 @@ describe('database release-proof contract', () => {
     expect(runner).toContain("failureCode = 'SUMMARY_WRITE_FAILED'")
     expect(runner).toContain("Add-Result 'summary-write' 'fail' 0")
     expect(runner).toMatch(/\$summaryJson\r?\nif \(\$failureCode\)/u)
+    expect(runner).toMatch(
+      /if \(\$failureCode\) \{\r?\n[ ]{2}exit 1\r?\n\}\r?\nexit 0/u,
+    )
   })
 
   it('surfaces only bounded redacted psql migration diagnostics', () => {
