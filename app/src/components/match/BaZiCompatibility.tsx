@@ -160,6 +160,51 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
       </section>
 
       <section
+        aria-labelledby="bazi-stem-contacts-heading"
+        className="mt-3 rounded-lg border border-white/[0.07] p-3"
+      >
+        <h5
+          id="bazi-stem-contacts-heading"
+          className="text-xs font-medium text-text"
+        >
+          Heavenly Stem Five Combinations
+        </h5>
+        <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
+          Canonical Wu He contacts across all 16 visible-stem pillar pairings.
+          This names the contact only; transformation, strength, and outcome are
+          not inferred.
+        </p>
+        {result.stemContacts.length > 0 ? (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {result.stemContacts.map((contact) => (
+              <article
+                key={`${contact.personAScope}-${contact.personBScope}`}
+                data-bazi-stem-contact={contact.kind}
+                className="rounded-md bg-white/[0.025] px-2.5 py-2"
+              >
+                <p className="text-[10px] text-text-secondary">
+                  A {PILLAR_LABELS[contact.personAScope]} ·{' '}
+                  {translateStem(contact.personAStem)} ↔ B{' '}
+                  {PILLAR_LABELS[contact.personBScope]} ·{' '}
+                  {translateStem(contact.personBStem)}
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-gold/90">
+                  {contact.label}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p
+            data-bazi-stem-contact-empty
+            className="mt-2 text-xs text-text-secondary"
+          >
+            No Five Combination appears across the 16 visible-stem pairings.
+          </p>
+        )}
+      </section>
+
+      <section
         aria-labelledby="bazi-hidden-stem-relationships-heading"
         className="mt-3 rounded-lg border border-white/[0.07] p-3"
       >
@@ -287,8 +332,8 @@ export function BaZiCompatibility({ result }: BaZiCompatibilityProps) {
       <p className="mt-3 border-t border-white/[0.06] pt-3 text-[10px] leading-relaxed text-text-muted">
         Ten Gods are directional: A reading B can differ from B reading A. This
         panel shows the complete pillars, directional visible- and hidden-stem
-        relationships, and a limited branch-contact map—no score, fate claim,
-        or relationship advice.
+        relationships, canonical visible-stem contacts, and a limited
+        branch-contact map—no score, fate claim, or relationship advice.
       </p>
     </section>
   )

@@ -124,6 +124,20 @@
 
 ## Recently Completed
 
+- Extended score-free BaZi Compatibility with a cross-person Heavenly Stem
+  Five Combinations map. It evaluates all 16 visible-stem pillar pairings and
+  exposes only the five canonical Wu He contacts while retaining both pillar
+  scopes and raw stems. The classifier is order-independent and exhaustively
+  covers Jia-Ji, Yi-Geng, Bing-Xin, Ding-Ren, and Wu-Gui. The feature makes no
+  transformation, seasonal-strength, useful-god, favorable/unfavorable,
+  score, prediction, AI, persistence, account, payment, or network claim.
+  Focused model and component coverage passes 9 tests; complete lint, 81 test
+  files / 672 tests, and the production build pass. Local Chrome rendered the
+  explicit empty state for the default pair, changed Person B from 1992-06-15
+  to 1992-06-16 and recomputed one canonical contact, retained all eight
+  pillars, and found no warning/error or horizontal overflow at desktop and
+  390×844 mobile widths.
+
 - Extended score-free BaZi Compatibility with a directional hidden-stem Ten
   Gods map. Each person's Day Master now classifies the canonical hidden-stem
   (藏干) sequence

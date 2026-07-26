@@ -15,6 +15,8 @@ export type BaziDayBranchRelationKind =
   | 'sixClash'
   | 'unclassified'
 
+export type BaziStemContactKind = 'fiveCombination' | 'unclassified'
+
 export interface BaziCompatibilityPerson {
   dayMaster: {
     stem: string
@@ -47,6 +49,12 @@ export interface BaziDayBranchRelation {
   description: string
 }
 
+export interface BaziStemContact {
+  kind: BaziStemContactKind
+  label: string
+  description: string
+}
+
 export interface BaziPillarBranchContact {
   personAScope: BaziPillarScope
   personABranch: string
@@ -60,6 +68,15 @@ export interface BaziPillarStemRelationship {
   targetScope: BaziPillarScope
   targetStem: string
   relationship: DirectionalTenGod
+  label: string
+}
+
+export interface BaziPillarStemContact {
+  personAScope: BaziPillarScope
+  personAStem: string
+  personBScope: BaziPillarScope
+  personBStem: string
+  kind: 'fiveCombination'
   label: string
 }
 
@@ -79,6 +96,7 @@ export interface BaziCompatibilityResult {
   personBToA: BaziDirectionalRelationship
   dayBranchRelation: BaziDayBranchRelation
   branchContacts: BaziPillarBranchContact[]
+  stemContacts: BaziPillarStemContact[]
   stemRelationships: {
     personAToB: BaziPillarStemRelationship[]
     personBToA: BaziPillarStemRelationship[]
@@ -106,6 +124,14 @@ const SIX_CLASH_PAIRS = new Set([
   '卯|酉',
   '戌|辰',
   '亥|巳',
+])
+
+const FIVE_COMBINATION_PAIRS = new Set([
+  '己|甲',
+  '乙|庚',
+  '丙|辛',
+  '丁|壬',
+  '戊|癸',
 ])
 
 const BRANCH_CONTACT_LABELS: Record<BaziPillarBranchContact['kind'], string> = {
@@ -210,6 +236,25 @@ function buildPerson(info: BirthInfo): BaziCompatibilityPerson | null {
   }
 }
 
+export function getBaziStemContact(
+  firstStem: string,
+  secondStem: string,
+): BaziStemContact {
+  if (FIVE_COMBINATION_PAIRS.has(orderedPair(firstStem, secondStem))) {
+    return {
+      kind: 'fiveCombination',
+      label: 'Five Combination · Wu He',
+      description: 'The two visible Heavenly Stems form one of the five canonical Wu He pairs. This names the contact only; transformation and its success are not inferred.',
+    }
+  }
+
+  return {
+    kind: 'unclassified',
+    label: 'No Five Combination',
+    description: 'This visible-stem pair is not one of the five canonical Wu He pairs.',
+  }
+}
+
 function buildPillarBranchContacts(
   personA: BaziCompatibilityPerson,
   personB: BaziCompatibilityPerson,
@@ -232,6 +277,31 @@ function buildPillarBranchContacts(
         personBBranch: personBPillar.branch,
         kind: relation.kind,
         label: BRANCH_CONTACT_LABELS[relation.kind],
+      })
+    }
+  }
+
+  return contacts
+}
+
+function buildPillarStemContacts(
+  personA: BaziCompatibilityPerson,
+  personB: BaziCompatibilityPerson,
+): BaziPillarStemContact[] {
+  const contacts: BaziPillarStemContact[] = []
+
+  for (const personAPillar of personA.pillars) {
+    for (const personBPillar of personB.pillars) {
+      const contact = getBaziStemContact(personAPillar.stem, personBPillar.stem)
+      if (contact.kind === 'unclassified') continue
+
+      contacts.push({
+        personAScope: personAPillar.scope,
+        personAStem: personAPillar.stem,
+        personBScope: personBPillar.scope,
+        personBStem: personBPillar.stem,
+        kind: contact.kind,
+        label: contact.label,
       })
     }
   }
@@ -305,6 +375,7 @@ export function buildBaziCompatibility(
       personB.dayPillar.branch,
     ),
     branchContacts: buildPillarBranchContacts(personA, personB),
+    stemContacts: buildPillarStemContacts(personA, personB),
     stemRelationships: {
       personAToB: buildPillarStemRelationships(personA.dayMaster.stem, personB),
       personBToA: buildPillarStemRelationships(personB.dayMaster.stem, personA),

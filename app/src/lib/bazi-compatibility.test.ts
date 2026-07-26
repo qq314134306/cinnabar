@@ -3,6 +3,7 @@ import type { BirthInfo } from './astro'
 import {
   buildBaziCompatibility,
   getBaziDayBranchRelation,
+  getBaziStemContact,
 } from './bazi-compatibility'
 
 function birthInfo(
@@ -46,6 +47,25 @@ describe('getBaziDayBranchRelation', () => {
   })
 })
 
+describe('getBaziStemContact', () => {
+  it('recognizes all five canonical combinations in either direction', () => {
+    const pairs = [
+      ['甲', '己'],
+      ['乙', '庚'],
+      ['丙', '辛'],
+      ['丁', '壬'],
+      ['戊', '癸'],
+    ]
+
+    for (const [first, second] of pairs) {
+      expect(getBaziStemContact(first, second).kind).toBe('fiveCombination')
+      expect(getBaziStemContact(second, first).kind).toBe('fiveCombination')
+    }
+    expect(getBaziStemContact('甲', '甲').kind).toBe('unclassified')
+    expect(getBaziStemContact('甲', '乙').kind).toBe('unclassified')
+  })
+})
+
 describe('buildBaziCompatibility', () => {
   it('builds directional Day Master relationships from resolved inputs', () => {
     const result = buildBaziCompatibility(
@@ -81,6 +101,11 @@ describe('buildBaziCompatibility', () => {
       personBScope: 'year',
       kind: 'sixHarmony',
     }))
+    expect(result?.stemContacts.length).toBeLessThanOrEqual(16)
+    expect(result?.stemContacts.every((contact) => (
+      getBaziStemContact(contact.personAStem, contact.personBStem).kind
+        === 'fiveCombination'
+    ))).toBe(true)
     expect(result?.stemRelationships.personAToB).toHaveLength(4)
     expect(result?.stemRelationships.personBToA).toHaveLength(4)
     expect(result?.stemRelationships.personAToB).toContainEqual({

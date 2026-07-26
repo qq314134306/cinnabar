@@ -60,6 +60,32 @@ const RESULT: BaziCompatibilityResult = {
       label: 'Six Clash · Liu Chong',
     },
   ],
+  stemContacts: [
+    {
+      personAScope: 'year',
+      personAStem: '庚',
+      personBScope: 'month',
+      personBStem: '乙',
+      kind: 'fiveCombination',
+      label: 'Five Combination · Wu He',
+    },
+    {
+      personAScope: 'year',
+      personAStem: '庚',
+      personBScope: 'hour',
+      personBStem: '乙',
+      kind: 'fiveCombination',
+      label: 'Five Combination · Wu He',
+    },
+    {
+      personAScope: 'day',
+      personAStem: '丙',
+      personBScope: 'day',
+      personBStem: '辛',
+      kind: 'fiveCombination',
+      label: 'Five Combination · Wu He',
+    },
+  ],
   stemRelationships: {
     personAToB: [
       { targetScope: 'year', targetStem: '壬', relationship: 'sevenKillings', label: 'Seven Killings' },
@@ -133,6 +159,12 @@ describe('BaZiCompatibility', () => {
     expect(screen.getByText('B Year · Shen')).toBeTruthy()
     expect(screen.getByText('A Year · Wu')).toBeTruthy()
     expect(screen.getByRole('heading', {
+      name: 'Heavenly Stem Five Combinations',
+    })).toBeTruthy()
+    expect(container.querySelectorAll('[data-bazi-stem-contact]')).toHaveLength(3)
+    expect(screen.getByText('A Day · Bing ↔ B Day · Xin')).toBeTruthy()
+    expect(screen.getAllByText('Five Combination · Wu He')).toHaveLength(3)
+    expect(screen.getByRole('heading', {
       name: 'Four-Pillar branch contacts',
     })).toBeTruthy()
     expect(container.querySelectorAll('[data-bazi-branch-contact]')).toHaveLength(2)
@@ -159,6 +191,16 @@ describe('BaZiCompatibility', () => {
 
     expect(screen.getByText(
       'No same-branch, Liu He, or Liu Chong contact appears across the 16 pairings.',
+    )).toBeTruthy()
+  })
+
+  it('shows an explicit empty state when no Five Combination is recognized', () => {
+    render(createElement(BaZiCompatibility, {
+      result: { ...RESULT, stemContacts: [] },
+    }))
+
+    expect(screen.getByText(
+      'No Five Combination appears across the 16 visible-stem pairings.',
     )).toBeTruthy()
   })
 })
