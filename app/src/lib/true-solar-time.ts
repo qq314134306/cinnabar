@@ -30,6 +30,31 @@ export interface ResolveBirthTimeInput {
   hour: number
   birthplace?: string
   enabled: boolean
+  evidence?: BirthTimeEvidence
+}
+
+export type BirthTimeSource =
+  | 'family_recollection'
+  | 'official_record'
+  | 'hospital_record'
+  | 'unknown'
+
+export type BirthTimeSourceReliability = 'high' | 'medium' | 'low' | 'unknown'
+export type BirthTimeUncertainty = 'exact' | 'approximate' | 'unknown'
+
+export interface BirthTimeCandidateRange {
+  /** Inclusive wall-clock hour, 0-23. */
+  startHour: number
+  /** Exclusive wall-clock hour; 0 means midnight at the end of the interval. */
+  endHour: number
+  crossesMidnight?: boolean
+}
+
+export interface BirthTimeEvidence {
+  source: BirthTimeSource
+  sourceReliability: BirthTimeSourceReliability
+  uncertainty: BirthTimeUncertainty
+  candidateRange: BirthTimeCandidateRange | null
 }
 
 export interface ResolveBirthTimeWithDataInput extends ResolveBirthTimeInput {
@@ -49,6 +74,29 @@ export interface ResolvedBirthTime {
   applied: boolean
   crossedDate: boolean
   location: Birthplace | null
+  /** Present on newly resolved values; optional only for persisted legacy shapes. */
+  evidence?: BirthTimeEvidence
+}
+
+export function reliabilityForBirthTimeSource(
+  source: BirthTimeSource,
+): BirthTimeSourceReliability {
+  if (source === 'official_record' || source === 'hospital_record') return 'high'
+  if (source === 'family_recollection') return 'medium'
+  return 'unknown'
+}
+
+export function createBirthTimeEvidence(
+  source: BirthTimeSource,
+  uncertainty: BirthTimeUncertainty,
+  candidateRange: BirthTimeCandidateRange | null = null,
+): BirthTimeEvidence {
+  return {
+    source,
+    sourceReliability: reliabilityForBirthTimeSource(source),
+    uncertainty,
+    candidateRange,
+  }
 }
 
 const MINUTES_PER_LONGITUDE_DEGREE = 4
@@ -206,6 +254,7 @@ export function resolveBirthTime(input: ResolveBirthTimeWithDataInput): Resolved
     applied: shouldApply,
     crossedDate: isDifferentDate(input, correctedDate),
     location,
+    evidence: input.evidence ?? createBirthTimeEvidence('unknown', 'exact'),
   }
 }
 

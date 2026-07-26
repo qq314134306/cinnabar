@@ -13,6 +13,7 @@ import {
   type FunctionalAstrolabe,
 } from './astro'
 import {
+  createBirthTimeEvidence,
   resolveBirthTime,
   type ResolvedBirthTime,
 } from './true-solar-time'
@@ -41,6 +42,7 @@ export interface BirthTimeScenarioSummary {
 export interface BirthTimeSensitivityResult {
   scenarios: BirthTimeScenarioSummary[]
   hasStructuralDifferences: boolean
+  suppressedConclusions: string[]
 }
 
 interface MinimalStar {
@@ -95,6 +97,15 @@ function resolveScenario(
     birthplace: knownLocation?.name,
     enabled: correctionEnabled,
     birthplaces: knownLocation ? [knownLocation] : [],
+    evidence: createBirthTimeEvidence(
+      birthInfo.birthTimeSource ?? birthInfo.resolvedBirthTime?.evidence?.source ?? 'unknown',
+      'approximate',
+      {
+        startHour: (input.hour + 23) % 24,
+        endHour: (input.hour + 1) % 24,
+        crossesMidnight: input.hour === 0 || input.hour === 23,
+      },
+    ),
   })
 }
 
@@ -170,5 +181,11 @@ export function buildBirthTimeSensitivity(
   return {
     scenarios,
     hasStructuralDifferences: haveStructuralBirthTimeDifferences(scenarios),
+    suppressedConclusions: [
+      'Exact Hour Pillar',
+      'Exact Zi Wei palace and star placement',
+      'Major Luck start timing',
+      'Hour-dependent daily timing',
+    ],
   }
 }

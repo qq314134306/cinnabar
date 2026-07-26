@@ -756,6 +756,14 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
   const resolvedTime = birthInfo.resolvedBirthTime
   const showCorrection = birthInfo.trueSolarEnabled && resolvedTime?.applied
   const showUnmatched = birthInfo.trueSolarEnabled && birthInfo.birthplace && !resolvedTime?.applied
+  const evidence = resolvedTime?.evidence
+  const sourceLabel = evidence?.source === 'family_recollection'
+    ? 'Family recollection'
+    : evidence?.source === 'official_record'
+      ? 'Official record'
+      : evidence?.source === 'hospital_record'
+        ? 'Hospital record'
+        : 'Unknown source'
 
   return (
     <div className="
@@ -794,6 +802,12 @@ function CenterInfo({ chart, solarDate, gender, birthInfo }: CenterInfoProps) {
                     : ''}
                 </>
               )}
+          </span>
+        </p>
+        <p>
+          <span className="text-text-muted">Time source</span>{' '}
+          <span className="text-text">
+            {sourceLabel} · {evidence?.sourceReliability ?? 'unknown'} reliability
           </span>
         </p>
         {showCorrection && resolvedTime && (

@@ -70,6 +70,7 @@ describe('birth-time sensitivity', () => {
       12,
       14,
     ])
+    expect(result.suppressedConclusions).toContain('Exact Hour Pillar')
     for (const item of result.scenarios) {
       expect(item.lifePalace?.branch).toBeTruthy()
       expect(item.bodyPalace?.branch).toBeTruthy()
@@ -171,9 +172,15 @@ describe('birth-time sensitivity', () => {
     })
 
     expect(result.scenarios.every((item) => item.resolved.applied)).toBe(true)
-    expect(result.scenarios[0].resolved).toEqual(expectedEarlier)
+    expect(result.scenarios[0].resolved).toMatchObject({
+      ...expectedEarlier,
+      evidence: expect.objectContaining({ uncertainty: 'approximate' }),
+    })
     expect(result.scenarios[1].resolved).toBe(birthInfo.resolvedBirthTime)
-    expect(result.scenarios[2].resolved).toEqual(expectedLater)
+    expect(result.scenarios[2].resolved).toMatchObject({
+      ...expectedLater,
+      evidence: expect.objectContaining({ uncertainty: 'approximate' }),
+    })
   })
 
   it('distinguishes stable and changed structural summaries', () => {

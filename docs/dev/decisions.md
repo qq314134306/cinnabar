@@ -1089,13 +1089,14 @@ before chart generation. Candidates that resolve to the same engine date and
 time index are one equivalent chart group and cannot be separated by event
 scoring.
 
-A completely unknown hour is a first-class input state. The browser may use
-noon only as a private engine position needed to host the finder, marked by
-`birthTimeUnknown=true`; it must not render that position as a natal chart or
-feed hour-dependent snapshots, AI, timeline, sharing, paid reports, or
-compatibility prefill. Explicitly applying one of the independently resolved
-civil candidates clears the unknown marker while retaining
-`birthTimeReliable=false`.
+A completely unknown hour is a first-class input state. It is never silently
+replaced with 00:00. The browser may use noon only as a private engine position
+needed to host the finder, marked by `birthTimeUnknown=true`; it must not render
+that position as a natal chart or feed hour-dependent snapshots, AI, timeline,
+sharing, paid reports, or compatibility prefill. Finder candidates are
+entertainment-and-self-discovery comparisons only and cannot overwrite the
+canonical birth input; only a separate explicit save of real profile data may
+change that authority.
 
 The optional rough-time recollection is bounded to ±2 evidence points. The
 question engine considers only elapsed adult years, chooses at most five
@@ -1123,12 +1124,17 @@ show at most three unambiguous groups plus every non-zero contribution. A tie
 that crosses the third-place cutoff is disclosed as one complete, non-
 applicable tier rather than arbitrarily truncated. Fewer than three scored
 domains or a leader margin below two is explicitly a no-clear-separation
-outcome and exposes no candidate apply action. Applying a candidate is the
-only mutation. It atomically
-replaces `birthInfo` and `chart`, retains `birthTimeReliable=false`, retains
-the candidate's independently resolved time, and clears every chart-derived
-content cache.
+outcome and exposes no candidate apply action. No finder candidate mutates
+`birthInfo`, `chart`, or chart-derived caches.
 Twins or multiples born close together are an explicit method limitation.
+
+Birth-time provenance is part of the resolved evidence contract. New
+resolutions carry one of family recollection, official record, hospital record,
+or unknown source; the derived source-reliability tier; exact, approximate, or
+unknown uncertainty; and an optional candidate interval. Legacy resolved
+objects remain readable without the new field. True-solar correction evidence
+does not upgrade the credibility of the source record, and an unreliable time
+suppresses the exact Hour Pillar and other hour-dependent conclusions.
 
 ## D046 - Palace Reading Uses a Four-Palace Relationship View
 

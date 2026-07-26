@@ -49,7 +49,6 @@ describe('BirthTimeFinder', () => {
       question('move-1', 'relocation'),
     ])
     const onApply = vi.fn()
-
     render(createElement(BirthTimeFinder, {
       birthInfo: BIRTH_INFO,
       onApply,
@@ -100,11 +99,10 @@ describe('BirthTimeFinder', () => {
     })
     expect(onApply).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', {
-      name: 'Use Snake Hour, 09:00–10:59',
-    }))
-
-    expect(onApply).toHaveBeenCalledWith(candidates[0])
+    expect(screen.getAllByText(
+      'Candidate only — your canonical birth time is unchanged.',
+    ).length).toBeGreaterThan(0)
+    expect(onApply).not.toHaveBeenCalled()
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -183,7 +181,7 @@ describe('BirthTimeFinder', () => {
     })).toBeTruthy()
   })
 
-  it('closes on Escape without applying a candidate', () => {
+  it('closes on Escape without mutating canonical birth data', () => {
     const onApply = vi.fn()
     const onClose = vi.fn()
     render(createElement(BirthTimeFinder, {
@@ -270,12 +268,8 @@ describe('BirthTimeFinder', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }))
 
-    expect(screen.getByRole('button', {
-      name: 'Use A Hour, 09:00–10:59',
-    })).toBeTruthy()
-    expect(screen.queryByRole('button', {
-      name: 'Use B Hour, 19:00–20:59',
-    })).toBeNull()
+    expect(screen.getByText('09:00–10:59')).toBeTruthy()
+    expect(screen.queryByText('19:00–20:59')).toBeNull()
     expect(screen.getByText(/tied across B Hour, C Hour, D Hour/)).toBeTruthy()
   })
 
