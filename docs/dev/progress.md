@@ -121,6 +121,16 @@
   `www.cinnabarastrology.com`. Production Chrome rendered the same 20 default
   relationships, changed Person B to 1992-06-16 and recomputed 19, retained all
   eight pillars, and found no horizontal overflow.
+- Pull request #25 merged the cross-person Heavenly Stem Five Combinations map
+  into protected `main` as `a87a847`. All four GitHub/Vercel candidate checks
+  passed, and isolated Preview deployment `44Uu83dKvrNLeZqvVwciReYcDKAA`
+  rendered the explicit default empty state, then recomputed one Wu He contact
+  after Person B changed to 1992-06-16 while retaining all eight pillars with
+  no horizontal overflow or console warning/error. Production deployment
+  `7tULZ5XUdjeMFbHRy5Qv1dAgsEKX` passed both Deployment Checks and is Ready,
+  Current, and bound to `www.cinnabarastrology.com` for exact source
+  `a87a847`. Production Chrome repeated the same empty-to-one-contact flow with
+  no overflow or browser warning/error.
 
 ## Recently Completed
 
