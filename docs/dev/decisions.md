@@ -2,6 +2,33 @@
 
 > L2 | Parent: `AGENTS.md`
 
+## D065 - Evidence Synthesis Is Traceable and Score-Free
+
+Passage evidence is modeled separately from interpretation. A source edition
+must disclose version, locator scheme, language, availability, and
+license/rights status; a citation identifies a passage and a page, chapter,
+section, paragraph, line, folio, or stable anchor. A displayed claim must link
+to a deterministic system fact, cited rule evidence, or both.
+
+Cross-system synthesis has exactly four states: `independent-agreement`,
+`shared-input-agreement`, `conflict`, and `insufficient-evidence`. Independent
+agreement requires disjoint evidence groups. Shared inputs, unresolved
+conflicts, and missing evidence remain visible; majority voting, numeric
+scores, probabilities, and confidence-shaped fields cannot replace provenance.
+
+Consequence: keep the contract provider-independent and fail closed on missing
+or dangling evidence. Add only verified, rights-safe passages with explicit
+edition metadata. A large corpus, LLM, or generated conclusion requires a
+separate reviewed decision and tests.
+
+The audience contract is English entertainment and self-discovery, never
+fortune-telling, psychic, or consulting positioning. Deterministic engines and
+Skill rules own facts; DeepSeek may only render verified facts into English on
+the server, and its key remains server-only. Unreliable time cannot produce an
+Hour Pillar. Birth-time-finder output remains a candidate and can never replace
+canonical birth time. Free basic facts and paid deep interpretation remain
+separate access tiers so credits can evolve without changing fact authority.
+
 ## D001 - True Solar Time Uses Birthplace Matching
 
 Users should not need to know longitude, latitude, or minute-level correction

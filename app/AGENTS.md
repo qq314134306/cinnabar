@@ -105,6 +105,22 @@ proofs pass. Future Report payments remain last and disabled.
 
 ## Member List
 
+`src/lib/evidence-contract.ts` + `evidence-fixtures.ts` +
+`src/components/EvidencePanel.tsx`: provider-independent passage evidence and
+minimal read-only inspection. Keep edition, location, availability,
+license/rights, fact, rule, uncertainty, and conflict references explicit.
+Every claim needs a system-fact or cited-rule basis. Synthesis permits only
+independent agreement, shared-input agreement, conflict, or insufficient
+evidence; never add voting, weights, probabilities, numeric confidence,
+generated readings, unverified corpus text, or a network request to this layer.
+Claimed independent evidence groups must be disjoint.
+English evidence presentation is entertainment/self-discovery only. Facts come
+from deterministic engines or Skill rules; future DeepSeek prose must remain
+server-only over verified facts and its key must never enter browser code.
+Unreliable time cannot yield an Hour Pillar, and birth-time candidates never
+overwrite canonical input. Keep free basic facts separate from paid deep
+interpretation and future credit entitlements.
+
 `src/main.tsx`: React entry point and app mounting.
 
 `src/App.tsx`: Top-level application composition (Cinnabar shell: Your Chart,

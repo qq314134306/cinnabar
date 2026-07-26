@@ -38,6 +38,12 @@ Primary runtime flow:
    server validates 18+ eligibility, rebuilds the chart and prompt, claims the
    persistent daily quota, and then streams DeepSeek SSE.
 
+The passage-evidence contract is currently an independent, provider-free
+foundation rather than another generation step. `src/lib/evidence-contract.ts`
+owns types and fail-closed validation; `src/lib/evidence-fixtures.ts` supplies
+synthetic fixtures; `src/components/EvidencePanel.tsx` is a minimal read-only
+renderer. No production claim or large source corpus is connected yet.
+
 ## Deployment Topology
 
 ```text
@@ -89,6 +95,19 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 </directory>
 
 ## Important Files
+
+- `app/src/lib/evidence-contract.ts` + `evidence-fixtures.ts` +
+  `app/src/components/EvidencePanel.tsx` - passage-level provenance boundary.
+  Sources retain edition, locator scheme, availability, license/rights, and
+  access metadata; citations retain an exact passage locator. Every claim must
+  point to a deterministic system fact or cited rule. Synthesis has four
+  exhaustive states and no vote, score, probability, or confidence field.
+  Facts identify deterministic-engine or Skill-rule authority and an access
+  tier. Hour Pillars require verified birth time; birth-time finder output stays
+  candidate-only and cannot replace canonical input. English presentation is
+  limited to entertainment/self-discovery, and any future DeepSeek prose stays
+  server-only over verified facts. Fixtures use synthetic project text rather
+  than imported classical material.
 
 - `app/src/App.tsx` + `App.test.ts` - top-level visible-surface navigation.
   Desktop and mobile navs have distinct names, report the active surface with
