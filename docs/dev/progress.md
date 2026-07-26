@@ -108,6 +108,19 @@
   `9aR4n693DDKPAcD7ufuwGFFUvJxV` is Ready and Current for source `a14bf57` on
   `www.cinnabarastrology.com`. Production Chrome repeated the same default
   comparison with no horizontal overflow or browser warning/error.
+- Pull request #23 merged the directional hidden-stem Ten Gods map into
+  protected `main` as `757f6e0`. All four candidate checks passed after the
+  branch was updated from `main`; isolated Preview deployment
+  `95qBdd9FJ9ZTbUaVm43YZY3iLdzF` rendered two directions, 20 hidden-stem
+  relationships, eight pillars, and five branch contacts without desktop
+  overflow. The first Production deployment
+  `3JkpFdwAKFiVxD9LY418hd22dg8U` built successfully but remained staged because
+  its required Typecheck stayed pending; it was not treated as a release.
+  Same-source retry `9pi27C9YkpSwRHhj6ap1ZLZ3CTyk` passed both Deployment
+  Checks and is Ready and Current for exact source `757f6e0` on
+  `www.cinnabarastrology.com`. Production Chrome rendered the same 20 default
+  relationships, changed Person B to 1992-06-16 and recomputed 19, retained all
+  eight pillars, and found no horizontal overflow.
 
 ## Recently Completed
 
