@@ -100,6 +100,14 @@
   owns `www.cinnabarastrology.com`. A production Chrome smoke test repeated
   the five-contact default comparison, retained all eight pillars, and found
   no horizontal overflow or browser warning/error.
+- Pull request #21 merged the visible-stem Ten Gods map into protected `main`
+  as `a14bf57`. All four candidate checks passed after the branch was updated
+  from `main`; the isolated Vercel Preview rendered two directions and eight
+  pillar-scoped relationships alongside the five branch contacts and eight
+  pillars with no overflow or console warning/error. Production deployment
+  `9aR4n693DDKPAcD7ufuwGFFUvJxV` is Ready and Current for source `a14bf57` on
+  `www.cinnabarastrology.com`. Production Chrome repeated the same default
+  comparison with no horizontal overflow or browser warning/error.
 
 ## Recently Completed
 
