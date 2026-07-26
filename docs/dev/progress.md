@@ -38,8 +38,13 @@
   `supabase_admin`, with `PGUSER=postgres` restored before the proof starts.
   Run `30184030058` then proved the marker, target guard, prerequisites, and
   baseline state, but the ordered migration transaction failed. The prior
-  runner suppressed the useful PostgreSQL error text, so it is not release
-  evidence and an exact-head rerun with bounded diagnostics is required.
+  runner suppressed the useful PostgreSQL error text. The repair sequence
+  culminated in run `30185280458`, where both `Verify candidate` and `Prove
+  database migrations on fresh Supabase` succeeded. Its downloaded sanitized
+  artifact was inspected: `success=true`, all 13 ordered steps and cleanup
+  passed, the run binding and migration SHA-256 matched, and Supabase CLI
+  `2.84.2` remained pinned. That is the first accepted hosted Fresh proof for
+  this candidate; earlier failed runs remain non-evidence.
 - GitHub `main` is not protected. Vercel has Git Fork Protection, Standard
   Deployment Protection, Build Logs protection, and Source protection enabled,
   but no Deployment Checks are configured and automatic custom-production-
@@ -54,6 +59,18 @@
 
 ## Recently Completed
 
+- Accepted hosted candidate run `30185280458`. The application job passed the
+  audit, lint, 77 files / 659 tests, build, and whitespace gates. The Fresh
+  database job passed migrations, migrated-state checks, six SQL behavior
+  suites, credit-ledger concurrency, cleanup, finalized-summary validation,
+  artifact upload, and the final gate. The downloaded
+  `cinnabar-database-proof` artifact contains only the sanitized v2 contract,
+  binds to source commit `e2cc05275cb52809c8292e6772de83254767085e`
+  (GitHub's pull-request merge ref), run `30185280458`, migration fingerprint
+  `3f196265095dfe938e4f91c63b45dd3d97d63afbf75d9d0c89e107c9edf559f1`,
+  and CLI `2.84.2`; all 13 steps plus cleanup are `pass`, `success` is true,
+  and `failureCode` is null. This proves Fresh only, not Upgrade against a
+  sanitized production-like clone and not production promotion.
 - Confirmed the GitHub authorization is now persisted for account
   `qq314134306`; local HEAD and `origin/codex/release-hardening` both resolve to
   `e75cd476aa3acf9292909efcc65fa7f9e5a34d04`. Added a bounded migration failure
