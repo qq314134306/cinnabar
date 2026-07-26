@@ -259,7 +259,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   until real third-party browser flows establish an enforcement allowlist.
 - `app/src/lib/compatibility-score.ts` +
   `app/src/lib/bazi-compatibility.ts` +
+  `app/src/lib/ziwei-compatibility.ts` +
   `app/src/components/match/BaZiCompatibility.tsx` +
+  `app/src/components/match/ZiweiCompatibility.tsx` +
   `app/src/components/match/MatchAnalysis.tsx` + their tests - always-available
   deterministic local Compatibility snapshot across communication, shared
   direction, emotional rhythm, and resilience. It is symmetric, needs no
@@ -292,6 +294,14 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   Liu Hai, Liu Po, and punishment are named structural contacts rather than
   adverse forecasts. This layer never
   changes the symmetric Zi Wei score and marks approximate inputs provisional.
+  The resolved pair also feeds an independent Zi Wei dual-chart evidence
+  adapter. It casts each chart through iztro, maps six key palaces by earthly
+  branch, maps each natal Lu/Quan/Ke/Ji landing into the other chart, and maps
+  Life/Partner San Fang Si Zheng receiving palaces in both directions. It does
+  not consume or produce BaZi pillars. Approximate time suppresses every
+  hour-dependent Zi Wei cross-chart fact rather than presenting a provisional
+  palace conclusion. Anonymous fixtures may cross-check external development
+  tools, but production has no external chart API dependency.
   The optional uncached AI narrative retains controller/request-key/
   input-identity ownership, sends both full allowlisted birth shapes, and is
   preflighted by the same local place check before quota/provider work.
