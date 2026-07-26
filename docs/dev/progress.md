@@ -157,7 +157,13 @@
   36 tests across four files; complete lint, 81 test files / 672 tests, and the
   production build pass. Local Chrome rendered one Liu Po contact among seven
   total branch contacts for the default pair, retained all eight pillars, and
-  showed no horizontal overflow at the desktop viewport.
+  showed no horizontal overflow at the desktop viewport. Feature pull request
+  #29 merged as `545be59` after candidate run `30197135210` passed both Verify
+  candidate and the fresh-Supabase migration proof. Vercel deployment
+  `5HoGy3tN84f3bav6weURuDLhH36j` is Ready, Production, Current, has two passing
+  deployment checks, and identifies `545be59` as its exact source. Chrome then
+  verified `https://www.cinnabarastrology.com` renders one Liu Po contact among
+  seven total contacts, one Day Branch contact, and all eight pillars.
 
 - Extended the score-free BaZi Compatibility Earthly Branch map with all six
   canonical Liu Hai contacts. The order-independent classifier now recognizes
