@@ -55,6 +55,13 @@ export interface BaziPillarBranchContact {
   label: string
 }
 
+export interface BaziPillarStemRelationship {
+  targetScope: BaziPillarScope
+  targetStem: string
+  relationship: DirectionalTenGod
+  label: string
+}
+
 export interface BaziCompatibilityResult {
   personA: BaziCompatibilityPerson
   personB: BaziCompatibilityPerson
@@ -62,6 +69,10 @@ export interface BaziCompatibilityResult {
   personBToA: BaziDirectionalRelationship
   dayBranchRelation: BaziDayBranchRelation
   branchContacts: BaziPillarBranchContact[]
+  stemRelationships: {
+    personAToB: BaziPillarStemRelationship[]
+    personBToA: BaziPillarStemRelationship[]
+  }
   provisional: boolean
 }
 
@@ -213,6 +224,23 @@ function buildPillarBranchContacts(
   return contacts
 }
 
+function buildPillarStemRelationships(
+  sourceDayMaster: string,
+  target: BaziCompatibilityPerson,
+): BaziPillarStemRelationship[] {
+  return target.pillars.flatMap((pillar) => {
+    const relationship = getBaziTenGod(sourceDayMaster, pillar.stem)
+    if (!relationship) return []
+
+    return [{
+      targetScope: pillar.scope,
+      targetStem: pillar.stem,
+      relationship,
+      label: BAZI_TEN_GOD_LABELS[relationship],
+    }]
+  })
+}
+
 export function buildBaziCompatibility(
   personAInfo: BirthInfo,
   personBInfo: BirthInfo,
@@ -241,6 +269,10 @@ export function buildBaziCompatibility(
       personB.dayPillar.branch,
     ),
     branchContacts: buildPillarBranchContacts(personA, personB),
+    stemRelationships: {
+      personAToB: buildPillarStemRelationships(personA.dayMaster.stem, personB),
+      personBToA: buildPillarStemRelationships(personB.dayMaster.stem, personA),
+    },
     provisional: personAInfo.birthTimeReliable === false
       || personBInfo.birthTimeReliable === false,
   }

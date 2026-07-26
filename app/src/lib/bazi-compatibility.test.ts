@@ -78,6 +78,20 @@ describe('buildBaziCompatibility', () => {
       personBScope: 'year',
       kind: 'sixHarmony',
     }))
+    expect(result?.stemRelationships.personAToB).toHaveLength(4)
+    expect(result?.stemRelationships.personBToA).toHaveLength(4)
+    expect(result?.stemRelationships.personAToB).toContainEqual({
+      targetScope: 'year',
+      targetStem: '壬',
+      relationship: 'sevenKillings',
+      label: 'Seven Killings',
+    })
+    expect(result?.stemRelationships.personBToA).toContainEqual({
+      targetScope: 'year',
+      targetStem: '己',
+      relationship: 'directOfficer',
+      label: 'Direct Officer',
+    })
     expect(result?.provisional).toBe(false)
   })
 

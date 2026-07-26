@@ -60,6 +60,20 @@ const RESULT: BaziCompatibilityResult = {
       label: 'Six Clash · Liu Chong',
     },
   ],
+  stemRelationships: {
+    personAToB: [
+      { targetScope: 'year', targetStem: '壬', relationship: 'sevenKillings', label: 'Seven Killings' },
+      { targetScope: 'month', targetStem: '乙', relationship: 'directResource', label: 'Direct Resource' },
+      { targetScope: 'day', targetStem: '辛', relationship: 'directWealth', label: 'Direct Wealth' },
+      { targetScope: 'hour', targetStem: '乙', relationship: 'directResource', label: 'Direct Resource' },
+    ],
+    personBToA: [
+      { targetScope: 'year', targetStem: '庚', relationship: 'robWealth', label: 'Rob Wealth' },
+      { targetScope: 'month', targetStem: '戊', relationship: 'directResource', label: 'Direct Resource' },
+      { targetScope: 'day', targetStem: '丙', relationship: 'directOfficer', label: 'Direct Officer' },
+      { targetScope: 'hour', targetStem: '甲', relationship: 'directWealth', label: 'Direct Wealth' },
+    ],
+  },
   provisional: false,
 }
 
@@ -72,11 +86,18 @@ describe('BaZiCompatibility', () => {
     expect(screen.getByRole('heading', {
       name: 'BaZi compatibility · Four Pillars',
     })).toBeTruthy()
-    expect(screen.getByText('Direct Wealth')).toBeTruthy()
-    expect(screen.getByText('Direct Officer')).toBeTruthy()
+    expect(screen.getAllByText('Direct Wealth')).toHaveLength(3)
+    expect(screen.getAllByText('Direct Officer')).toHaveLength(2)
     expect(screen.getAllByText('Six Harmony · Liu He')).toHaveLength(2)
     expect(container.querySelectorAll('[data-bazi-compatibility-person]')).toHaveLength(2)
     expect(container.querySelectorAll('[data-bazi-pillar]')).toHaveLength(8)
+    expect(screen.getByRole('heading', {
+      name: 'Visible-stem Ten Gods map',
+    })).toBeTruthy()
+    expect(container.querySelectorAll('[data-bazi-stem-direction]')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-bazi-stem-relationship]')).toHaveLength(8)
+    expect(screen.getByText('B Year · Ren')).toBeTruthy()
+    expect(screen.getByText('A Year · Geng')).toBeTruthy()
     expect(screen.getByRole('heading', {
       name: 'Four-Pillar branch contacts',
     })).toBeTruthy()
