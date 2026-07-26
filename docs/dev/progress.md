@@ -84,6 +84,14 @@
   1992-06-15 to 1992-06-16, observed the Day Pillar and both directional Ten
   Gods updates plus Liu He classification, and found no horizontal overflow or
   console warning/error.
+- Pull request #17 merged the complete BaZi Four-Pillar comparison into
+  protected `main` as `5ad4b4b`. All four GitHub/Vercel candidate checks
+  passed, and the isolated Vercel Preview repeated the eight-pillar flow with
+  no overflow or browser warning/error. Production deployment
+  `6ippLyDtTGY68FeJZon9Gby9vaoj` is Ready and Current; both Deployment Checks
+  passed before the one-second custom-domain assignment. A production Chrome
+  smoke test on `www.cinnabarastrology.com` rendered both ordered Four-Pillar
+  sets and both Day Master relationships with no overflow or warning/error.
 
 ## Recently Completed
 
@@ -97,7 +105,9 @@
   tests, and the production build pass. Local Chrome acceptance rendered all
   eight pillars plus both directional relationships at desktop and 390-by-844
   mobile sizes; both layouts had no document overflow and the browser log had
-  no warning or error.
+  no warning or error. Protected PR #17 then passed all four checks, repeated
+  the same default flow in its isolated Vercel Preview, merged as `5ad4b4b`,
+  and passed the production smoke recorded above.
 - Added a score-free BaZi structural layer to the existing local Compatibility
   result. It reuses both true-solar-resolved inputs and the established Four
   Pillars/Ten Gods helpers to show both Day Pillars, separate A-to-B and B-to-A
