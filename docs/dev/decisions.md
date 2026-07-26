@@ -1269,3 +1269,31 @@ classification, useful-god selection, luck pillars, compatibility, prose
 interpretation, scores, predictions, AI, persistence, account gating, or a
 network request. Each remains a separate future product and calculation
 decision.
+
+## D054 - Major Luck Is an Opt-In Calendar Navigator
+
+Cinnabar may add BaZi Major Luck (Da Yun) after an explicit user action. It
+uses the exact corrected year, month, day, hour, and minute already owned by
+`resolvedBirthTime`; it must not recalculate true solar time or silently return
+to the uncorrected civil timestamp. The established Four Pillars panel remains
+the visible natal context.
+
+`lunar-typescript` owns the direction, solar-term distance, start time, and
+ten-year cycle calculation. Cinnabar uses the engine's sect 2 method because it
+converts the actual minute distance to the relevant solar term, preserving the
+precision of a true-solar-corrected birth minute. Gender is passed only to the
+engine's documented direction rule. The pre-cycle period at engine index zero
+is not presented as a Da Yun pillar; the UI displays the following eight named
+cycles with their calendar years and engine-provided ages.
+
+The larger engine must remain behind dynamic import and load only when the user
+chooses `Show Major Luck`; adding the feature must not place a second copy in
+the initial chart bundle. Calculation failure produces no partial cycles.
+Approximate birth time marks the start and boundaries provisional. Calendar
+ranges must be labeled as neither a lifespan forecast nor an outcome
+prediction, including when displayed ages exceed ordinary life expectancy.
+
+This decision authorizes structural navigation only. It does not authorize
+strength/weakness or useful-god judgment, favorable/unfavorable labeling,
+event claims, compatibility, prose interpretation, scores, AI, persistence,
+account gating, payment, or any network request.

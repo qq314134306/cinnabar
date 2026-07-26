@@ -143,7 +143,9 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
 - `app/src/lib/ziwei-glossary.ts` - Chinese→English terminology dictionaries (Cinnabar glossary).
 - `app/src/components/chart/ChartDisplay.tsx` +
   `app/src/components/chart/BaZiFourPillars.tsx` +
+  `app/src/components/chart/BaZiMajorLuck.tsx` +
   `app/src/lib/bazi-four-pillars.ts` +
+  `app/src/lib/bazi-major-luck.ts` +
   `app/src/lib/chart-explanations.ts` +
   `app/src/lib/palace-relations.ts` +
   `app/src/lib/chart-transformations.ts` +
@@ -158,8 +160,13 @@ app/tests/ - Tests outside source tree, currently including workflow validation.
   relationship, while an explicit exhaustively-tested twelve-branch table owns
   ordered hidden stems. Both apply to those exact calculated pillars rather
   than recasting the date through another boundary path, and normalize into a
-  closed English UI vocabulary. This remains a structural index without
-  strength, weighting, useful-element, or outcome judgment. Palace cards are
+  closed English UI vocabulary. The opt-in Major Luck adapter then uses the
+  exact corrected date, hour, and minute with `lunar-typescript` sect 2 to
+  derive the gender-dependent direction, start offset, and eight calendar
+  cycles. Its calendar engine remains in an on-demand chunk, and its result is
+  a structural navigator rather than a lifespan or outcome forecast. This
+  remains a structural index without strength, weighting, useful-element, or
+  outcome judgment. Palace cards are
   accessible toggle buttons;
   one selected palace exposes English palace and major-star context,
   derives the focus/opposite/two-trine San Fang Si Zheng group from fixed

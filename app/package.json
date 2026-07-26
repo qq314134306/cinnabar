@@ -22,6 +22,7 @@
     "html2canvas": "^1.4.1",
     "iztro": "^2.5.8",
     "lunar-lite": "^0.2.8",
+    "lunar-typescript": "^1.8.6",
     "pinyin-pro": "^3.28.1",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",

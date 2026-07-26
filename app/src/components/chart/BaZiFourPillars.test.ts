@@ -76,8 +76,11 @@ describe('BaZiFourPillars', () => {
       /Year Pillar uses the Li Chun boundary/,
     )).toBeTruthy()
     expect(screen.getByText(
-      /does not judge strength, useful elements, luck cycles, or outcomes/,
+      /does not judge strength, useful elements, or outcomes/,
     )).toBeTruthy()
+    expect(screen.getByRole('button', {
+      name: 'Show Major Luck',
+    })).toBeTruthy()
   })
 
   it('marks the Hour Pillar provisional for an approximate time', () => {

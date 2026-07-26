@@ -9,6 +9,7 @@ import {
   translateGanZhi,
   translateStem,
 } from '@/lib/ziwei-glossary'
+import { BaZiMajorLuck } from './BaZiMajorLuck'
 
 interface BaZiFourPillarsProps {
   birthInfo: BirthInfo
@@ -151,9 +152,11 @@ export function BaZiFourPillars({ birthInfo }: BaZiFourPillarsProps) {
         </p>
       )}
 
+      <BaZiMajorLuck birthInfo={birthInfo} />
+
       <p className="mt-2 text-[10px] leading-relaxed text-text-muted">
         Ten Gods are structural relationships to the Day Master. This view
-        does not judge strength, useful elements, luck cycles, or outcomes.
+        does not judge strength, useful elements, or outcomes.
       </p>
     </section>
   )

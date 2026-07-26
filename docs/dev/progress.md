@@ -41,6 +41,23 @@
 
 ## Recently Completed
 
+- Added an opt-in BaZi Major Luck (Da Yun) navigator beneath the Four Pillars
+  companion. It derives gender-dependent forward/reverse direction, the
+  minute-aware start offset and start timestamp, and eight ten-year
+  stem-branch cycles from the already true-solar-corrected birth timestamp.
+  The adapter deliberately uses `lunar-typescript` sect 2 so the distance to
+  the relevant solar term retains corrected minute precision. The 303.24 kB
+  calendar engine is isolated behind the `Show Major Luck` action; it does not
+  enter the initial chart load, while ChartDisplay remains 55.95 kB raw /
+  16.23 kB gzip. The surface displays structure and calendar ranges only,
+  labels approximate-time results provisional, and explicitly says the ranges
+  are neither a lifespan forecast nor an outcome prediction. The complete app
+  passes 77 test files / 656 tests, lint, and the strict production build. A
+  real 1905-pixel-wide Chrome pass cast the default chart, loaded all eight
+  cycles (Yi-Hai through Wu-Chen), found no document or panel overflow, and
+  recorded no browser console errors. No push, pull request, deployment,
+  payment, AI, persistence, strength judgment, or useful-element selection was
+  added.
 - Extended the provider-independent BaZi companion with visible-stem Ten Gods
   and ordered hidden stems plus their Day-Master-relative Ten Gods. The adapter
   preserves the already-verified `lunar-lite` Four Pillars as the only calendar
