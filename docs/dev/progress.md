@@ -10,7 +10,9 @@
 - Authenticated Vercel inspection on 2026-07-23 confirmed team
   `cinnabarastrology`, project `cinnabar`, direct Git integration to
   `qq314134306/cinnabar`, production branch `main`, and Root Directory `app`.
-  The current production deployment is sourced from merge commit `3b5b856`.
+  The production application tree gained Daily Timing at feature merge
+  `3b5b856`; later documentation-only merges may be the newest deployment
+  source without changing that application tree.
   No Vercel project identifier or environment value is recorded in repository
   documentation.
 - The current Vercel path is direct GitHub-to-Vercel deployment. The historical
