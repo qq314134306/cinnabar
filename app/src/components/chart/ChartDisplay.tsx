@@ -928,8 +928,9 @@ export function ChartDisplay() {
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-text-secondary">
             Your date and gender are saved, but Cinnabar is not displaying the
-            noon placeholder as a natal chart. Compare all 13 time blocks
-            below, then explicitly apply the candidate you want to inspect.
+            noon placeholder as a natal chart. Compare all 13 time blocks below.
+            Each result stays a separate candidate for review and never replaces
+            your saved birth time.
           </p>
         </div>
         <BirthTimeSensitivity />

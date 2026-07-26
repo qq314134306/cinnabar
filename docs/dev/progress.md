@@ -163,8 +163,15 @@
   production AOV/Mingyu fetch path. A clean `npm ci` reported zero known
   vulnerabilities, 14 focused files / 98 tests and the complete 89-file /
   729-test suite passed, and lint plus the production TypeScript/Vite build
-  passed. This is candidate evidence only until the integration PR's hosted
-  checks and Vercel Preview complete.
+  passed. Anonymous Vercel Preview acceptance then confirmed the three local
+  Question Charts, dual-chart Zi Wei compatibility, high-reliability Chengdu
+  true-solar correction, Qizheng's explicit fail-closed state, and complete
+  unknown-hour suppression of the placeholder chart, Life Timeline, and Share
+  Card. That pass found and removed two stale “apply candidate” phrases so the
+  visible UI now matches the non-mutating candidate contract; the 18 focused
+  tests, full suite, lint, and build passed again. This is candidate evidence
+  only until the updated integration PR's hosted checks and Vercel Preview
+  complete.
 
 - Established the first passage-level evidence foundation without adding a
   reading, corpus, network request, LLM, score, or vote. The contract separates

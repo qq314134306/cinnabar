@@ -481,7 +481,7 @@ export function BirthTimeFinder({
                       ? `${question.domain} (${question.startYear}–${question.endYear})`
                       : questionId
                   }).join(', ')}
-                  . Review those memories before applying a candidate.
+                  . Review those memories before comparing candidates.
                 </p>
               )}
             </div>

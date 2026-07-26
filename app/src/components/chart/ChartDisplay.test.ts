@@ -555,5 +555,9 @@ describe('ChartDisplay palace explanations', () => {
     expect(screen.getByRole('heading', {
       name: 'Start With All 13 Time Blocks',
     })).toBeTruthy()
+    expect(screen.getByText(
+      /Each result stays a separate candidate for review and never replaces your saved birth time/,
+    )).toBeTruthy()
+    expect(screen.queryByText(/apply the candidate/i)).toBeNull()
   })
 })
